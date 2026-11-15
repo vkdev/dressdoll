@@ -8,5 +8,5 @@ import ru.vkdev.dressdoll.doll.api.DollRoute
 
 @OptIn(KoinExperimentalAPI::class)
 val dollModule = module {
-    navigation<DollRoute> { DollScreen(repository = koinInject()) }
+    navigation<DollRoute> { DollScreen(catalog = koinInject()) }
 }

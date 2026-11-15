@@ -11,4 +11,4 @@
 | План | Создан | Части | Статус |
 |---|---|---|---|
 | Темы 70-х и навигация (`themes-navigation`) | 2026-11-15 21:01 | [1. Общее и навигация](themes-navigation/plan_part_1.md) · [2. Темы](themes-navigation/plan_part_2.md) · [3. Заставка и бары](themes-navigation/plan_part_3.md) · [4. Экран выбора темы](themes-navigation/plan_part_4.md) | все части выполнены и закоммичены |
-| Каталог в bottom sheet (`catalog-sheet`) | 2026-11-16 00:18 | [1. Общее, элементы темы и модуль catalog](catalog-sheet/plan_part_1.md) · [2. Проверочный экран куклы](catalog-sheet/plan_part_2.md) · [3. Экран темы на элементах темы](catalog-sheet/plan_part_3.md) | часть 1 выполнена и закоммичена |
+| Каталог в bottom sheet (`catalog-sheet`) | 2026-11-16 00:18 | [1. Общее, элементы темы и модуль catalog](catalog-sheet/plan_part_1.md) · [2. Проверочный экран куклы](catalog-sheet/plan_part_2.md) · [3. Экран темы на элементах темы](catalog-sheet/plan_part_3.md) | части 1 и 2 выполнены и закоммичены |

@@ -13,8 +13,8 @@ import androidx.compose.ui.graphics.luminance
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import org.koin.android.ext.android.inject
 import org.koin.compose.koinInject
+import ru.vkdev.dressdoll.doll.api.DollRoute
 import ru.vkdev.dressdoll.navigation.api.AppNavigation
-import ru.vkdev.dressdoll.settings.theme.api.ThemeSettingsRoute
 import ru.vkdev.dressdoll.theme.api.AppTheme
 import ru.vkdev.dressdoll.theme.api.LocalThemePalette
 import ru.vkdev.dressdoll.theme.api.ThemeSelector
@@ -48,8 +48,8 @@ class MainActivity : ComponentActivity() {
                     applySystemBars(darkBackground)
                     onDispose {}
                 }
-                // Временно: выбор темы — стартовый экран. DollRoute по-прежнему зарегистрирован.
-                navigation.Host(startRoute = ThemeSettingsRoute)
+                // Экран выбора темы зарегистрирован, но входа на него пока нет: вход в настройки — отдельная задача.
+                navigation.Host(startRoute = DollRoute)
             }
         }
     }

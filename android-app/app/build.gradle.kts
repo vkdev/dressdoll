@@ -28,6 +28,7 @@ dependencies {
     implementation(project(":theme:palette:powder"))
     implementation(project(":theme:palette:denim"))
     implementation(project(":doll:impl"))
+    implementation(project(":catalog:impl"))
     implementation(project(":repository:impl"))
     implementation(project(":navigation:impl"))
     implementation(project(":settings:settings-theme:impl"))

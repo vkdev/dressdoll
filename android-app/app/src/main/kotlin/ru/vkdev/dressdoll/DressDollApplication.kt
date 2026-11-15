@@ -4,6 +4,7 @@ import android.app.Application
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
+import ru.vkdev.dressdoll.catalog.impl.catalogModule
 import ru.vkdev.dressdoll.doll.impl.dollModule
 import ru.vkdev.dressdoll.navigation.impl.navigationModule
 import ru.vkdev.dressdoll.repository.api.DollRepository
@@ -33,6 +34,7 @@ class DressDollApplication : Application() {
                 denimPaletteModule,
                 navigationModule,
                 repositoryModule,
+                catalogModule,
                 dollModule,
                 themeSettingsModule,
             )
