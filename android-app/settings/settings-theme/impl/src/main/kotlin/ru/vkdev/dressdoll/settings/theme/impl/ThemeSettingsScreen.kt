@@ -43,11 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -59,6 +54,7 @@ import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import ru.vkdev.dressdoll.theme.api.AppIcons
 import ru.vkdev.dressdoll.theme.api.HeadlineText
 import ru.vkdev.dressdoll.theme.api.LocalThemePalette
 import ru.vkdev.dressdoll.theme.api.ThemeChoice
@@ -159,7 +155,7 @@ private fun TopBar(onBack: (() -> Unit)?, modifier: Modifier = Modifier) {
         if (onBack != null) {
             IconButton(onClick = onBack) {
                 Icon(
-                    imageVector = BackArrow,
+                    imageVector = AppIcons.ArrowBack,
                     contentDescription = stringResource(R.string.settings_theme_back),
                 )
             }
@@ -391,22 +387,3 @@ private fun SampleControls() {
         }
     }
 }
-
-// В проекте нет material-icons ради одной стрелки.
-private val BackArrow: ImageVector = ImageVector.Builder(
-    name = "BackArrow",
-    defaultWidth = 24.dp,
-    defaultHeight = 24.dp,
-    viewportWidth = 24f,
-    viewportHeight = 24f,
-    autoMirror = true,
-).path(
-    stroke = SolidColor(Color.Black),
-    strokeLineWidth = 2f,
-    strokeLineCap = StrokeCap.Round,
-    strokeLineJoin = StrokeJoin.Round,
-) {
-    moveTo(15f, 5f)
-    lineTo(8f, 12f)
-    lineTo(15f, 19f)
-}.build()

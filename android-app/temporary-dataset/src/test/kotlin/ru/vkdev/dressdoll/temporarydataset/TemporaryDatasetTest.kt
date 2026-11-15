@@ -16,7 +16,6 @@ import org.robolectric.RobolectricTestRunner
 import ru.vkdev.dressdoll.temporarydataset.bitmap.AssetBitmapDecoder
 import ru.vkdev.dressdoll.temporarydataset.bitmap.BitmapRepository
 import java.io.File
-import java.io.FileNotFoundException
 
 @RunWith(RobolectricTestRunner::class)
 class TemporaryDatasetTest {
@@ -87,7 +86,7 @@ class TemporaryDatasetTest {
         val items = allItems()
 
         items.forEach { item ->
-            val catalog = dataset.catalogImage(item.id)
+            val catalog = checkNotNull(dataset.catalogImage(item.id)) { "no catalog ${item.name}" }
             val doll = dataset.dollImages(item.id)
             assertTrue("empty catalog ${item.name}", catalog.width > 0 && catalog.height > 0)
             assertTrue("empty front ${item.name}", doll.front.width > 0 && doll.front.height > 0)
@@ -109,9 +108,9 @@ class TemporaryDatasetTest {
         assertSame(dataset.dollImages(id).front, dataset.dollImages(id).front)
     }
 
-    @Test(expected = FileNotFoundException::class)
-    fun `catalogImage for unknown item throws`() = runTest(dispatcher) {
-        dataset.catalogImage(TDItemId(CategoryName("нет-такой"), "01"))
+    @Test
+    fun `catalogImage for unknown item is null`() = runTest(dispatcher) {
+        assertNull(dataset.catalogImage(TDItemId(CategoryName("нет-такой"), "01")))
     }
 
     private suspend fun allItems(): List<TDClothingItem> =

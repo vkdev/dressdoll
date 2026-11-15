@@ -49,8 +49,8 @@ class TemporaryDataset internal constructor(
         )
     }.flowOn(ioDispatcher)
 
-    /** Image of the whole item for the catalog. */
-    suspend fun catalogImage(item: TDItemId): Bitmap = require(TDImageKey(item, TDImageKind.CATALOG))
+    /** Image of the whole item for the catalog, or null if the item has none. */
+    suspend fun catalogImage(item: TDItemId): Bitmap? = bitmaps.load(TDImageKey(item, TDImageKind.CATALOG))
 
     /** Front and optional back plane of the item for the doll. */
     suspend fun dollImages(item: TDItemId): TDDollImages = coroutineScope {

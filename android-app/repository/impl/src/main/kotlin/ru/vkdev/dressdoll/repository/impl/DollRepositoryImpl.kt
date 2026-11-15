@@ -22,7 +22,7 @@ internal class DollRepositoryImpl(
     override fun clothingItems(category: CategoryId): Flow<List<ClothingItem>> =
         dataset.clothingItems(category.toCategoryName()).map { items -> items.map { it.toClothingItem() } }
 
-    override suspend fun catalogImage(item: ClothingItemId): Bitmap =
+    override suspend fun catalogImage(item: ClothingItemId): Bitmap? =
         dataset.catalogImage(item.toTDItemId())
 
     override suspend fun dollImages(item: ClothingItemId): DollImages =

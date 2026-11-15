@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="catalog_title">Каталог</string>
+
+    <plurals name="catalog_categories">
+        <item quantity="one">%d категория</item>
+        <item quantity="few">%d категории</item>
+        <item quantity="many">%d категорий</item>
+        <item quantity="other">%d категории</item>
+    </plurals>
+
+    <plurals name="catalog_items">
+        <item quantity="one">%d вещь</item>
+        <item quantity="few">%d вещи</item>
+        <item quantity="many">%d вещей</item>
+        <item quantity="other">%d вещи</item>
+    </plurals>
+</resources>

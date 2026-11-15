@@ -9,8 +9,8 @@ interface DollRepository {
 
     fun clothingItems(category: CategoryId): Flow<List<ClothingItem>>
 
-    /** Image of the whole item for the catalog. */
-    suspend fun catalogImage(item: ClothingItemId): Bitmap
+    /** Image of the whole item for the catalog, or null if the item has none. */
+    suspend fun catalogImage(item: ClothingItemId): Bitmap?
 
     /** Front and optional back plane of the item for the doll. */
     suspend fun dollImages(item: ClothingItemId): DollImages
