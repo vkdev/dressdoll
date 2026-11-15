@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="settings_theme_title">Настройки</string>
-    <string name="settings_theme_back">Назад</string>
     <string name="settings_theme_section">Тема оформления</string>
     <string name="settings_theme_system">Как в системе</string>
     <string name="settings_theme_system_hint">Днём — %1$s, ночью — %2$s</string>

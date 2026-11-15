@@ -10,12 +10,16 @@ object Spacing {
     val medium: Dp = 12.dp
     val large: Dp = 16.dp
     val extraLarge: Dp = 24.dp
+    /** Запас под последним элементом прокручиваемого экрана. */
+    val extraExtraLarge: Dp = 32.dp
 }
 
 /** Размеры элементов. Общие для всех палитр. */
 object Sizes {
     /** Минимальная область нажатия. */
     val touchTarget: Dp = 48.dp
+    /** Минимальная высота шапки полноэкранного экрана. */
+    val topBarHeight: Dp = 64.dp
     val icon: Dp = 24.dp
     val iconSmall: Dp = 18.dp
     /** Значок выбора в углу карточки. */

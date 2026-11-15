@@ -1,7 +1,6 @@
 package ru.vkdev.dressdoll.settings.theme.impl
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,16 +21,12 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
@@ -44,19 +40,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.intl.LocaleList
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
-import ru.vkdev.dressdoll.theme.api.AppIcons
+import ru.vkdev.dressdoll.theme.api.HeaderBar
 import ru.vkdev.dressdoll.theme.api.HeadlineText
 import ru.vkdev.dressdoll.theme.api.LocalThemePalette
+import ru.vkdev.dressdoll.theme.api.SectionLabel
+import ru.vkdev.dressdoll.theme.api.SelectableCard
+import ru.vkdev.dressdoll.theme.api.Sizes
+import ru.vkdev.dressdoll.theme.api.Spacing
+import ru.vkdev.dressdoll.theme.api.Strokes
 import ru.vkdev.dressdoll.theme.api.ThemeChoice
 import ru.vkdev.dressdoll.theme.api.ThemeIds
 import ru.vkdev.dressdoll.theme.api.ThemePalette
@@ -82,16 +76,15 @@ internal fun ThemeSettingsScreen(
     val choice by selector.choice.collectAsState()
     val palettes = selector.palettes
     val colors = MaterialTheme.colorScheme
-    // Рамка выбора рисуется цветами активной темы, а не палитры карточки: так выбранный
-    // пункт одинаково заметен на любой карточке.
-    val selectedBorder = BorderStroke(3.dp, colors.primary)
-    val idleBorder = BorderStroke(1.dp, colors.outline)
     val insets = WindowInsets.safeDrawing
 
     Surface(modifier = Modifier.fillMaxSize(), color = colors.background) {
         Column {
-            TopBar(
+            HeaderBar(
+                title = stringResource(R.string.settings_theme_title),
                 onBack = onBack,
+                titleStyle = MaterialTheme.typography.headlineMedium,
+                minHeight = Sizes.topBarHeight,
                 modifier = Modifier.windowInsetsPadding(
                     insets.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
                 ),
@@ -102,134 +95,89 @@ internal fun ThemeSettingsScreen(
                     .windowInsetsPadding(insets.only(WindowInsetsSides.Horizontal))
                     .selectableGroup(),
                 contentPadding = PaddingValues(
-                    start = 16.dp,
-                    end = 16.dp,
-                    bottom = 32.dp + insets.only(WindowInsetsSides.Bottom).asPaddingValues()
+                    start = Spacing.large,
+                    end = Spacing.large,
+                    bottom = Spacing.extraExtraLarge + insets.only(WindowInsetsSides.Bottom)
+                        .asPaddingValues()
                         .calculateBottomPadding(),
                 ),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(Spacing.medium),
             ) {
                 item(key = "section") {
-                    SectionLabel(stringResource(R.string.settings_theme_section))
+                    SectionLabel(
+                        text = stringResource(R.string.settings_theme_section),
+                        modifier = Modifier.padding(start = Spacing.extraSmall, top = Spacing.medium),
+                    )
                 }
                 item(key = "system") {
                     SystemItem(
                         palettes = palettes,
                         selected = choice == ThemeChoice.System,
-                        border = if (choice == ThemeChoice.System) selectedBorder else idleBorder,
                         onClick = { selector.select(ThemeChoice.System) },
                     )
                 }
                 items(palettes, key = { it.id }) { palette ->
-                    val selected = choice == ThemeChoice.Palette(palette.id)
                     PaletteCard(
                         palette = palette,
-                        selected = selected,
-                        border = if (selected) selectedBorder else idleBorder,
+                        selected = choice == ThemeChoice.Palette(palette.id),
                         onClick = { selector.select(ThemeChoice.Palette(palette.id)) },
                     )
                 }
                 item(key = "footer") {
                     Text(
                         text = stringResource(R.string.settings_theme_footer),
-                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 13.sp),
+                        style = MaterialTheme.typography.bodySmall,
                         color = colors.onSurfaceVariant,
-                        modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 8.dp),
+                        modifier = Modifier.padding(
+                            start = Spacing.extraSmall,
+                            end = Spacing.extraSmall,
+                            top = Spacing.small,
+                        ),
                     )
                 }
             }
         }
     }
-}
-
-@Composable
-private fun TopBar(onBack: (() -> Unit)?, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 64.dp)
-            .padding(horizontal = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        if (onBack != null) {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = AppIcons.ArrowBack,
-                    contentDescription = stringResource(R.string.settings_theme_back),
-                )
-            }
-        } else {
-            Box(Modifier.width(12.dp))
-        }
-        HeadlineText(
-            text = stringResource(R.string.settings_theme_title),
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.semantics { heading() },
-        )
-    }
-}
-
-@Composable
-private fun SectionLabel(text: String) {
-    Text(
-        text = text.toUpperCase(LocaleList.current),
-        style = MaterialTheme.typography.labelMedium.copy(
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 0.18.em,
-        ),
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier
-            .padding(start = 4.dp, top = 12.dp)
-            .semantics { heading() },
-    )
 }
 
 @Composable
 private fun SystemItem(
     palettes: List<ThemePalette>,
     selected: Boolean,
-    border: BorderStroke,
     onClick: () -> Unit,
 ) {
     val day = palettes.firstOrNull { it.id == ThemeIds.CINNAMON }
     val night = palettes.firstOrNull { it.id == ThemeIds.DISCO }
     val colors = MaterialTheme.colorScheme
-    val shape = RoundedCornerShape(20.dp)
-    Surface(
-        shape = shape,
+    SelectableCard(
+        selected = selected,
+        onClick = onClick,
         color = colors.surface,
-        border = border,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(shape)
-            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick),
+        modifier = Modifier.fillMaxWidth(),
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+            modifier = Modifier.padding(Spacing.large),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
         ) {
             Row(
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(DayNightSize)
                     .clip(CircleShape)
-                    .border(1.dp, colors.outline, CircleShape),
+                    .border(Strokes.thin, colors.outline, CircleShape),
             ) {
                 listOf(day, night).forEach { palette ->
                     Box(
                         Modifier
                             .weight(1f)
-                            .height(44.dp)
+                            .fillMaxHeight()
                             .background(palette?.colorScheme?.background ?: Color.Transparent),
                     )
                 }
             }
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(3.dp),
+                verticalArrangement = Arrangement.spacedBy(Spacing.extraSmall),
             ) {
                 Text(
                     text = stringResource(R.string.settings_theme_system),
@@ -243,7 +191,7 @@ private fun SystemItem(
                             stringResource(day.titleRes),
                             stringResource(night.titleRes),
                         ),
-                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 13.sp),
+                        style = MaterialTheme.typography.bodySmall,
                         color = colors.onSurfaceVariant,
                     )
                 }
@@ -257,30 +205,31 @@ private fun SystemItem(
 private fun PaletteCard(
     palette: ThemePalette,
     selected: Boolean,
-    border: BorderStroke,
     onClick: () -> Unit,
 ) {
-    MaterialTheme(colorScheme = palette.colorScheme, typography = palette.typography) {
-        // HeadlineText берёт регистр заголовков из LocalThemePalette.
-        CompositionLocalProvider(LocalThemePalette provides palette) {
+    // Карточка снаружи темы палитры: рамку выбора SelectableCard рисует цветами активной темы,
+    // так выбранный пункт одинаково заметен на любой карточке.
+    SelectableCard(
+        selected = selected,
+        onClick = onClick,
+        color = palette.colorScheme.background,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        MaterialTheme(colorScheme = palette.colorScheme, typography = palette.typography) {
             val colors = MaterialTheme.colorScheme
-            val shape = RoundedCornerShape(22.dp)
-            Surface(
-                shape = shape,
-                color = colors.background,
-                border = border,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(shape)
-                    .selectable(selected = selected, role = Role.RadioButton, onClick = onClick),
+            // HeadlineText берёт регистр заголовков из LocalThemePalette. Цвет текста по умолчанию
+            // Surface карточки вычислил по активной теме, поэтому задаём его заново.
+            CompositionLocalProvider(
+                LocalThemePalette provides palette,
+                LocalContentColor provides colors.onBackground,
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.padding(Spacing.large),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.medium),
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
                     ) {
                         HeadlineText(
                             text = stringResource(palette.titleRes),
@@ -311,8 +260,8 @@ private fun ColorStripe() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(10.dp)
-            .clip(RoundedCornerShape(5.dp))
+            .height(ColorStripeHeight)
+            .clip(CircleShape)
             .clearAndSetSemantics {},
     ) {
         listOf(
@@ -325,12 +274,16 @@ private fun ColorStripe() {
             Box(
                 Modifier
                     .weight(1f)
-                    .height(10.dp)
+                    .fillMaxHeight()
                     .background(color),
             )
         }
     }
 }
+
+// Размеры превью палитры: только у этого экрана, поэтому не элементы темы.
+private val DayNightSize = 44.dp
+private val ColorStripeHeight = 10.dp
 
 // Образцы, а не настоящие кнопки и чипсы: внутри выбираемой карточки они не должны
 // перехватывать нажатия и попадать в озвучку.
@@ -341,15 +294,15 @@ private fun SampleControls() {
     // FlowRow и heightIn: при крупном шрифте образцы переносятся, а не сжимаются и обрезаются.
     FlowRow(
         modifier = Modifier.clearAndSetSemantics {},
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+        verticalArrangement = Arrangement.spacedBy(Spacing.small),
         itemVerticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier = Modifier
                 .heightIn(min = 36.dp)
                 .background(colors.primary, CircleShape)
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = Spacing.large),
             contentAlignment = Alignment.Center,
         ) {
             Text(
@@ -362,8 +315,8 @@ private fun SampleControls() {
         Box(
             modifier = Modifier
                 .heightIn(min = 32.dp)
-                .border(1.dp, colors.outline, CircleShape)
-                .padding(horizontal = 14.dp),
+                .border(Strokes.thin, colors.outline, CircleShape)
+                .padding(horizontal = Spacing.medium),
             contentAlignment = Alignment.Center,
         ) {
             Text(
@@ -376,7 +329,7 @@ private fun SampleControls() {
             modifier = Modifier
                 .heightIn(min = 32.dp)
                 .background(colors.secondaryContainer, CircleShape)
-                .padding(horizontal = 14.dp),
+                .padding(horizontal = Spacing.medium),
             contentAlignment = Alignment.Center,
         ) {
             Text(

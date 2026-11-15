@@ -33,19 +33,19 @@
 
 | Токен | Значение | Где используется | Статус |
 |---|---|---|---|
-| `extraSmall` | 4dp | промежуток между кнопкой «Назад» и заголовком в `HeaderBar` | есть |
-| `small` | 8dp | промежутки между `NavigationTile`, внутренние поля `ChoiceTile`, отступ значка выбора, поле `HeaderBar` слева перед кнопкой «Назад», промежуток между текстом и шевроном в `NavigationTile` | есть |
-| `medium` | 12dp | промежутки между `ChoiceTile` и между карточками в списке | есть |
+| `extraSmall` | 4dp | промежуток между кнопкой «Назад» и заголовком в `HeaderBar`, отступ подписи раздела и подвала от края списка, промежуток между строками текста в карточке | есть |
+| `small` | 8dp | промежутки между `NavigationTile`, внутренние поля `ChoiceTile`, отступ значка выбора, поле `HeaderBar` слева перед кнопкой «Назад», промежуток между текстом и шевроном в `NavigationTile`, промежутки между образцами-чипсами, отступ подвала списка сверху | есть |
+| `medium` | 12dp | промежутки между `ChoiceTile` и между карточками в списке, промежутки внутри карточек, отступ подписи раздела сверху | есть |
 | `large` | 16dp | поля контейнеров, списков и сеток, поля `NavigationTile` и `SelectableCard`, поля `HeaderBar` справа и слева без кнопки «Назад» | есть |
 | `extraLarge` | 24dp | — | есть |
-| `extraExtraLarge` | 32dp | запас под последним элементом прокручиваемого экрана | план ([catalog-sheet, часть 3](../plans/catalog-sheet/plan_part_3.md)) |
+| `extraExtraLarge` | 32dp | запас под последним элементом прокручиваемого экрана | есть |
 
 ### Размеры — `object Sizes`
 
 | Токен | Значение | Где используется | Статус |
 |---|---|---|---|
 | `touchTarget` | 48dp | `BackButton` и любые иконочные кнопки, высота язычка скрытой шторки, минимальная высота `HeaderBar` по умолчанию | есть |
-| `topBarHeight` | 64dp | минимальная высота `HeaderBar` в шапке полноэкранного экрана | план ([catalog-sheet, часть 3](../plans/catalog-sheet/plan_part_3.md)) |
+| `topBarHeight` | 64dp | минимальная высота `HeaderBar` в шапке полноэкранного экрана | есть |
 | `icon` | 24dp | иконка в `BackButton` | есть |
 | `iconSmall` | 18dp | шеврон в `NavigationTile`, галочка в значке выбора | есть |
 | `badge` | 24dp | значок выбора в `ChoiceTile` | есть |
@@ -55,7 +55,7 @@
 
 | Токен | Значение | Где используется | Статус |
 |---|---|---|---|
-| `thin` | 1dp | рамка невыбранной `SelectableCard` | есть |
+| `thin` | 1dp | рамка невыбранной `SelectableCard`, обводка кружка «день/ночь» и чипса-образца на экране выбора темы | есть |
 | `thick` | 3dp | рамка выбранной `SelectableCard` | есть |
 
 Толщина выбора одна во всём приложении. Взята с экрана выбора темы: там 3dp проверены на всех пяти палитрах.
@@ -76,31 +76,16 @@
 |---|---|---|---|---|
 | `HeadlineText(text, style, …)` | текст заголовка с регистром палитры (`uppercaseHeadlines`) | стиль задаёт вызывающий | экран выбора темы, `HeaderBar` | есть |
 | `BackButton(onClick)` | `IconButton` размером `touchTarget` с `AppIcons.ArrowBack`. `contentDescription` «Назад» из ресурсов `:theme:api` | иконка `onSurface` | `HeaderBar` | есть |
-| `HeaderBar(title, onBack, supportingText, titleStyle, minHeight)` | шапка экрана или панели: `BackButton`, если `onBack != null`, иначе отступ до выравнивания с контентом; заголовок через `HeadlineText` с `heading()`; справа поясняющий текст | заголовок `titleStyle` (по умолчанию `headlineSmall`) / `onSurface`, пояснение `bodySmall` / `onSurfaceVariant`. `minHeight` по умолчанию `touchTarget` | каталог; экран выбора темы (`headlineMedium`, `topBarHeight`) — с части 3 | есть |
-| `SelectableCard(selected, onClick, color, content)` | карточка выбора одного из многих: `selectable(role = Role.RadioButton)`, фигура `large`, рамка `Strokes.thick` `primary` у выбранной и `Strokes.thin` `outline` у остальных. Содержимое и индикатор выбора задаёт вызывающий | фон `color` (по умолчанию `surface`) | `ChoiceTile`; экран выбора темы: «Как в системе» и карточки палитр — с части 3 | есть |
+| `HeaderBar(title, onBack, supportingText, titleStyle, minHeight)` | шапка экрана или панели: `BackButton`, если `onBack != null`, иначе отступ до выравнивания с контентом; заголовок через `HeadlineText` с `heading()`; справа поясняющий текст | заголовок `titleStyle` (по умолчанию `headlineSmall`) / `onSurface`, пояснение `bodySmall` / `onSurfaceVariant`. `minHeight` по умолчанию `touchTarget` | каталог; экран выбора темы (`headlineMedium`, `topBarHeight`) | есть |
+| `SelectableCard(selected, onClick, color, content)` | карточка выбора одного из многих: `selectable(role = Role.RadioButton)`, фигура `large`, рамка `Strokes.thick` `primary` у выбранной и `Strokes.thin` `outline` у остальных. Содержимое и индикатор выбора задаёт вызывающий | фон `color` (по умолчанию `surface`) | `ChoiceTile`; экран выбора темы: «Как в системе» и карточки палитр | есть |
 | `ChoiceTile(selected, onClick, content)` | `SelectableCard` с круглым значком `badge` и `Check` в правом верхнем углу у выбранной | фон `surfaceContainerLowest`, значок `primary` / `onPrimary` | каталог: вещи | есть |
 | `NavigationTile(text, onClick)` | плашка-переход: текст в одну строку с многоточием, справа `ChevronRight`. Высота `tileHeight`, фигура `large` | фон `surfaceContainerHigh`, текст `titleSmall` / `onSurface` | каталог: категории | есть |
-| `SectionLabel(text)` | надзаголовок раздела: капс, разрядка, `heading()` | `labelMedium` полужирный с разрядкой 0.18em / `onSurfaceVariant` | экран выбора темы: «Тема оформления» | план ([catalog-sheet, часть 3](../plans/catalog-sheet/plan_part_3.md)) |
+| `SectionLabel(text)` | надзаголовок раздела: капс, разрядка, `heading()` | `labelMedium` полужирный с разрядкой 0.18em / `onSurfaceVariant` | экран выбора темы: «Тема оформления» | есть |
 
 Компоненты выбора не знают про пропорции и группу: квадратность (`aspectRatio`) и `selectableGroup()` задаёт вызывающий. В `SelectableCard` индикатором может быть M3 `RadioButton(onClick = null)`, как на экране выбора темы, или значок, как в `ChoiceTile`.
 
+Рамку `SelectableCard` рисует цветами текущей `MaterialTheme`. Если содержимое карточки показано в другой палитре (превью на экране выбора темы), `SelectableCard` ставят снаружи `MaterialTheme` этой палитры, а внутрь — только содержимое: тогда рамка выбора остаётся цвета активной темы и одинаково заметна на любой карточке.
+
 ## Где найдены кандидаты
 
-### `ThemeSettingsScreen` (`:settings:settings-theme:impl`)
-
-Что на экране становится элементом темы и что при переводе изменится внешне. Перевод — [часть 3 плана catalog-sheet](../plans/catalog-sheet/plan_part_3.md); после него раздел удаляется.
-
-| На экране сейчас | Элемент темы | Что меняется |
-|---|---|---|
-| `TopBar`: `IconButton` + `AppIcons.ArrowBack`, `headlineMedium`, высота от 64dp, без стрелки заголовок с 24dp от края | `HeaderBar(titleStyle = headlineMedium, minHeight = Sizes.topBarHeight)` | без стрелки заголовок с 16dp (`Spacing.large`), по полям списка |
-| ~~`BackArrow`~~ | `AppIcons.ArrowBack` | уже переведено |
-| строка `settings_theme_back` | строка «Назад» в `:theme:api` | строка удаляется из модуля экрана |
-| `SectionLabel` | `SectionLabel` | ничего |
-| `SystemItem`: `Surface` 20dp + рамка + `selectable` | `SelectableCard(color = surface)` | радиус 20 → 16dp |
-| `PaletteCard`: `Surface` 22dp + рамка + `selectable` | `SelectableCard(color = background палитры)` | радиус 22 → 16dp |
-| рамки 3dp `primary` / 1dp `outline` | `Strokes.thick` / `Strokes.thin` | ничего |
-| поля списка 16dp, промежутки 12dp, запас снизу 32dp | `Spacing.large`, `Spacing.medium`, `Spacing.extraExtraLarge` | ничего |
-| поля `SystemItem` 16 × 14dp, промежуток 14dp | `Spacing.large`, `Spacing.medium` | 14 → 16 и 12dp |
-| `bodySmall.copy(fontSize = 13.sp)` в подсказке и подвале | `bodySmall` | 13 → 12sp |
-
-Остаются в модуле экрана — это превью палитры, а не общие элементы: кружок «день/ночь» 44dp, полоса цветов `ColorStripe`, образцы кнопки и чипсов `SampleControls`. Их промежутки переходят на `Spacing`.
+Сейчас кандидатов нет.
