@@ -39,6 +39,7 @@ import ru.vkdev.dressdoll.theme.api.ChoiceTile
 import ru.vkdev.dressdoll.theme.api.HeaderBar
 import ru.vkdev.dressdoll.theme.api.NavigationTile
 import ru.vkdev.dressdoll.theme.api.Spacing
+import java.io.IOException
 
 /** [categories] — `null`, пока список не загружен. */
 @Composable
@@ -122,7 +123,12 @@ internal fun ItemsPane(
 @Composable
 private fun ItemTileContent(repository: DollRepository, item: ClothingItem) {
     val image by produceState<ImageBitmap?>(null, item.id) {
-        value = repository.catalogImage(item.id)?.asImageBitmap()
+        // Битая или нечитаемая картинка оставляет плитку без изображения, а не роняет приложение.
+        value = try {
+            repository.catalogImage(item.id)?.asImageBitmap()
+        } catch (_: IOException) {
+            null
+        }
     }
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -147,7 +153,8 @@ private fun ItemTileContent(repository: DollRepository, item: ClothingItem) {
             text = item.title.displayed(),
             style = MaterialTheme.typography.labelLarge,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            // Номер вещи в конце подписи: многоточие в середине оставляет его видимым.
+            overflow = TextOverflow.MiddleEllipsis,
         )
     }
 }

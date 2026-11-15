@@ -25,12 +25,10 @@ internal class AssetBitmapDecoder(
         } catch (_: FileNotFoundException) {
             return null
         }
-        return stream.use { BitmapFactory.decodeStream(it, null, OPTIONS) }
-            ?: throw IOException("Cannot decode ${key.assetPath}")
-    }
-
-    private companion object {
+        // Options are mutable (the decoder writes out* fields), so each concurrent decode gets its own.
         // Clothing images need transparency, so no RGB_565.
-        val OPTIONS = BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.ARGB_8888 }
+        val options = BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.ARGB_8888 }
+        return stream.use { BitmapFactory.decodeStream(it, null, options) }
+            ?: throw IOException("Cannot decode ${key.assetPath}")
     }
 }

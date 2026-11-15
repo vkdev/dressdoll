@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.onConsumedWindowInsetsChanged
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
@@ -68,7 +69,8 @@ internal class CatalogImpl(
                 slideIntoContainer(direction) togetherWith slideOutOfContainer(direction)
             },
             modifier = modifier
-                .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal))
+                // safeDrawing, а не navigationBars: в альбомной ориентации сбоку бывает вырез камеры.
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
                 .onConsumedWindowInsetsChanged { consumedInsets = it },
             label = "catalogMode",
         ) { category ->
