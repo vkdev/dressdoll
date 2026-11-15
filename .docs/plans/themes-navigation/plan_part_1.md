@@ -33,6 +33,7 @@
 :theme:api                            ThemePalette, ThemeChoice, ThemeSelector, AppTheme, LocalThemePalette, HeadlineText
 :theme:common                         Manrope, Rubik, лицензии OFL, buildTypography(...)
 :theme:impl                           ThemeSelectorImpl (DataStore), AppThemeImpl, themeModule
+:theme:testing                        PaletteContractTest — общие тесты модулей палитр (testImplementation)
 :theme:palette:cinnamon               ┐
 :theme:palette:disco                  │ зависят от :theme:api и :theme:common;
 :theme:palette:avocado                │ ColorScheme, Typography, заголовочный шрифт,

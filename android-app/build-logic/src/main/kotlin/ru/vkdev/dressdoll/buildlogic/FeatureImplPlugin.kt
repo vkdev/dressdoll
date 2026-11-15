@@ -6,7 +6,6 @@ import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
-/** Impl-модуль фичи: library + compose + Koin + Koin для Navigation 3. */
 class FeatureImplPlugin : Plugin<Project> {
 
     override fun apply(target: Project) = with(target) {

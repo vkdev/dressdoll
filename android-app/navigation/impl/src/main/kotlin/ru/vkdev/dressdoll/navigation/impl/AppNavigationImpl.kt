@@ -14,9 +14,6 @@ internal class AppNavigationImpl : AppNavigation {
 
     @Composable
     override fun Host(startRoute: NavKey) {
-        // Бэкстек живёт в composition и сохраняется в saved state:
-        // переживает и поворот экрана, и смерть процесса.
-        // Декоратор сохранения состояния экранов NavDisplay добавляет по умолчанию.
         val backStack = rememberNavBackStack(startRoute)
         val navigator = remember(backStack) { NavigatorImpl(backStack) }
         CompositionLocalProvider(LocalNavigator provides navigator) {

@@ -7,7 +7,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/** Те же проверки на обычном списке и на настоящем [NavBackStack] (snapshot-список). */
 abstract class NavigatorImplTest {
 
     protected abstract fun createBackStack(start: NavKey): MutableList<NavKey>

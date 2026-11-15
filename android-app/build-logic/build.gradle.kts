@@ -18,5 +18,9 @@ gradlePlugin {
             id = libs.plugins.dressdoll.feature.impl.get().pluginId
             implementationClass = "ru.vkdev.dressdoll.buildlogic.FeatureImplPlugin"
         }
+        register("themePalette") {
+            id = libs.plugins.dressdoll.theme.palette.get().pluginId
+            implementationClass = "ru.vkdev.dressdoll.buildlogic.ThemePalettePlugin"
+        }
     }
 }

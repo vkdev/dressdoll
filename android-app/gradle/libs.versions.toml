@@ -9,6 +9,7 @@ composeBom = "2026.06.01"
 koin = "4.2.2"
 navigation3 = "1.2.1"
 kotlinxSerialization = "1.11.0"
+datastore = "1.2.1"
 kotlinxCoroutines = "1.11.0"
 junit = "4.13.2"
 robolectric = "4.17"
@@ -24,10 +25,13 @@ koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core" }
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-compose = { module = "io.insert-koin:koin-compose" }
+koin-test = { module = "io.insert-koin:koin-test" }
 koin-compose-navigation3 = { module = "io.insert-koin:koin-compose-navigation3" }
 
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
+
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerialization" }
 
@@ -52,3 +56,4 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 # convention plugins (build-logic)
 dressdoll-android-library-compose = { id = "dressdoll.android.library.compose" }
 dressdoll-feature-impl = { id = "dressdoll.feature.impl" }
+dressdoll-theme-palette = { id = "dressdoll.theme.palette" }

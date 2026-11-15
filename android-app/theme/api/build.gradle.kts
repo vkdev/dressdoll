@@ -15,6 +15,8 @@ android {
 }
 
 dependencies {
-    implementation(platform(libs.androidx.compose.bom))
+    api(platform(libs.androidx.compose.bom))
+    api(libs.androidx.compose.material3)
+    api(libs.kotlinx.coroutines.core)
     implementation(libs.androidx.compose.ui)
 }

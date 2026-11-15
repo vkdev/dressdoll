@@ -3,10 +3,6 @@ package ru.vkdev.dressdoll.navigation.impl
 import androidx.navigation3.runtime.NavKey
 import ru.vkdev.dressdoll.navigation.api.Navigator
 
-/**
- * Работает поверх любого [MutableList]: в приложении это `NavBackStack`
- * (snapshot-состояние, Compose видит изменения), в тестах обычный список.
- */
 internal class NavigatorImpl(
     private val backStack: MutableList<NavKey>,
 ) : Navigator {

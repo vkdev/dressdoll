@@ -6,7 +6,6 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 
-/** Android library + Jetpack Compose. Namespace задаёт сам модуль. */
 class AndroidLibraryComposePlugin : Plugin<Project> {
 
     override fun apply(target: Project) = with(target) {

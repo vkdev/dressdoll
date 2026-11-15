@@ -9,6 +9,11 @@ import ru.vkdev.dressdoll.navigation.impl.navigationModule
 import ru.vkdev.dressdoll.repository.api.DollRepository
 import ru.vkdev.dressdoll.repository.impl.repositoryModule
 import ru.vkdev.dressdoll.theme.impl.themeModule
+import ru.vkdev.dressdoll.theme.palette.avocado.avocadoPaletteModule
+import ru.vkdev.dressdoll.theme.palette.cinnamon.cinnamonPaletteModule
+import ru.vkdev.dressdoll.theme.palette.denim.denimPaletteModule
+import ru.vkdev.dressdoll.theme.palette.disco.discoPaletteModule
+import ru.vkdev.dressdoll.theme.palette.powder.powderPaletteModule
 
 class DressDollApplication : Application() {
 
@@ -18,7 +23,17 @@ class DressDollApplication : Application() {
         super.onCreate()
         startKoin {
             androidContext(this@DressDollApplication)
-            modules(themeModule, navigationModule, repositoryModule, dollModule)
+            modules(
+                themeModule,
+                cinnamonPaletteModule,
+                discoPaletteModule,
+                avocadoPaletteModule,
+                powderPaletteModule,
+                denimPaletteModule,
+                navigationModule,
+                repositoryModule,
+                dollModule,
+            )
         }
     }
 

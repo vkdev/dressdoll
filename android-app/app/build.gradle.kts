@@ -22,6 +22,11 @@ android {
 
 dependencies {
     implementation(project(":theme:impl"))
+    implementation(project(":theme:palette:cinnamon"))
+    implementation(project(":theme:palette:disco"))
+    implementation(project(":theme:palette:avocado"))
+    implementation(project(":theme:palette:powder"))
+    implementation(project(":theme:palette:denim"))
     implementation(project(":doll:impl"))
     implementation(project(":repository:impl"))
     implementation(project(":navigation:impl"))
