@@ -24,7 +24,6 @@ dependencies {
     implementation(project(":theme:impl"))
     implementation(project(":doll:impl"))
     implementation(project(":repository:impl"))
-    implementation(project(":temporary-dataset"))
 
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
