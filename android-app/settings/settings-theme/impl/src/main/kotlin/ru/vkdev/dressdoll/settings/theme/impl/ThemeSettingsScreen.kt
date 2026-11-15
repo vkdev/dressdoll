@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -149,7 +151,7 @@ private fun TopBar(onBack: (() -> Unit)?, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(64.dp)
+            .heightIn(min = 64.dp)
             .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -340,14 +342,16 @@ private fun ColorStripe() {
 private fun SampleControls() {
     val colors = MaterialTheme.colorScheme
     val label = MaterialTheme.typography.labelLarge
-    Row(
+    // FlowRow и heightIn: при крупном шрифте образцы переносятся, а не сжимаются и обрезаются.
+    FlowRow(
         modifier = Modifier.clearAndSetSemantics {},
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        itemVerticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier = Modifier
-                .height(36.dp)
+                .heightIn(min = 36.dp)
                 .background(colors.primary, CircleShape)
                 .padding(horizontal = 16.dp),
             contentAlignment = Alignment.Center,
@@ -361,7 +365,7 @@ private fun SampleControls() {
         }
         Box(
             modifier = Modifier
-                .height(32.dp)
+                .heightIn(min = 32.dp)
                 .border(1.dp, colors.outline, CircleShape)
                 .padding(horizontal = 14.dp),
             contentAlignment = Alignment.Center,
@@ -374,7 +378,7 @@ private fun SampleControls() {
         }
         Box(
             modifier = Modifier
-                .height(32.dp)
+                .heightIn(min = 32.dp)
                 .background(colors.secondaryContainer, CircleShape)
                 .padding(horizontal = 14.dp),
             contentAlignment = Alignment.Center,
