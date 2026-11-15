@@ -10,4 +10,4 @@
 
 | План | Создан | Части | Статус |
 |---|---|---|---|
-| Темы 70-х и навигация (`themes-navigation`) | 2026-11-15 21:01 | [1. Общее и навигация](themes-navigation/plan_part_1.md) · [2. Темы](themes-navigation/plan_part_2.md) · [3. Заставка и бары](themes-navigation/plan_part_3.md) · [4. Экран выбора темы](themes-navigation/plan_part_4.md) | в работе: части 1–3 выполнены |
+| Темы 70-х и навигация (`themes-navigation`) | 2026-11-15 21:01 | [1. Общее и навигация](themes-navigation/plan_part_1.md) · [2. Темы](themes-navigation/plan_part_2.md) · [3. Заставка и бары](themes-navigation/plan_part_3.md) · [4. Экран выбора темы](themes-navigation/plan_part_4.md) | все части выполнены и закоммичены |

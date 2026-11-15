@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_theme_title">Настройки</string>
+    <string name="settings_theme_back">Назад</string>
+    <string name="settings_theme_section">Тема оформления</string>
+    <string name="settings_theme_system">Как в системе</string>
+    <string name="settings_theme_system_hint">Днём — %1$s, ночью — %2$s</string>
+    <string name="settings_theme_footer">Тема применяется сразу. Шрифты и цвета меняются во всём приложении.</string>
+
+    <string name="settings_theme_sample_button">Примерить</string>
+    <string name="settings_theme_sample_chip_dresses">Платья</string>
+    <string name="settings_theme_sample_chip_shoes">Обувь</string>
+
+    <string name="settings_theme_tagline_cinnamon">Замша, терракота и верблюжья шерсть — образы этого сезона.</string>
+    <string name="settings_theme_tagline_disco">Люрекс, сливовый бархат и золото — до самого утра.</string>
+    <string name="settings_theme_tagline_avocado">Вельвет, трикотаж и урожайное золото — шьём сами.</string>
+    <string name="settings_theme_tagline_powder">Пыльная роза и винный бархат — вечер в бутике.</string>
+    <string name="settings_theme_tagline_denim">Клёш, деним и замшевая бахрома — на всю неделю.</string>
+</resources>

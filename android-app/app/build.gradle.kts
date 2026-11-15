@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":doll:impl"))
     implementation(project(":repository:impl"))
     implementation(project(":navigation:impl"))
+    implementation(project(":settings:settings-theme:impl"))
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.splashscreen)

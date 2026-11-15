@@ -12,8 +12,8 @@ import androidx.compose.ui.graphics.luminance
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import org.koin.android.ext.android.inject
 import org.koin.compose.koinInject
-import ru.vkdev.dressdoll.doll.api.DollRoute
 import ru.vkdev.dressdoll.navigation.api.AppNavigation
+import ru.vkdev.dressdoll.settings.theme.api.ThemeSettingsRoute
 import ru.vkdev.dressdoll.theme.api.AppTheme
 import ru.vkdev.dressdoll.theme.api.ThemeSelector
 
@@ -39,7 +39,8 @@ class MainActivity : ComponentActivity() {
                     }
                     enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
                 }
-                navigation.Host(startRoute = DollRoute)
+                // Временно: выбор темы — стартовый экран. DollRoute по-прежнему зарегистрирован.
+                navigation.Host(startRoute = ThemeSettingsRoute)
             }
         }
     }

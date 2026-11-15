@@ -8,6 +8,7 @@ import ru.vkdev.dressdoll.doll.impl.dollModule
 import ru.vkdev.dressdoll.navigation.impl.navigationModule
 import ru.vkdev.dressdoll.repository.api.DollRepository
 import ru.vkdev.dressdoll.repository.impl.repositoryModule
+import ru.vkdev.dressdoll.settings.theme.impl.themeSettingsModule
 import ru.vkdev.dressdoll.theme.impl.themeModule
 import ru.vkdev.dressdoll.theme.palette.avocado.avocadoPaletteModule
 import ru.vkdev.dressdoll.theme.palette.cinnamon.cinnamonPaletteModule
@@ -33,6 +34,7 @@ class DressDollApplication : Application() {
                 navigationModule,
                 repositoryModule,
                 dollModule,
+                themeSettingsModule,
             )
         }
     }
