@@ -1,8 +1,12 @@
 package ru.vkdev.dressdoll.doll.impl
 
+import org.koin.compose.koinInject
+import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.dsl.module
-import ru.vkdev.dressdoll.doll.api.DollScreen
+import org.koin.dsl.navigation3.navigation
+import ru.vkdev.dressdoll.doll.api.DollRoute
 
+@OptIn(KoinExperimentalAPI::class)
 val dollModule = module {
-    single<DollScreen> { DollScreenImpl(repository = get()) }
+    navigation<DollRoute> { DollScreen(repository = koinInject()) }
 }

@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google()
         mavenCentral()
@@ -24,3 +25,5 @@ include(":doll:impl")
 include(":repository:api")
 include(":repository:impl")
 include(":temporary-dataset")
+include(":navigation:api")
+include(":navigation:impl")

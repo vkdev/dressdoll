@@ -24,4 +24,6 @@ dependencies {
 
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.core)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.navigation3)
 }

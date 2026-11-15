@@ -1,0 +1,43 @@
+# Темы 70-х и навигация. Часть 4: экран выбора темы
+
+Создан: 2026-11-15 21:01
+
+Общие решения, модули и зависимости описаны в [части 1](plan_part_1.md). Это отдельный коммит.
+
+### 14. `:settings:settings-theme:api` и `:impl`
+- api: `@Serializable data object ThemeSettingsRoute : NavKey`.
+- impl:
+```kotlin
+val themeSettingsModule = module {
+    navigation<ThemeSettingsRoute> {
+        val navigator = LocalNavigator.current
+        ThemeSettingsScreen(
+            selector = koinInject(),
+            onBack = if (navigator.canGoBack) ({ navigator.back() }) else null,
+        )
+    }
+}
+```
+- `ThemeSettingsScreen` — `internal` composable-функция, без интерфейса и `single` в Koin (как `DollScreen` в части 1).
+- Экран по макету:
+  - шапка «Настройки», стрелка «Назад» только при `canGoBack`;
+  - раздел «Тема оформления»;
+  - пункт «Как в системе»;
+  - пять карточек-образцов. Каждая рисуется в своём `MaterialTheme(palette…)`, название выводится через `HeadlineText`. Нажатие вызывает `select(...)`.
+- Тексты в `strings.xml`.
+
+### 15. Выбор темы временно становится главным экраном
+- `:app`: зависимость на `:settings:settings-theme:impl`, `themeSettingsModule` в `startKoin`.
+- `MainActivity`: `Host(startRoute = ThemeSettingsRoute)`.
+- Регистрация `DollRoute` остаётся. Чтобы вернуть куклу главным экраном, достаточно поменять `startRoute` и добавить в `DollScreen` переход в настройки через `LocalNavigator`.
+
+### 16. Проверка
+Ручная проверка на эмуляторе:
+- старт на экране темы без стрелки «Назад»;
+- системный «Назад» закрывает приложение;
+- переключение всех тем;
+- «Как в системе» в светлом и тёмном режиме;
+- выбор сохраняется после перезапуска;
+- при старте нет вспышки;
+- иконки баров меняются вместе с темой;
+- после поворота экрана выбор и прокрутка сохраняются.

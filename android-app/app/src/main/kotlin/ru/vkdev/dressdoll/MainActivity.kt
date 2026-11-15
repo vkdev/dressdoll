@@ -4,7 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import org.koin.compose.koinInject
-import ru.vkdev.dressdoll.doll.api.DollScreen
+import ru.vkdev.dressdoll.doll.api.DollRoute
+import ru.vkdev.dressdoll.navigation.api.AppNavigation
 import ru.vkdev.dressdoll.theme.api.AppTheme
 
 class MainActivity : ComponentActivity() {
@@ -13,9 +14,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val theme = koinInject<AppTheme>()
-            val dollScreen = koinInject<DollScreen>()
+            val navigation = koinInject<AppNavigation>()
             theme.Apply {
-                dollScreen.Content()
+                navigation.Host(startRoute = DollRoute)
             }
         }
     }
