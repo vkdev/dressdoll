@@ -11,7 +11,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":repository:api"))
+    api(project(":repository:api"))
 
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.core)

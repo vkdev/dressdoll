@@ -15,7 +15,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":doll:api"))
+    api(project(":doll:api"))
     implementation(project(":repository:api"))
 
     implementation(platform(libs.androidx.compose.bom))

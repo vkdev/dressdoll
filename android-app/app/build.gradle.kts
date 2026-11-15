@@ -21,9 +21,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":theme:api"))
     implementation(project(":theme:impl"))
-    implementation(project(":doll:api"))
     implementation(project(":doll:impl"))
     implementation(project(":repository:impl"))
 
