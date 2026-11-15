@@ -51,7 +51,7 @@ settings/
 - ~~`io.insert-koin:koin-compose-navigation3` (версия из Koin BOM).~~
 - ~~Плагин `org.jetbrains.kotlin.plugin.serialization` и `org.jetbrains.kotlinx:kotlinx-serialization-core`.~~
 - `androidx.datastore:datastore-preferences` (часть 2).
-- `androidx.core:core-splashscreen` (часть 3).
+- ~~`androidx.core:core-splashscreen` (часть 3).~~
 - ~~Для `build-logic`: артефакты AGP и Compose Compiler Gradle Plugin.~~ Добавлен ещё `kotlin-gradle-plugin-api` (`compileOnly`): нужен для opt-in в `dressdoll.feature.impl`. ID convention-плагинов тоже лежат в каталоге (`libs.plugins.dressdoll.*`).
 
 ### Открытые вопросы

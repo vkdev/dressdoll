@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Нейтральный фон, общий для всех палитр: на этом этапе выбранная тема ещё не прочитана. -->
+    <style name="Theme.DressDoll.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#F3E6D0</item>
+        <item name="postSplashScreenTheme">@style/Theme.DressDoll</item>
+    </style>
+</resources>

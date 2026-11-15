@@ -4,7 +4,7 @@
     <application
         android:name=".DressDollApplication"
         android:label="@string/app_name"
-        android:theme="@style/Theme.DressDoll">
+        android:theme="@style/Theme.DressDoll.Starting">
 
         <activity
             android:name=".MainActivity"
