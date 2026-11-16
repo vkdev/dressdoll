@@ -67,7 +67,6 @@ class TemporaryDataset internal constructor(
     fun trimMemory(level: Int) = bitmaps.trimMemory(level)
 
     // Сборка уже сверила конфиг с папками; здесь страховка на случай нестандартного ignoreAssetsPattern.
-    // NFC не нужен: имена не в NFC сборка не пропускает.
     private fun matchFolders(configured: List<TDClothingCategory>): List<TDClothingCategory> {
         val folders = list(DATASET_ROOT).toSet()
         val names = configured.mapTo(mutableSetOf()) { it.name.value }

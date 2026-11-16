@@ -21,7 +21,6 @@ class ClothingDatasetPlugin : Plugin<Project> {
             strayFiles.set(entries.map { it.files })
         }
 
-        // Сгенерированный код — источник компиляции, поэтому проверка конфига идёт перед любой сборкой модуля.
         pluginManager.withPlugin("com.android.library") {
             extensions.getByType<LibraryAndroidComponentsExtension>().onVariants { variant ->
                 variant.sources.kotlin?.addGeneratedSourceDirectory(generate, GenerateCategoriesConfigTask::outputDir)

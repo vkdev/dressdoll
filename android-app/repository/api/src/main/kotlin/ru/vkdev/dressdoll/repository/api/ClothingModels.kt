@@ -44,8 +44,9 @@ value class CatalogSectionId(val value: String)
  * Уровень с большей [position] рисуется поверх. Позиция задаёт только порядок, это не z-index:
  * его считает кукла с учётом порядка надевания.
  */
-data class DrawLevel(val id: DrawLevelId, val position: Int) : Comparable<DrawLevel> {
-    override fun compareTo(other: DrawLevel): Int = position.compareTo(other.position)
+data class DrawLevel(val id: DrawLevelId, val position: Int) {
+
+    fun compareByPosition(other: DrawLevel): Int = position.compareTo(other.position)
 }
 
 /** Одновременно надевается не больше [limit] вещей из категорий группы. */

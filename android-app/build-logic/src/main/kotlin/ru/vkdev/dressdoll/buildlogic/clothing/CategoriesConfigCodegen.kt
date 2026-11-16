@@ -1,6 +1,5 @@
 package ru.vkdev.dressdoll.buildlogic.clothing
 
-/** Kotlin-исходник для `:temporary-dataset` из проверенного [DatasetConfig]. */
 internal object CategoriesConfigCodegen {
 
     const val PACKAGE = "ru.vkdev.dressdoll.temporarydataset"

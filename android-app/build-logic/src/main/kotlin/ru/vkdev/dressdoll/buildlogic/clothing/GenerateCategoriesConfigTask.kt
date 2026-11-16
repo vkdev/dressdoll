@@ -15,7 +15,6 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
-/** Проверяет `categories.json` по папкам cloth-src и генерирует из него Kotlin-конфиг. */
 @CacheableTask
 abstract class GenerateCategoriesConfigTask : DefaultTask() {
 

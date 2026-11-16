@@ -78,7 +78,8 @@ class TemporaryDatasetMappersTest {
         val socks = TDLevel(TDLevelId("socks"), 3).toDrawLevel()
         val tights = TDLevel(TDLevelId("tights"), 2).toDrawLevel()
 
-        assertTrue(socks > tights)
+        assertTrue(socks.compareByPosition(tights) > 0)
+        assertTrue(tights.compareByPosition(socks) < 0)
     }
 
     @Test

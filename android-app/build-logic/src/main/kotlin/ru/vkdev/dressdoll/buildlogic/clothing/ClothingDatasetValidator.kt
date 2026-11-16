@@ -9,7 +9,7 @@ import java.text.Normalizer
  */
 internal object ClothingDatasetValidator {
 
-    /** Сгенерированный код ссылается на `TDSlot.<SLOT>`, поэтому расхождение с `TDSlot` не скомпилируется. */
+    /** Должны совпадать с константами `TDSlot`: на них ссылается сгенерированный код. */
     val SLOTS = listOf("feet", "legs", "waist", "torso", "neck", "arms", "head")
 
     private val ROOT_FIELDS = setOf("levels", "groups", "sections", "categories")
@@ -17,7 +17,6 @@ internal object ClothingDatasetValidator {
     private val SECTION_FIELDS = setOf("id", "title")
     private val CATEGORY_FIELDS = setOf("slot", "level", "group", "section")
 
-    /** [strayFiles] — файлы, которые лежат в cloth-src рядом с папками категорий. */
     fun validate(
         configJson: String,
         categoryFolders: Set<String>,
