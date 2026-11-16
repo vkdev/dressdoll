@@ -59,3 +59,4 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 dressdoll-android-library-compose = { id = "dressdoll.android.library.compose" }
 dressdoll-feature-impl = { id = "dressdoll.feature.impl" }
 dressdoll-theme-palette = { id = "dressdoll.theme.palette" }
+dressdoll-clothing-dataset = { id = "dressdoll.clothing.dataset" }

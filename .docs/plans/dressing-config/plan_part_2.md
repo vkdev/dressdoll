@@ -13,29 +13,29 @@
 
 ## Шаги
 
-### 1. Валидатор
+### ~~1. Валидатор~~
 
 `build-logic/src/main/kotlin/ru/vkdev/dressdoll/buildlogic/clothing/ClothingDatasetValidator.kt`:
 
-- Чистая функция `validate(configJson: String, categoryFolders: Set<String>): List<String>` — список ошибок по-русски, пустой при успехе.
-- JSON читается через `groovy.json.JsonSlurper`: он уже есть в рантайме Gradle, новые зависимости не нужны.
-- Проверяет инварианты из z-index.md:
-  - каждой папке соответствует категория, и наоборот;
-  - `slot` из списка `feet`, `legs`, `waist`, `torso`, `neck`, `arms`, `head`;
-  - `level`, `group`, `section` ссылаются на существующие записи;
-  - id уровней, групп и разделов уникальны;
-  - у каждой группы `limit ≥ 1`;
-  - в каждом уровне, явной группе и разделе есть хотя бы одна категория;
-  - имена папок и ключи категорий в NFC;
-  - у каждой категории нет лишних полей (ловит опечатки вроде `levle`).
+- ~~Чистая функция `validate(configJson: String, categoryFolders: Set<String>): List<String>` — список ошибок по-русски, пустой при успехе.~~
+- ~~JSON читается через `groovy.json.JsonSlurper`: он уже есть в рантайме Gradle, новые зависимости не нужны.~~
+- ~~Проверяет инварианты из z-index.md:~~
+  - ~~каждой папке соответствует категория, и наоборот;~~
+  - ~~`slot` из списка `feet`, `legs`, `waist`, `torso`, `neck`, `arms`, `head`;~~
+  - ~~`level`, `group`, `section` ссылаются на существующие записи;~~
+  - ~~id уровней, групп и разделов уникальны;~~
+  - ~~у каждой группы `limit ≥ 1`;~~
+  - ~~в каждом уровне, явной группе и разделе есть хотя бы одна категория;~~
+  - ~~имена папок и ключи категорий в NFC;~~
+  - ~~у каждой категории нет лишних полей (ловит опечатки вроде `levle`).~~
 
-### 2. Задача
+### ~~2. Задача~~
 
 `ValidateClothingDatasetTask`:
 
-- `@InputFile` — `categories.json`; `@Input` — отсортированный список имён папок `cloth-src`. Картинки на вход не попадают, поэтому их правка не перезапускает проверку.
-- Пустой `@OutputFile`-маркер в `build/`, чтобы задача была up-to-date между сборками.
-- При ошибках — `GradleException` со списком:
+- ~~`@InputFile` — `categories.json`; `@Input` — отсортированный список имён папок `cloth-src`. Картинки на вход не попадают, поэтому их правка не перезапускает проверку.~~
+- ~~Пустой `@OutputFile`-маркер в `build/`, чтобы задача была up-to-date между сборками.~~
+- ~~При ошибках — `GradleException` со списком:~~
 
 ```
 categories.json не согласован с cloth-src:
@@ -43,19 +43,28 @@ categories.json не согласован с cloth-src:
   - «жакет»: уровень «jakets» не найден
 ```
 
-### 3. Плагин
+### ~~3. Плагин~~
 
-- `ClothingDatasetPlugin`, id `dressdoll.clothing.dataset`, регистрация в `build-logic/build.gradle.kts` и алиас в `libs.versions.toml` по образцу остальных convention-плагинов.
-- Регистрирует `validateClothingDataset` с путями `src/main/assets/categories.json` и `src/main/assets/cloth-src`; `preBuild` зависит от неё.
-- Подключается только в `temporary-dataset/build.gradle.kts`.
+- ~~`ClothingDatasetPlugin`, id `dressdoll.clothing.dataset`, регистрация в `build-logic/build.gradle.kts` и алиас в `libs.versions.toml` по образцу остальных convention-плагинов.~~
+- ~~Регистрирует `validateClothingDataset` с путями `src/main/assets/categories.json` и `src/main/assets/cloth-src`; `preBuild` зависит от неё.~~
+- ~~Подключается только в `temporary-dataset/build.gradle.kts`.~~
 
-### 4. Тесты валидатора
+### ~~4. Тесты валидатора~~
 
-- В `build-logic` добавить `testImplementation(junit)`.
-- `ClothingDatasetValidatorTest`: корректный конфиг без ошибок; папка без записи; запись без папки; неизвестный слот, уровень, группа, раздел; пустой раздел; `limit = 0`; NFD-имя («и» + U+0306); лишнее поле; несколько ошибок попадают в отчёт вместе.
+- ~~В `build-logic` добавить `testImplementation(junit)`.~~
+- ~~`ClothingDatasetValidatorTest`: корректный конфиг без ошибок; папка без записи; запись без папки; неизвестный слот, уровень, группа, раздел; пустой раздел; `limit = 0`; NFD-имя («и» + U+0306); лишнее поле; несколько ошибок попадают в отчёт вместе.~~
 
-### 5. Ручная проверка
+### ~~5. Ручная проверка~~
 
-- `./gradlew :app:assembleDebug` проходит.
-- Временно создать пустую папку `cloth-src/галстук-бабочка` → сборка падает с понятным сообщением → удалить папку.
-- Повторная сборка без изменений: `validateClothingDataset` в статусе UP-TO-DATE.
+- ~~`./gradlew :app:assembleDebug` проходит.~~
+- ~~Временно создать пустую папку `cloth-src/галстук-бабочка` → сборка падает с понятным сообщением → удалить папку.~~
+- ~~Повторная сборка без изменений: `validateClothingDataset` в статусе UP-TO-DATE.~~
+
+### Итог части 2
+
+Выполнена 2026-11-16. Отличия от плана:
+- Список папок приходит в задачу через `ValueSource` (`CategoryFoldersSource`), а не через `provider {}`: с configuration cache новая папка ловится и при переиспользованном кеше конфигурации (проверено).
+- Сверх плана валидатор ловит лишние поля в корне, группах и разделах; нечисловой `limit`; совпадение неявной группы категории с id явной группы; ключи категорий, совпадающие после NFC.
+- Дубликат ключа группы проверить нельзя: `JsonSlurper` молча оставляет последний. Уникальность групп держится на том, что их id — ключи объекта.
+- Добавлен тест, который прогоняет валидатор по настоящему `categories.json` и папкам датасета.
+- `preBuild` находится через `tasks.named { it == "preBuild" }`, чтобы не зависеть от порядка применения плагинов.

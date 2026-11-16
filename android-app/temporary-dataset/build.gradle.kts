@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.dressdoll.clothing.dataset)
 }
 
 // Временный модуль: сырой датасет одежды в ассетах (src/main/assets).

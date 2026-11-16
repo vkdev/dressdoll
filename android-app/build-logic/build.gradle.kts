@@ -6,6 +6,8 @@ dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin.api)
     compileOnly(libs.compose.gradlePlugin)
+
+    testImplementation(libs.junit)
 }
 
 gradlePlugin {
@@ -21,6 +23,10 @@ gradlePlugin {
         register("themePalette") {
             id = libs.plugins.dressdoll.theme.palette.get().pluginId
             implementationClass = "ru.vkdev.dressdoll.buildlogic.ThemePalettePlugin"
+        }
+        register("clothingDataset") {
+            id = libs.plugins.dressdoll.clothing.dataset.get().pluginId
+            implementationClass = "ru.vkdev.dressdoll.buildlogic.clothing.ClothingDatasetPlugin"
         }
     }
 }
