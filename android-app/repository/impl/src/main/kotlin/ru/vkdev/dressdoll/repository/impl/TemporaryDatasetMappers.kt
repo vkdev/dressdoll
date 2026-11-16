@@ -11,8 +11,6 @@ import ru.vkdev.dressdoll.temporarydataset.TDClothingItem
 import ru.vkdev.dressdoll.temporarydataset.TDDollImages
 import ru.vkdev.dressdoll.temporarydataset.TDItemId
 
-// Dataset -> repository
-
 internal fun CategoryName.toCategoryId(): CategoryId = CategoryId(value)
 
 internal fun TDClothingCategory.toClothingCategory(): ClothingCategory =
@@ -25,8 +23,6 @@ internal fun TDClothingItem.toClothingItem(): ClothingItem =
     ClothingItem(id = id.toClothingItemId(), title = name)
 
 internal fun TDDollImages.toDollImages(): DollImages = DollImages(front = front, back = back)
-
-// Repository -> dataset
 
 internal fun CategoryId.toCategoryName(): CategoryName = CategoryName(value)
 

@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
@@ -23,8 +24,8 @@ class TemporaryDatasetTest {
     private val dispatcher = StandardTestDispatcher()
     private val assets = ApplicationProvider.getApplicationContext<Context>().assets
 
-    // Robolectric's AssetManager.open() cannot find assets with non-ASCII (Cyrillic) paths,
-    // although list() sees them, so images are read straight from the module's assets folder.
+    // AssetManager.open() в Robolectric не находит ассеты с кириллицей в пути, хотя list() их видит,
+    // поэтому картинки читаются прямо из папки ассетов модуля.
     private val dataset = TemporaryDataset(
         assets = assets,
         ioDispatcher = dispatcher,
@@ -37,12 +38,46 @@ class TemporaryDatasetTest {
     )
 
     @Test
-    fun `clothingCategories returns all category folders sorted`() = runTest(dispatcher) {
-        val names = dataset.clothingCategories().first().map { it.name.value }
+    fun `clothingCategories returns all categories in config order`() = runTest(dispatcher) {
+        val categories = dataset.clothingCategories().first()
+        val names = categories.map { it.name.value }
 
         assertEquals(34, names.size)
-        assertEquals(names.sorted(), names)
-        assertTrue("сапоги" in names)
+        assertEquals(listOf("трусы", "бюстгальтер", "бельевая-майка", "майка"), names.take(4))
+        assertEquals("галстук", names.last())
+        assertNotEquals(names.sorted(), names)
+        val sectionOrder = dataset.catalogSections().first().map { it.id }
+        val sectionIndexes = categories.map { sectionOrder.indexOf(it.section) }
+        assertEquals(sectionIndexes.sorted(), sectionIndexes)
+    }
+
+    @Test
+    fun `socks are drawn above tights`() = runTest(dispatcher) {
+        val categories = dataset.clothingCategories().first().associateBy { it.name.value }
+
+        assertTrue(categories.getValue("носки").level.position > categories.getValue("колготки").level.position)
+    }
+
+    @Test
+    fun `tights and stockings share one group with limit 1`() = runTest(dispatcher) {
+        val categories = dataset.clothingCategories().first().associateBy { it.name.value }
+
+        val tights = categories.getValue("колготки").group
+        assertEquals(tights, categories.getValue("чулки").group)
+        assertEquals(1, tights.limit)
+    }
+
+    @Test
+    fun `catalogSections returns 10 sections in config order`() = runTest(dispatcher) {
+        val ids = dataset.catalogSections().first().map { it.id.value }
+
+        assertEquals(
+            listOf(
+                "underwear", "tops", "sweaters", "jackets", "bottoms",
+                "dresses", "outerwear", "hosiery", "shoes", "accessories",
+            ),
+            ids,
+        )
     }
 
     @Test

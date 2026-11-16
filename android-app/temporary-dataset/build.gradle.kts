@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
 }
 
-// Temporary module: raw clothing dataset shipped as assets (see src/main/assets/cloth-src).
+// Временный модуль: сырой датасет одежды в ассетах (src/main/assets).
 android {
     namespace = "ru.vkdev.dressdoll.temporarydataset"
     compileSdk = libs.versions.compileSdk.get().toInt()
@@ -12,7 +12,7 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
         unitTests.all {
-            // Robolectric needs access to JDK internals on recent JDKs.
+            // Robolectric на свежих JDK нужен доступ к внутренним пакетам JDK.
             it.jvmArgs("--add-exports=java.base/jdk.internal.access=ALL-UNNAMED")
         }
     }

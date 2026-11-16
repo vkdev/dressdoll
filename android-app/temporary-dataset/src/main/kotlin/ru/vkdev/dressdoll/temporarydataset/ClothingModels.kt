@@ -2,43 +2,76 @@ package ru.vkdev.dressdoll.temporarydataset
 
 import android.graphics.Bitmap
 
-/** Name of a clothing category, equal to its folder name in the dataset (e.g. "сапоги"). */
+/** Совпадает с именем папки категории в датасете, например «сапоги». */
 @JvmInline
 value class CategoryName(val value: String)
 
-data class TDClothingCategory(val name: CategoryName)
+/**
+ * Свойства категории из `categories.json`, правила — в `.docs/doll/z-index.md`.
+ * Категория без явной группы получает собственную [group] с лимитом 1.
+ */
+data class TDClothingCategory(
+    val name: CategoryName,
+    val slot: TDSlot,
+    val level: TDLevel,
+    val group: TDGroup,
+    val section: TDSectionId,
+)
 
-/** Location of an item in the dataset: `cloth-src/<category>/<folder>/`. */
+/** [id] — значение слота в `categories.json`. */
+enum class TDSlot(val id: String) {
+    FEET("feet"),
+    LEGS("legs"),
+    WAIST("waist"),
+    TORSO("torso"),
+    NECK("neck"),
+    ARMS("arms"),
+    HEAD("head"),
+}
+
+@JvmInline
+value class TDLevelId(val value: String)
+
+@JvmInline
+value class TDGroupId(val value: String)
+
+@JvmInline
+value class TDSectionId(val value: String)
+
+/** [position] считается с 1 от фигурки наружу: уровень выше рисуется поверх. */
+data class TDLevel(val id: TDLevelId, val position: Int)
+
+/** Одновременно надевается не больше [limit] вещей из категорий группы. */
+data class TDGroup(val id: TDGroupId, val limit: Int)
+
+data class TDSection(val id: TDSectionId, val title: String)
+
+/** Папка вещи в датасете: `cloth-src/<category>/<folder>/`. */
 data class TDItemId(
     val category: CategoryName,
     val folder: String,
 )
 
-/**
- * @param id where the item's images live in the dataset.
- * @param name category name + item folder name, e.g. "сапоги 01".
- */
+/** [name] — имя категории и папки вещи, например «сапоги 01». */
 data class TDClothingItem(
     val id: TDItemId,
     val name: String,
 ) {
-    /** Folder name of the category this item belongs to. */
     val parentCategory: CategoryName get() = id.category
 }
 
-/** Image files of an item. */
 enum class TDImageKind(val fileName: String) {
-    /** Whole item for the catalog, including neckline and paper tabs. */
+    /** Вся вещь для каталога, с горловиной и бумажными клапанами. */
     CATALOG("catalog.png"),
 
-    /** Front plane of the item worn on the doll. */
+    /** Передняя плоскость вещи на кукле. */
     FRONT("front.png"),
 
-    /** Back plane of the item worn on the doll, hidden behind the figure. Optional. */
+    /** Задняя плоскость, прячется за фигуркой. Есть не у всех вещей. */
     BACK("back.png"),
 }
 
-/** Images to draw an item on the doll. [back] is null when the item has no back plane. */
+/** [back] — `null`, если у вещи нет задней плоскости. */
 data class TDDollImages(
     val front: Bitmap,
     val back: Bitmap?,

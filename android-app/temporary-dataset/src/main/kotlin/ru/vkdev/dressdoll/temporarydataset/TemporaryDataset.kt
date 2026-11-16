@@ -15,17 +15,13 @@ import java.io.FileNotFoundException
 
 internal const val DATASET_ROOT = "cloth-src"
 
-/** Read access to the clothing dataset stored in assets under `cloth-src/<category>/<item>/`. */
+/** Датасет одежды в ассетах: картинки в `cloth-src/<category>/<item>/`, свойства категорий в `categories.json`. */
 class TemporaryDataset internal constructor(
     private val assets: AssetManager,
     private val ioDispatcher: CoroutineDispatcher,
     private val bitmaps: BitmapRepository,
 ) {
 
-    /**
-     * @param catalogCacheBytes memory budget for decoded catalog images.
-     * @param dollCacheBytes memory budget for decoded doll images (front and back).
-     */
     constructor(
         assets: AssetManager,
         ioDispatcher: CoroutineDispatcher,
@@ -37,8 +33,20 @@ class TemporaryDataset internal constructor(
         bitmaps = BitmapRepository(AssetBitmapDecoder(assets), ioDispatcher, catalogCacheBytes, dollCacheBytes),
     )
 
+    // Читается только внутри flow на ioDispatcher, поэтому ассет не открывается на главном потоке.
+    private val config: TDCategoriesConfig by lazy {
+        CategoriesConfigParser.parse(assets.open(CATEGORIES_CONFIG).bufferedReader().use { it.readText() })
+    }
+
+    private val categories: List<TDClothingCategory> by lazy { matchFolders(config.categories) }
+
+    /** Порядок из конфига: по разделам каталога, внутри раздела — как в `categories.json`. */
     fun clothingCategories(): Flow<List<TDClothingCategory>> = flow {
-        emit(list(DATASET_ROOT).map { TDClothingCategory(CategoryName(it)) })
+        emit(categories)
+    }.flowOn(ioDispatcher)
+
+    fun catalogSections(): Flow<List<TDSection>> = flow {
+        emit(config.sections)
     }.flowOn(ioDispatcher)
 
     fun clothingItems(category: CategoryName): Flow<List<TDClothingItem>> = flow {
@@ -49,24 +57,35 @@ class TemporaryDataset internal constructor(
         )
     }.flowOn(ioDispatcher)
 
-    /** Image of the whole item for the catalog, or null if the item has none. */
     suspend fun catalogImage(item: TDItemId): Bitmap? = bitmaps.load(TDImageKey(item, TDImageKind.CATALOG))
 
-    /** Front and optional back plane of the item for the doll. */
     suspend fun dollImages(item: TDItemId): TDDollImages = coroutineScope {
         val front = async { require(TDImageKey(item, TDImageKind.FRONT)) }
         val back = async { bitmaps.load(TDImageKey(item, TDImageKind.BACK)) }
         TDDollImages(front = front.await(), back = back.await())
     }
 
-    /** Call from `Application.onTrimMemory` to release cached bitmaps. */
+    /** Вызывать из `Application.onTrimMemory`. */
     fun trimMemory(level: Int) = bitmaps.trimMemory(level)
+
+    // Имена сравниваются в NFC, но для путей к ассетам остаётся написание самой папки.
+    private fun matchFolders(configured: List<TDClothingCategory>): List<TDClothingCategory> {
+        val folders = list(DATASET_ROOT).associateBy { it.toNfc() }
+        val names = configured.map { it.name.value }
+        val notConfigured = folders.keys - names.toSet()
+        val noFolder = names - folders.keys
+        check(notConfigured.isEmpty() && noFolder.isEmpty()) {
+            "$CATEGORIES_CONFIG does not match $DATASET_ROOT: " +
+                "folders without entry $notConfigured, entries without folder $noFolder"
+        }
+        return configured.map { it.copy(name = CategoryName(folders.getValue(it.name.value))) }
+    }
 
     private suspend fun require(key: TDImageKey): Bitmap =
         bitmaps.load(key) ?: throw FileNotFoundException("No image ${key.assetPath}")
 
-    // Direct children of [path]. Some AssetManager implementations (e.g. Robolectric)
-    // return nested entries like "01/front.png", so keep only the first segment.
+    // Некоторые реализации AssetManager (например, Robolectric) отдают вложенные пути вида
+    // "01/front.png", поэтому берётся только первый сегмент.
     private fun list(path: String): List<String> =
         assets.list(path).orEmpty()
             .map { it.substringBefore('/') }
@@ -74,7 +93,7 @@ class TemporaryDataset internal constructor(
             .sorted()
 
     private companion object {
-        // Each cache gets 1/16 of the heap: enough for a dressed doll or a screen of catalog.
+        // Каждому кешу 1/16 кучи: хватает на одетую куклу или экран каталога.
         fun defaultCacheBytes(): Int = (Runtime.getRuntime().maxMemory() / 16).toInt()
     }
 }

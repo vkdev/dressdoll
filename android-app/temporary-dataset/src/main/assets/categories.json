@@ -1,0 +1,87 @@
+{
+  "levels": [
+    "underwear",
+    "tights",
+    "socks",
+    "shoes",
+    "bottoms",
+    "undershirts",
+    "shirts",
+    "tie",
+    "dresses",
+    "sweaters",
+    "oversweaters",
+    "jackets",
+    "outerwear"
+  ],
+  "groups": {
+    "tights": { "limit": 1 },
+    "socks": { "limit": 1 },
+    "shoes": { "limit": 1 },
+    "bottoms": { "limit": 1 },
+    "undershirts": { "limit": 2 },
+    "shirts": { "limit": 1 },
+    "dresses": { "limit": 1 },
+    "sweaters": { "limit": 1 },
+    "oversweaters": { "limit": 1 },
+    "jackets": { "limit": 1 },
+    "outerwear": { "limit": 1 }
+  },
+  "sections": [
+    { "id": "underwear", "title": "Бельё" },
+    { "id": "tops", "title": "Футболки и рубашки" },
+    { "id": "sweaters", "title": "Свитеры и кофты" },
+    { "id": "jackets", "title": "Пиджаки и жилеты" },
+    { "id": "bottoms", "title": "Низ" },
+    { "id": "dresses", "title": "Платья и комбинезоны" },
+    { "id": "outerwear", "title": "Верхняя одежда" },
+    { "id": "hosiery", "title": "Носки и колготки" },
+    { "id": "shoes", "title": "Обувь" },
+    { "id": "accessories", "title": "Аксессуары" }
+  ],
+  "categories": {
+    "трусы": { "slot": "waist", "level": "underwear", "section": "underwear" },
+    "бюстгальтер": { "slot": "torso", "level": "underwear", "section": "underwear" },
+    "бельевая-майка": { "slot": "torso", "level": "underwear", "section": "underwear" },
+
+    "майка": { "slot": "torso", "level": "undershirts", "group": "undershirts", "section": "tops" },
+    "футболка": { "slot": "torso", "level": "undershirts", "group": "undershirts", "section": "tops" },
+    "водолазка": { "slot": "torso", "level": "undershirts", "group": "undershirts", "section": "tops" },
+    "рубашка": { "slot": "torso", "level": "shirts", "group": "shirts", "section": "tops" },
+    "блузка": { "slot": "torso", "level": "shirts", "group": "shirts", "section": "tops" },
+
+    "свитер": { "slot": "torso", "level": "sweaters", "group": "sweaters", "section": "sweaters" },
+    "кофта": { "slot": "torso", "level": "sweaters", "group": "sweaters", "section": "sweaters" },
+    "кардиган": { "slot": "torso", "level": "oversweaters", "group": "oversweaters", "section": "sweaters" },
+
+    "жилет": { "slot": "torso", "level": "oversweaters", "group": "oversweaters", "section": "jackets" },
+    "пиджак": { "slot": "torso", "level": "jackets", "group": "jackets", "section": "jackets" },
+    "жакет": { "slot": "torso", "level": "jackets", "group": "jackets", "section": "jackets" },
+
+    "леггинсы": { "slot": "waist", "level": "bottoms", "group": "bottoms", "section": "bottoms" },
+    "брюки": { "slot": "waist", "level": "bottoms", "group": "bottoms", "section": "bottoms" },
+    "юбка": { "slot": "waist", "level": "bottoms", "group": "bottoms", "section": "bottoms" },
+    "шорты": { "slot": "waist", "level": "bottoms", "group": "bottoms", "section": "bottoms" },
+
+    "платье": { "slot": "torso", "level": "dresses", "group": "dresses", "section": "dresses" },
+    "сарафан": { "slot": "torso", "level": "dresses", "group": "dresses", "section": "dresses" },
+    "комбинезон": { "slot": "torso", "level": "dresses", "group": "dresses", "section": "dresses" },
+
+    "плащ": { "slot": "torso", "level": "outerwear", "group": "outerwear", "section": "outerwear" },
+    "куртка": { "slot": "torso", "level": "outerwear", "group": "outerwear", "section": "outerwear" },
+    "пальто": { "slot": "torso", "level": "outerwear", "group": "outerwear", "section": "outerwear" },
+    "шуба": { "slot": "torso", "level": "outerwear", "group": "outerwear", "section": "outerwear" },
+
+    "колготки": { "slot": "waist", "level": "tights", "group": "tights", "section": "hosiery" },
+    "чулки": { "slot": "legs", "level": "tights", "group": "tights", "section": "hosiery" },
+    "носки": { "slot": "feet", "level": "socks", "group": "socks", "section": "hosiery" },
+    "гольфы": { "slot": "legs", "level": "socks", "group": "socks", "section": "hosiery" },
+
+    "тапки": { "slot": "feet", "level": "shoes", "group": "shoes", "section": "shoes" },
+    "туфли": { "slot": "feet", "level": "shoes", "group": "shoes", "section": "shoes" },
+    "ботинки": { "slot": "feet", "level": "shoes", "group": "shoes", "section": "shoes" },
+    "сапоги": { "slot": "feet", "level": "shoes", "group": "shoes", "section": "shoes" },
+
+    "галстук": { "slot": "neck", "level": "tie", "section": "accessories" }
+  }
+}

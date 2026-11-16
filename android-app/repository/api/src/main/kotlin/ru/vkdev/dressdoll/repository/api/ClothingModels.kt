@@ -2,29 +2,22 @@ package ru.vkdev.dressdoll.repository.api
 
 import android.graphics.Bitmap
 
-/** Stable identifier of a clothing category. */
 @JvmInline
 value class CategoryId(val value: String)
 
-/**
- * @param id identifier to request the category's items.
- * @param title human-readable category name, e.g. "сапоги".
- */
+/** [title] — название для пользователя, например «сапоги». */
 data class ClothingCategory(
     val id: CategoryId,
     val title: String,
 )
 
-/** Stable identifier of a clothing item within its [category]. */
+/** [key] уникален только внутри [category]. */
 data class ClothingItemId(
     val category: CategoryId,
     val key: String,
 )
 
-/**
- * @param id identifier to request the item's images.
- * @param title human-readable item name, e.g. "сапоги 01".
- */
+/** [title] — название для пользователя, например «сапоги 01». */
 data class ClothingItem(
     val id: ClothingItemId,
     val title: String,
@@ -32,7 +25,7 @@ data class ClothingItem(
     val category: CategoryId get() = id.category
 }
 
-/** Images to draw an item on the doll. [back] is null when the item has no back plane. */
+/** [back] — `null`, если у вещи нет задней плоскости. */
 data class DollImages(
     val front: Bitmap,
     val back: Bitmap?,

@@ -16,7 +16,7 @@ class ThemePalettePlugin : Plugin<Project> {
             testOptions {
                 unitTests.isIncludeAndroidResources = true
                 unitTests.all {
-                    // Robolectric needs access to JDK internals on recent JDKs.
+                    // Robolectric на свежих JDK нужен доступ к внутренним пакетам JDK.
                     it.jvmArgs("--add-exports=java.base/jdk.internal.access=ALL-UNNAMED")
                 }
             }

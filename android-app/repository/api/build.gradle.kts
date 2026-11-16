@@ -11,6 +11,6 @@ android {
 }
 
 dependencies {
-    // Flow is part of the public API.
+    // Flow входит в публичный API.
     api(libs.kotlinx.coroutines.core)
 }

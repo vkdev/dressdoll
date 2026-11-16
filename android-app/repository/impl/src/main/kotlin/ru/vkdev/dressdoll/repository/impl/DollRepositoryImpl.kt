@@ -30,6 +30,6 @@ internal class DollRepositoryImpl(
 
     override fun onTrimMemory(level: Int) = dataset.trimMemory(level)
 
-    @Suppress("DEPRECATION") // The strongest level: drops every cache.
+    @Suppress("DEPRECATION") // Самый сильный уровень: сбрасывает все кеши.
     override fun onLowMemory() = dataset.trimMemory(ComponentCallbacks2.TRIM_MEMORY_COMPLETE)
 }

@@ -9,15 +9,13 @@ interface DollRepository {
 
     fun clothingItems(category: CategoryId): Flow<List<ClothingItem>>
 
-    /** Image of the whole item for the catalog, or null if the item has none. */
     suspend fun catalogImage(item: ClothingItemId): Bitmap?
 
-    /** Front and optional back plane of the item for the doll. */
     suspend fun dollImages(item: ClothingItemId): DollImages
 
-    /** Call from `ComponentCallbacks2.onTrimMemory`: releases caches depending on [level]. */
+    /** Вызывать из `ComponentCallbacks2.onTrimMemory`. */
     fun onTrimMemory(level: Int)
 
-    /** Call from `ComponentCallbacks.onLowMemory`: releases all caches. */
+    /** Вызывать из `ComponentCallbacks.onLowMemory`: сбрасывает все кеши. */
     fun onLowMemory()
 }

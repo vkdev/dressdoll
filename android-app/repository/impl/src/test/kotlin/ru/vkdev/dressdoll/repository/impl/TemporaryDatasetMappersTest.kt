@@ -9,7 +9,13 @@ import ru.vkdev.dressdoll.repository.api.ClothingItemId
 import ru.vkdev.dressdoll.temporarydataset.CategoryName
 import ru.vkdev.dressdoll.temporarydataset.TDClothingCategory
 import ru.vkdev.dressdoll.temporarydataset.TDClothingItem
+import ru.vkdev.dressdoll.temporarydataset.TDGroup
+import ru.vkdev.dressdoll.temporarydataset.TDGroupId
 import ru.vkdev.dressdoll.temporarydataset.TDItemId
+import ru.vkdev.dressdoll.temporarydataset.TDLevel
+import ru.vkdev.dressdoll.temporarydataset.TDLevelId
+import ru.vkdev.dressdoll.temporarydataset.TDSectionId
+import ru.vkdev.dressdoll.temporarydataset.TDSlot
 
 class TemporaryDatasetMappersTest {
 
@@ -17,7 +23,13 @@ class TemporaryDatasetMappersTest {
     fun `category maps name to id and title`() {
         assertEquals(
             ClothingCategory(id = CategoryId("сапоги"), title = "сапоги"),
-            TDClothingCategory(CategoryName("сапоги")).toClothingCategory(),
+            TDClothingCategory(
+                name = CategoryName("сапоги"),
+                slot = TDSlot.FEET,
+                level = TDLevel(TDLevelId("shoes"), 4),
+                group = TDGroup(TDGroupId("shoes"), 1),
+                section = TDSectionId("shoes"),
+            ).toClothingCategory(),
         )
     }
 

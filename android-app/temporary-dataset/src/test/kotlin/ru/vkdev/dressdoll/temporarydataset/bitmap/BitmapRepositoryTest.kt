@@ -67,8 +67,8 @@ class BitmapRepositoryTest {
 
         repo.load(A_FRONT)
         repo.load(B_FRONT)
-        repo.load(A_FRONT) // A moves to the top, B becomes least recently used
-        repo.load(C_FRONT) // evicts B
+        repo.load(A_FRONT) // A поднимается наверх, B становится самым давним
+        repo.load(C_FRONT) // вытесняет B
 
         assertNotNull(repo.dollCache.get(A_FRONT))
         assertNull(repo.dollCache.get(B_FRONT))

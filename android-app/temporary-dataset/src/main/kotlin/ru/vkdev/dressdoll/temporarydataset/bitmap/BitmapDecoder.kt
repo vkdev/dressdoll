@@ -7,12 +7,12 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
 
-/** Blocking image decoder. Returns null when the image file does not exist. */
+/** Блокирующий. Возвращает `null`, если файла нет. */
 internal fun interface BitmapDecoder {
     fun decode(key: TDImageKey): Bitmap?
 }
 
-/** Decodes images from asset paths; [open] throws [FileNotFoundException] for a missing file. */
+/** [open] бросает [FileNotFoundException], если файла нет. */
 internal class AssetBitmapDecoder(
     private val open: (assetPath: String) -> InputStream,
 ) : BitmapDecoder {
@@ -25,8 +25,8 @@ internal class AssetBitmapDecoder(
         } catch (_: FileNotFoundException) {
             return null
         }
-        // Options are mutable (the decoder writes out* fields), so each concurrent decode gets its own.
-        // Clothing images need transparency, so no RGB_565.
+        // Options изменяемые (декодер пишет в поля out*), поэтому у каждого параллельного декодирования свои.
+        // Одежде нужна прозрачность, поэтому не RGB_565.
         val options = BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.ARGB_8888 }
         return stream.use { BitmapFactory.decodeStream(it, null, options) }
             ?: throw IOException("Cannot decode ${key.assetPath}")

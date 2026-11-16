@@ -7,7 +7,7 @@ android {
 }
 
 dependencies {
-    // ClothingItemId is part of the public API.
+    // ClothingItemId входит в публичный API.
     api(project(":repository:api"))
     implementation(libs.androidx.compose.ui)
 }

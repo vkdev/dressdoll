@@ -1,0 +1,61 @@
+# Конфиг надевания. Часть 2: проверка при сборке
+
+Создан: 2026-11-16 09:41
+
+Части плана:
+1. [Общее и конфиг датасета](plan_part_1.md)
+2. **Проверка при сборке** (этот файл)
+3. [Данные в репозитории](plan_part_3.md)
+
+## Цель
+
+Сборка любого варианта приложения падает, если `categories.json` и папки `cloth-src` расходятся. В сообщении перечислены все нарушения сразу, а не только первое.
+
+## Шаги
+
+### 1. Валидатор
+
+`build-logic/src/main/kotlin/ru/vkdev/dressdoll/buildlogic/clothing/ClothingDatasetValidator.kt`:
+
+- Чистая функция `validate(configJson: String, categoryFolders: Set<String>): List<String>` — список ошибок по-русски, пустой при успехе.
+- JSON читается через `groovy.json.JsonSlurper`: он уже есть в рантайме Gradle, новые зависимости не нужны.
+- Проверяет инварианты из z-index.md:
+  - каждой папке соответствует категория, и наоборот;
+  - `slot` из списка `feet`, `legs`, `waist`, `torso`, `neck`, `arms`, `head`;
+  - `level`, `group`, `section` ссылаются на существующие записи;
+  - id уровней, групп и разделов уникальны;
+  - у каждой группы `limit ≥ 1`;
+  - в каждом уровне, явной группе и разделе есть хотя бы одна категория;
+  - имена папок и ключи категорий в NFC;
+  - у каждой категории нет лишних полей (ловит опечатки вроде `levle`).
+
+### 2. Задача
+
+`ValidateClothingDatasetTask`:
+
+- `@InputFile` — `categories.json`; `@Input` — отсортированный список имён папок `cloth-src`. Картинки на вход не попадают, поэтому их правка не перезапускает проверку.
+- Пустой `@OutputFile`-маркер в `build/`, чтобы задача была up-to-date между сборками.
+- При ошибках — `GradleException` со списком:
+
+```
+categories.json не согласован с cloth-src:
+  - папка «галстук-бабочка» есть, записи в categories нет
+  - «жакет»: уровень «jakets» не найден
+```
+
+### 3. Плагин
+
+- `ClothingDatasetPlugin`, id `dressdoll.clothing.dataset`, регистрация в `build-logic/build.gradle.kts` и алиас в `libs.versions.toml` по образцу остальных convention-плагинов.
+- Регистрирует `validateClothingDataset` с путями `src/main/assets/categories.json` и `src/main/assets/cloth-src`; `preBuild` зависит от неё.
+- Подключается только в `temporary-dataset/build.gradle.kts`.
+
+### 4. Тесты валидатора
+
+- В `build-logic` добавить `testImplementation(junit)`.
+- `ClothingDatasetValidatorTest`: корректный конфиг без ошибок; папка без записи; запись без папки; неизвестный слот, уровень, группа, раздел; пустой раздел; `limit = 0`; NFD-имя («и» + U+0306); лишнее поле; несколько ошибок попадают в отчёт вместе.
+
+### 5. Ручная проверка
+
+- `./gradlew :app:assembleDebug` проходит.
+- Временно создать пустую папку `cloth-src/галстук-бабочка` → сборка падает с понятным сообщением → удалить папку.
+- Повторная сборка без изменений: `validateClothingDataset` в статусе UP-TO-DATE.

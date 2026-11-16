@@ -4,7 +4,7 @@ import ru.vkdev.dressdoll.temporarydataset.DATASET_ROOT
 import ru.vkdev.dressdoll.temporarydataset.TDImageKind
 import ru.vkdev.dressdoll.temporarydataset.TDItemId
 
-/** One image file of one item; the cache key. */
+/** Ключ кеша: одна картинка одной вещи. */
 internal data class TDImageKey(
     val item: TDItemId,
     val kind: TDImageKind,
