@@ -27,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import ru.vkdev.dressdoll.catalog.api.Catalog
 import ru.vkdev.dressdoll.repository.api.CategoryId
-import ru.vkdev.dressdoll.repository.api.ClothingCategory
 import ru.vkdev.dressdoll.repository.api.ClothingItem
 import ru.vkdev.dressdoll.repository.api.ClothingItemId
 import ru.vkdev.dressdoll.repository.api.DollRepository
@@ -43,7 +42,6 @@ internal class CatalogImpl(
         isOpen: Boolean,
         modifier: Modifier,
     ) {
-        // Категория сохраняется вместе с названием: после смерти процесса шапка не ждёт список категорий.
         var openCategory by rememberSaveable(saver = OpenCategorySaver) { mutableStateOf(null) }
         val categories by remember(repository) { repository.clothingCategories() }
             .collectAsState(initial = null)
@@ -79,7 +77,7 @@ internal class CatalogImpl(
                     categories = categories,
                     state = categoriesState,
                     bottomInset = bottomInset,
-                    onOpen = { openCategory = it },
+                    onOpen = { openCategory = OpenCategory(it.id, it.title) },
                 )
             } else {
                 ItemsPane(
@@ -96,10 +94,13 @@ internal class CatalogImpl(
     }
 }
 
-// ClothingCategory не Parcelable, поэтому id и название лежат списком строк; пустой список — категория не открыта.
-private val OpenCategorySaver = Saver<MutableState<ClothingCategory?>, List<String>>(
+/** Только то, что нужно экрану вещей: после смерти процесса шапка не ждёт список категорий. */
+internal data class OpenCategory(val id: CategoryId, val title: String)
+
+// OpenCategory не Parcelable, поэтому id и название лежат списком строк; пустой список — категория не открыта.
+private val OpenCategorySaver = Saver<MutableState<OpenCategory?>, List<String>>(
     save = { state -> state.value?.let { arrayListOf(it.id.value, it.title) } ?: arrayListOf() },
     restore = { saved ->
-        mutableStateOf(saved.takeIf { it.size == 2 }?.let { ClothingCategory(CategoryId(it[0]), it[1]) })
+        mutableStateOf(saved.takeIf { it.size == 2 }?.let { OpenCategory(CategoryId(it[0]), it[1]) })
     },
 )

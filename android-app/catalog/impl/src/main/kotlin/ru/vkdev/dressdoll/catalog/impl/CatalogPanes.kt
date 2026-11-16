@@ -80,7 +80,7 @@ internal fun CategoriesPane(
 @Composable
 internal fun ItemsPane(
     repository: DollRepository,
-    category: ClothingCategory,
+    category: OpenCategory,
     loadedItems: MutableMap<CategoryId, List<ClothingItem>>,
     selected: ClothingItemId?,
     onSelect: (ClothingItemId) -> Unit,

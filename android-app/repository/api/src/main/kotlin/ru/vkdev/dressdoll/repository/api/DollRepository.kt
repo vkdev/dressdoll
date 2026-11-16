@@ -5,7 +5,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface DollRepository {
 
+    /** Категории идут по разделам в порядке [catalogSections]. */
     fun clothingCategories(): Flow<List<ClothingCategory>>
+
+    fun catalogSections(): Flow<List<CatalogSection>>
 
     fun clothingItems(category: CategoryId): Flow<List<ClothingItem>>
 

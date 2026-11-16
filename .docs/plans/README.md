@@ -11,4 +11,3 @@
 | План | Создан | Части | Статус |
 |---|---|---|---|
 | Темы 70-х и навигация (`themes-navigation`) | 2026-11-15 21:01 | [1. Общее и навигация](themes-navigation/plan_part_1.md) · [2. Темы](themes-navigation/plan_part_2.md) · [3. Заставка и бары](themes-navigation/plan_part_3.md) · [4. Экран выбора темы](themes-navigation/plan_part_4.md) | все части выполнены и закоммичены |
-| Конфиг надевания (`dressing-config`) | 2026-11-16 09:41 | [1. Общее и конфиг датасета](dressing-config/plan_part_1.md) · [2. Проверка при сборке](dressing-config/plan_part_2.md) · [3. Данные в репозитории](dressing-config/plan_part_3.md) | части 1–2 выполнены и закоммичены; часть 3 не начата |

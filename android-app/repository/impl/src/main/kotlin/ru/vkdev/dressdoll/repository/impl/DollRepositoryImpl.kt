@@ -4,6 +4,7 @@ import android.content.ComponentCallbacks2
 import android.graphics.Bitmap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import ru.vkdev.dressdoll.repository.api.CatalogSection
 import ru.vkdev.dressdoll.repository.api.CategoryId
 import ru.vkdev.dressdoll.repository.api.ClothingCategory
 import ru.vkdev.dressdoll.repository.api.ClothingItem
@@ -18,6 +19,9 @@ internal class DollRepositoryImpl(
 
     override fun clothingCategories(): Flow<List<ClothingCategory>> =
         dataset.clothingCategories().map { categories -> categories.map { it.toClothingCategory() } }
+
+    override fun catalogSections(): Flow<List<CatalogSection>> =
+        dataset.catalogSections().map { sections -> sections.map { it.toCatalogSection() } }
 
     override fun clothingItems(category: CategoryId): Flow<List<ClothingItem>> =
         dataset.clothingItems(category.toCategoryName()).map { items -> items.map { it.toClothingItem() } }
