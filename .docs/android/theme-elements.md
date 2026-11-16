@@ -34,9 +34,9 @@
 | Токен | Значение | Где используется | Статус |
 |---|---|---|---|
 | `extraSmall` | 4dp | промежуток между кнопкой «Назад» и заголовком в `HeaderBar`, отступ подписи раздела и подвала от края списка, промежуток между строками текста в карточке | есть |
-| `small` | 8dp | промежутки между `NavigationTile`, внутренние поля `ChoiceTile`, отступ значка выбора, поле `HeaderBar` слева перед кнопкой «Назад», промежуток между текстом и шевроном в `NavigationTile`, промежутки между образцами-чипсами, отступ подвала списка сверху | есть |
+| `small` | 8dp | промежутки между `NavigationTile`, внутренние поля `ChoiceTile`, отступ значка выбора, поле `HeaderBar` слева перед кнопкой «Назад» и справа после кнопок действий, промежуток между текстом и шевроном в `NavigationTile`, промежутки между образцами-чипсами, отступ подвала списка сверху | есть |
 | `medium` | 12dp | промежутки между `ChoiceTile` и между карточками в списке, промежутки внутри карточек, отступ подписи раздела сверху | есть |
-| `large` | 16dp | поля контейнеров, списков и сеток, поля `NavigationTile` и `SelectableCard`, поля `HeaderBar` справа и слева без кнопки «Назад» | есть |
+| `large` | 16dp | поля контейнеров, списков и сеток, поля `NavigationTile` и `SelectableCard`, поля `HeaderBar` справа без кнопок действий и слева без кнопки «Назад» | есть |
 | `extraLarge` | 24dp | — | есть |
 | `extraExtraLarge` | 32dp | запас под последним элементом прокручиваемого экрана | есть |
 
@@ -44,9 +44,9 @@
 
 | Токен | Значение | Где используется | Статус |
 |---|---|---|---|
-| `touchTarget` | 48dp | `BackButton` и любые иконочные кнопки, высота язычка скрытой шторки, минимальная высота `HeaderBar` по умолчанию | есть |
-| `topBarHeight` | 64dp | минимальная высота `HeaderBar` в шапке полноэкранного экрана | есть |
-| `icon` | 24dp | иконка в `BackButton` | есть |
+| `touchTarget` | 48dp | `IconActionButton` и любые иконочные кнопки, высота язычка скрытой шторки, минимальная высота `HeaderBar` по умолчанию | есть |
+| `topBarHeight` | 64dp | минимальная высота `HeaderBar` в шапке полноэкранного экрана: выбор темы, кукла | есть |
+| `icon` | 24dp | иконка в `IconActionButton` | есть |
 | `iconSmall` | 18dp | шеврон в `NavigationTile`, галочка в значке выбора | есть |
 | `badge` | 24dp | значок выбора в `ChoiceTile` | есть |
 | `tileHeight` | 56dp | высота `NavigationTile` | есть |
@@ -69,14 +69,16 @@
 | `ArrowBack` | `BackButton` | есть. Перенесена из `ThemeSettingsScreen` как есть: уголок «<» с `autoMirror = true` |
 | `ChevronRight` | `NavigationTile` | есть |
 | `Check` | значок выбора в `ChoiceTile` | есть |
+| `Settings` | шестерёнка: 8 зубов, ось-кружок. Кнопка настроек в шапке экрана куклы | есть |
 
 ## Компоненты
 
 | Компонент | Что это | Цвета и типографика | Где используется | Статус |
 |---|---|---|---|---|
 | `HeadlineText(text, style, …)` | текст заголовка с регистром палитры (`uppercaseHeadlines`) | стиль задаёт вызывающий | экран выбора темы, `HeaderBar` | есть |
-| `BackButton(onClick)` | `IconButton` размером `touchTarget` с `AppIcons.ArrowBack`. `contentDescription` «Назад» из ресурсов `:theme:api` | иконка `onSurface` | `HeaderBar` | есть |
-| `HeaderBar(title, onBack, supportingText, titleStyle, minHeight)` | шапка экрана или панели: `BackButton`, если `onBack != null`, иначе отступ до выравнивания с контентом; заголовок через `HeadlineText` с `heading()`; справа поясняющий текст | заголовок `titleStyle` (по умолчанию `headlineSmall`) / `onSurface`, пояснение `bodySmall` / `onSurfaceVariant`. `minHeight` по умолчанию `touchTarget` | каталог; экран выбора темы (`headlineMedium`, `topBarHeight`) | есть |
+| `IconActionButton(icon, contentDescription, onClick)` | `IconButton` размером `touchTarget` с иконкой `icon` | иконка `onSurface` | `BackButton`; шапка экрана куклы: настройки | есть |
+| `BackButton(onClick)` | `IconActionButton` с `AppIcons.ArrowBack`. `contentDescription` «Назад» из ресурсов `:theme:api` | как у `IconActionButton` | `HeaderBar` | есть |
+| `HeaderBar(title, onBack, supportingText, titleStyle, minHeight, actions)` | шапка экрана или панели: `BackButton`, если `onBack != null`, иначе отступ до выравнивания с контентом; заголовок через `HeadlineText` с `heading()`; справа поясняющий текст и кнопки `actions` (`IconActionButton`) | заголовок `titleStyle` (по умолчанию `headlineSmall`) / `onSurface`, пояснение `bodySmall` / `onSurfaceVariant`. `minHeight` по умолчанию `touchTarget` | каталог; экран выбора темы и экран куклы (`headlineMedium`, `topBarHeight`) | есть |
 | `SelectableCard(selected, onClick, color, content)` | карточка выбора одного из многих: `selectable(role = Role.RadioButton)`, фигура `large`, рамка `Strokes.thick` `primary` у выбранной и `Strokes.thin` `outline` у остальных. Содержимое и индикатор выбора задаёт вызывающий | фон `color` (по умолчанию `surface`) | `ChoiceTile`; экран выбора темы: «Как в системе» и карточки палитр | есть |
 | `ChoiceTile(selected, onClick, content)` | `SelectableCard` с круглым значком `badge` и `Check` в правом верхнем углу у выбранной | фон `surfaceContainerLowest`, значок `primary` / `onPrimary` | каталог: вещи | есть |
 | `NavigationTile(text, onClick)` | плашка-переход: текст в одну строку с многоточием, справа `ChevronRight`. Высота `tileHeight`, фигура `large` | фон `surfaceContainerHigh`, текст `titleSmall` / `onSurface` | каталог: категории | есть |

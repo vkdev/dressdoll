@@ -3,9 +3,13 @@ package ru.vkdev.dressdoll.doll.impl
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,16 +27,21 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import ru.vkdev.dressdoll.catalog.api.Catalog
 import ru.vkdev.dressdoll.repository.api.CategoryId
 import ru.vkdev.dressdoll.repository.api.ClothingItemId
+import ru.vkdev.dressdoll.theme.api.AppIcons
+import ru.vkdev.dressdoll.theme.api.HeaderBar
+import ru.vkdev.dressdoll.theme.api.IconActionButton
 import ru.vkdev.dressdoll.theme.api.Sizes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun DollScreen(
     catalog: Catalog,
+    onOpenSettings: () -> Unit,
 ) {
     // Шторка не прячется целиком: «скрыта» — это PartiallyExpanded, виден только язычок.
     val sheetState = rememberStandardBottomSheetState(
@@ -59,6 +68,24 @@ internal fun DollScreen(
             sheetPeekHeight = peekHeight,
             sheetDragHandle = { BottomSheetDefaults.DragHandle() },
             containerColor = MaterialTheme.colorScheme.background,
+            topBar = {
+                HeaderBar(
+                    title = stringResource(R.string.doll_title),
+                    onBack = null,
+                    titleStyle = MaterialTheme.typography.headlineMedium,
+                    minHeight = Sizes.topBarHeight,
+                    modifier = Modifier.windowInsetsPadding(
+                        WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+                    ),
+                    actions = {
+                        IconActionButton(
+                            icon = AppIcons.Settings,
+                            contentDescription = stringResource(R.string.doll_settings),
+                            onClick = onOpenSettings,
+                        )
+                    },
+                )
+            },
             sheetContent = {
                 catalog.Content(
                     selected = selected,

@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":repository:api"))
     implementation(project(":catalog:api"))
     implementation(project(":theme:api"))
+    implementation(project(":settings:settings-theme:api"))
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)

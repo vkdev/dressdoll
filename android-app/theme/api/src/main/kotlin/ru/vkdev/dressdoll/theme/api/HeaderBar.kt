@@ -2,6 +2,7 @@ package ru.vkdev.dressdoll.theme.api
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,8 @@ import androidx.compose.ui.unit.Dp
  * Шапка экрана или панели.
  *
  * Без [onBack] кнопки нет, и заголовок выровнен по полям контента ([Spacing.large]).
+ * [actions] — иконочные кнопки справа ([IconActionButton]); с ними правое поле, как у
+ * кнопки «Назад» слева, — [Spacing.small].
  */
 @Composable
 fun HeaderBar(
@@ -28,6 +31,7 @@ fun HeaderBar(
     supportingText: String? = null,
     titleStyle: TextStyle = MaterialTheme.typography.headlineSmall,
     minHeight: Dp = Sizes.touchTarget,
+    actions: (@Composable RowScope.() -> Unit)? = null,
 ) {
     val colors = MaterialTheme.colorScheme
     Row(
@@ -36,7 +40,7 @@ fun HeaderBar(
             .heightIn(min = minHeight)
             .padding(
                 start = if (onBack != null) Spacing.small else Spacing.large,
-                end = Spacing.large,
+                end = if (actions != null) Spacing.small else Spacing.large,
             ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Spacing.extraSmall),
@@ -59,5 +63,6 @@ fun HeaderBar(
                 color = colors.onSurfaceVariant,
             )
         }
+        actions?.invoke(this)
     }
 }
