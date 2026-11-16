@@ -15,14 +15,93 @@ class ClothingDatasetValidatorTest {
     @Test
     fun `настоящий конфиг датасета согласован с папками`() {
         // Тесты build-logic запускаются из его каталога, датасет — соседний модуль.
-        val assets = File("../temporary-dataset/src/main/assets")
-        val folders = assets.resolve("cloth-src").listFiles().orEmpty()
-            .filter { it.isDirectory }
-            .mapTo(mutableSetOf()) { it.name }
+        val module = File("../temporary-dataset")
+        val entries = ClothSrcEntries.scan(module.resolve("src/main/assets/cloth-src"))
 
-        val errors = ClothingDatasetValidator.validate(assets.resolve("categories.json").readText(), folders)
+        val result = ClothingDatasetValidator.validate(
+            configJson = module.resolve("categories.json").readText(),
+            categoryFolders = entries.folders.toSet(),
+            strayFiles = entries.files.toSet(),
+        )
 
-        assertEquals(emptyList<String>(), errors)
+        assertEquals(emptyList<String>(), result.errors)
+    }
+
+    @Test
+    fun `категории упорядочены по разделам, внутри раздела — как в файле`() {
+        val config = CONFIG.replace(
+            "\"трусы\": { \"slot\": \"waist\", \"level\": \"underwear\", \"section\": \"underwear\" },",
+            "\"трусы\": { \"slot\": \"waist\", \"level\": \"underwear\", \"section\": \"underwear\" }," +
+                " \"гольфы\": { \"slot\": \"legs\", \"level\": \"socks\", \"group\": \"socks\", \"section\": \"hosiery\" },",
+        ).replace(
+            "\"носки\": { \"slot\": \"feet\", \"level\": \"socks\", \"group\": \"socks\", \"section\": \"hosiery\" }",
+            "\"носки\": { \"slot\": \"feet\", \"level\": \"socks\", \"group\": \"socks\", \"section\": \"hosiery\" }," +
+                " \"бюстгальтер\": { \"slot\": \"torso\", \"level\": \"underwear\", \"section\": \"underwear\" }",
+        )
+
+        val result = ClothingDatasetValidator.validate(config, FOLDERS + "гольфы" + "бюстгальтер")
+
+        assertEquals(emptyList<String>(), result.errors)
+        assertEquals(listOf("трусы", "бюстгальтер", "гольфы", "носки"), result.config!!.categories.map { it.name })
+    }
+
+    @Test
+    fun `конфиг без ошибок разобран полностью`() {
+        val config = ClothingDatasetValidator.validate(CONFIG, FOLDERS).config
+
+        assertEquals(
+            DatasetConfig(
+                levels = listOf("underwear", "socks"),
+                groups = listOf(DatasetGroup("socks", 1)),
+                sections = listOf(DatasetSection("underwear", "Бельё"), DatasetSection("hosiery", "Носки")),
+                categories = listOf(
+                    DatasetCategory("трусы", slot = "waist", level = "underwear", group = null, section = "underwear"),
+                    DatasetCategory("носки", slot = "feet", level = "socks", group = "socks", section = "hosiery"),
+                ),
+            ),
+            config,
+        )
+    }
+
+    @Test
+    fun `при ошибках конфига нет`() {
+        val result = ClothingDatasetValidator.validate(CONFIG, FOLDERS - "трусы")
+
+        assertEquals(null, result.config)
+    }
+
+    @Test
+    fun `явный null в группе`() {
+        val config = CONFIG.replace("\"section\": \"underwear\" }", "\"group\": null, \"section\": \"underwear\" }")
+
+        val errors = validate(config = config)
+
+        assertEquals(1, errors.size)
+        assertTrue(errors.single(), errors.single().startsWith("«трусы»: поле «group» должно быть строкой, сейчас «null»"))
+    }
+
+    @Test
+    fun `файл среди папок категорий`() {
+        val errors = ClothingDatasetValidator.validate(CONFIG, FOLDERS, strayFiles = setOf("notes.txt")).errors
+
+        assertEquals(listOf("файл «notes.txt» лежит в cloth-src: там должны быть только папки категорий"), errors)
+    }
+
+    @Test
+    fun `повтор ключа категории`() {
+        val config = CONFIG.replace(
+            "\"носки\": { \"slot\": \"feet\"",
+            "\"трусы\": { \"slot\": \"legs\", \"level\": \"socks\", \"section\": \"underwear\" }, \"носки\": { \"slot\": \"feet\"",
+        )
+
+        assertEquals(listOf("в «categories» ключ «трусы» повторяется"), validate(config = config))
+    }
+
+    @Test
+    fun `повтор ключа внутри записи`() {
+        val config = CONFIG.replace("\"limit\": 1", "\"limit\": 1, \"limit\": 2")
+
+        assertEquals(listOf("в «groups.socks» ключ «limit» повторяется"), validate(config = config))
     }
 
     @Test
@@ -176,7 +255,7 @@ class ClothingDatasetValidatorTest {
     }
 
     private fun validate(config: String = CONFIG, folders: Set<String> = FOLDERS): List<String> =
-        ClothingDatasetValidator.validate(config, folders)
+        ClothingDatasetValidator.validate(config, folders).errors
 
     private companion object {
         val FOLDERS = setOf("трусы", "носки")

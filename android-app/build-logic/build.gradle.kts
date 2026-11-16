@@ -6,6 +6,7 @@ dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin.api)
     compileOnly(libs.compose.gradlePlugin)
+    implementation(libs.jackson.core)
 
     testImplementation(libs.junit)
 }

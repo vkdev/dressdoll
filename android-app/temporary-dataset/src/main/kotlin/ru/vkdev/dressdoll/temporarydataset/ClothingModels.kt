@@ -7,6 +7,18 @@ import android.graphics.Bitmap
 value class CategoryName(val value: String)
 
 /**
+ * Генерируется при сборке из `categories.json` (`categoriesConfig`).
+ * [groups] — только явные группы, неявные есть только у категорий.
+ * [categories] упорядочены по разделам, внутри раздела — как в файле.
+ */
+internal data class TDCategoriesConfig(
+    val levels: List<TDLevel>,
+    val groups: List<TDGroup>,
+    val sections: List<TDSection>,
+    val categories: List<TDClothingCategory>,
+)
+
+/**
  * Свойства категории из `categories.json`, правила — в `.docs/doll/z-index.md`.
  * Категория без явной группы получает собственную [group] с лимитом 1.
  */
@@ -18,15 +30,15 @@ data class TDClothingCategory(
     val section: TDSectionId,
 )
 
-/** [id] — значение слота в `categories.json`. */
-enum class TDSlot(val id: String) {
-    FEET("feet"),
-    LEGS("legs"),
-    WAIST("waist"),
-    TORSO("torso"),
-    NECK("neck"),
-    ARMS("arms"),
-    HEAD("head"),
+/** Имя константы — значение слота в `categories.json` в верхнем регистре: на него ссылается сгенерированный код. */
+enum class TDSlot {
+    FEET,
+    LEGS,
+    WAIST,
+    TORSO,
+    NECK,
+    ARMS,
+    HEAD,
 }
 
 @JvmInline

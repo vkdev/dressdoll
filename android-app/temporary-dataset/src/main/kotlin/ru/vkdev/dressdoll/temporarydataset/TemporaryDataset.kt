@@ -7,6 +7,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import ru.vkdev.dressdoll.temporarydataset.bitmap.AssetBitmapDecoder
 import ru.vkdev.dressdoll.temporarydataset.bitmap.BitmapRepository
@@ -15,7 +16,10 @@ import java.io.FileNotFoundException
 
 internal const val DATASET_ROOT = "cloth-src"
 
-/** Датасет одежды в ассетах: картинки в `cloth-src/<category>/<item>/`, свойства категорий в `categories.json`. */
+/**
+ * Датасет одежды в ассетах: картинки в `cloth-src/<category>/<item>/`.
+ * Свойства категорий сгенерированы при сборке из `categories.json` модуля.
+ */
 class TemporaryDataset internal constructor(
     private val assets: AssetManager,
     private val ioDispatcher: CoroutineDispatcher,
@@ -33,21 +37,15 @@ class TemporaryDataset internal constructor(
         bitmaps = BitmapRepository(AssetBitmapDecoder(assets), ioDispatcher, catalogCacheBytes, dollCacheBytes),
     )
 
-    // Читается только внутри flow на ioDispatcher, поэтому ассет не открывается на главном потоке.
-    private val config: TDCategoriesConfig by lazy {
-        CategoriesConfigParser.parse(assets.open(CATEGORIES_CONFIG).bufferedReader().use { it.readText() })
-    }
-
-    private val categories: List<TDClothingCategory> by lazy { matchFolders(config.categories) }
+    // Читается только внутри flow на ioDispatcher, поэтому список ассетов не читается на главном потоке.
+    private val categories: List<TDClothingCategory> by lazy { matchFolders(categoriesConfig.categories) }
 
     /** Порядок из конфига: по разделам каталога, внутри раздела — как в `categories.json`. */
     fun clothingCategories(): Flow<List<TDClothingCategory>> = flow {
         emit(categories)
     }.flowOn(ioDispatcher)
 
-    fun catalogSections(): Flow<List<TDSection>> = flow {
-        emit(config.sections)
-    }.flowOn(ioDispatcher)
+    fun catalogSections(): Flow<List<TDSection>> = flowOf(categoriesConfig.sections)
 
     fun clothingItems(category: CategoryName): Flow<List<TDClothingItem>> = flow {
         emit(
@@ -68,17 +66,16 @@ class TemporaryDataset internal constructor(
     /** Вызывать из `Application.onTrimMemory`. */
     fun trimMemory(level: Int) = bitmaps.trimMemory(level)
 
-    // Имена сравниваются в NFC, но для путей к ассетам остаётся написание самой папки.
+    // Сборка уже сверила конфиг с папками; здесь страховка на случай нестандартного ignoreAssetsPattern.
+    // NFC не нужен: имена не в NFC сборка не пропускает.
     private fun matchFolders(configured: List<TDClothingCategory>): List<TDClothingCategory> {
-        val folders = list(DATASET_ROOT).associateBy { it.toNfc() }
-        val names = configured.map { it.name.value }
-        val notConfigured = folders.keys - names.toSet()
-        val noFolder = names - folders.keys
-        check(notConfigured.isEmpty() && noFolder.isEmpty()) {
-            "$CATEGORIES_CONFIG does not match $DATASET_ROOT: " +
-                "folders without entry $notConfigured, entries without folder $noFolder"
+        val folders = list(DATASET_ROOT).toSet()
+        val names = configured.mapTo(mutableSetOf()) { it.name.value }
+        check(folders == names) {
+            "categories.json does not match $DATASET_ROOT: " +
+                "folders without entry ${folders - names}, entries without folder ${names - folders}"
         }
-        return configured.map { it.copy(name = CategoryName(folders.getValue(it.name.value))) }
+        return configured
     }
 
     private suspend fun require(key: TDImageKey): Bitmap =

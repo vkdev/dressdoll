@@ -1,16 +1,15 @@
 package ru.vkdev.dressdoll.buildlogic.clothing
 
-import groovy.json.JsonException
-import groovy.json.JsonSlurper
+import com.fasterxml.jackson.core.JsonProcessingException
 import java.text.Normalizer
 
 /**
  * Проверяет инварианты из `.docs/doll/z-index.md`. Собирает все нарушения, а не падает
- * на первом: рантайм датасета доверяет этой проверке и сам ошибки не перечисляет.
+ * на первом: конфиг для рантайма генерируется только из проверенного файла.
  */
 internal object ClothingDatasetValidator {
 
-    /** Совпадает с `TDSlot` в `:temporary-dataset`. */
+    /** Сгенерированный код ссылается на `TDSlot.<SLOT>`, поэтому расхождение с `TDSlot` не скомпилируется. */
     val SLOTS = listOf("feet", "legs", "waist", "torso", "neck", "arms", "head")
 
     private val ROOT_FIELDS = setOf("levels", "groups", "sections", "categories")
@@ -18,36 +17,80 @@ internal object ClothingDatasetValidator {
     private val SECTION_FIELDS = setOf("id", "title")
     private val CATEGORY_FIELDS = setOf("slot", "level", "group", "section")
 
-    fun validate(configJson: String, categoryFolders: Set<String>): List<String> {
-        val root = try {
-            JsonSlurper().parseText(configJson)
-        } catch (e: JsonException) {
-            return listOf("не удалось разобрать JSON: ${e.message}")
+    /** [strayFiles] — файлы, которые лежат в cloth-src рядом с папками категорий. */
+    fun validate(
+        configJson: String,
+        categoryFolders: Set<String>,
+        strayFiles: Set<String> = emptySet(),
+    ): ValidationResult {
+        val tree = try {
+            readJsonTree(configJson)
+        } catch (e: JsonProcessingException) {
+            return failure("не удалось разобрать JSON: ${e.originalMessage}")
         }
-        if (root !is Map<*, *>) return listOf("корень должен быть объектом")
+        val root = tree.root as? Map<*, *> ?: return failure("корень должен быть объектом")
 
         val errors = mutableListOf<String>()
+        tree.duplicateKeys.forEach { (path, key) ->
+            val owner = if (path.isEmpty()) "в корне" else "в «${path.joinToString(".")}»"
+            errors += "$owner ключ «$key» повторяется"
+        }
         errors += unknownFields(root, ROOT_FIELDS, "в корне")
 
         val levels = parseLevels(root["levels"], errors)
         val groups = parseGroups(root["groups"], errors)
         val sections = parseSections(root["sections"], errors)
-        val categories = parseCategories(root["categories"], levels, groups, sections, errors)
+        val categories = parseCategories(root["categories"], levels, groups.map { it.id }, sections.map { it.id }, errors)
 
         checkFolders(categoryFolders, categories.map { it.name }, errors)
+        strayFiles.sorted().forEach { errors += "файл «$it» лежит в cloth-src: там должны быть только папки категорий" }
 
         val usedLevels = categories.mapNotNullTo(mutableSetOf()) { it.level }
         levels.filterNot { it in usedLevels }.forEach { errors += "уровень «$it» не используется ни одной категорией" }
         val usedGroups = categories.mapNotNullTo(mutableSetOf()) { it.group }
-        groups.filterNot { it in usedGroups }.forEach { errors += "группа «$it» не используется ни одной категорией" }
+        groups.filterNot { it.id in usedGroups }.forEach { errors += "группа «${it.id}» не используется ни одной категорией" }
         val usedSections = categories.mapNotNullTo(mutableSetOf()) { it.section }
-        sections.filterNot { it in usedSections }.forEach { errors += "раздел «$it» пуст" }
+        sections.filterNot { it.id in usedSections }.forEach { errors += "раздел «${it.id}» пуст" }
 
-        return errors
+        if (errors.isNotEmpty()) return ValidationResult(errors, config = null)
+
+        // Без ошибок все поля разобраны: null остаётся только рядом с ошибкой в отчёте.
+        val sectionOrder = sections.map { it.id }
+        val config = DatasetConfig(
+            levels = levels,
+            groups = groups.map { DatasetGroup(it.id, checkNotNull(it.limit)) },
+            sections = sections.map { DatasetSection(it.id, checkNotNull(it.title)) },
+            categories = categories
+                .map {
+                    DatasetCategory(
+                        name = it.name,
+                        slot = checkNotNull(it.slot),
+                        level = checkNotNull(it.level),
+                        group = it.group,
+                        section = checkNotNull(it.section),
+                    )
+                }
+                // sortedBy стабилен: внутри раздела сохраняется порядок из файла.
+                .sortedBy { sectionOrder.indexOf(it.section) },
+        )
+        return ValidationResult(errors = emptyList(), config = config)
     }
 
     /** Поля, которые не удалось разобрать, остаются `null`: ошибка о них уже в отчёте. */
-    private class Category(val name: String, val level: String?, val group: String?, val section: String?)
+    private class ParsedGroup(val id: String, val limit: Int?)
+
+    private class ParsedSection(val id: String, val title: String?)
+
+    /** [group] `null` и для неявной группы, и для ошибочного поля. */
+    private class ParsedCategory(
+        val name: String,
+        val slot: String?,
+        val level: String?,
+        val group: String?,
+        val section: String?,
+    )
+
+    private fun failure(error: String) = ValidationResult(listOf(error), config = null)
 
     private fun parseLevels(json: Any?, errors: MutableList<String>): List<String> {
         if (json !is List<*>) {
@@ -63,28 +106,26 @@ internal object ClothingDatasetValidator {
         return levels.distinct()
     }
 
-    // Дубликаты ключей объекта JsonSlurper молча схлопывает, поэтому уникальность групп
-    // по ключу проверить нельзя: она держится на том, что id групп — латиница без вариантов написания.
-    private fun parseGroups(json: Any?, errors: MutableList<String>): List<String> {
+    private fun parseGroups(json: Any?, errors: MutableList<String>): List<ParsedGroup> {
         if (json == null) return emptyList()
         if (json !is Map<*, *>) {
             errors += "«groups» должен быть объектом"
             return emptyList()
         }
-        return json.mapNotNull { (key, value) ->
+        return json.map { (key, value) ->
             val id = key as String
             if (value !is Map<*, *>) {
                 errors += "группа «$id»: описание должно быть объектом"
-                return@mapNotNull id
+                return@map ParsedGroup(id, limit = null)
             }
             errors += unknownFields(value, GROUP_FIELDS, "группа «$id»:")
-            val limit = value["limit"]
-            if (limit !is Int || limit < 1) errors += "группа «$id»: limit должен быть целым числом ≥ 1, сейчас «$limit»"
-            id
+            val limit = (value["limit"] as? Int)?.takeIf { it >= 1 }
+            if (limit == null) errors += "группа «$id»: limit должен быть целым числом ≥ 1, сейчас «${value["limit"]}»"
+            ParsedGroup(id, limit)
         }
     }
 
-    private fun parseSections(json: Any?, errors: MutableList<String>): List<String> {
+    private fun parseSections(json: Any?, errors: MutableList<String>): List<ParsedSection> {
         if (json !is List<*>) {
             errors += "«sections» должен быть массивом"
             return emptyList()
@@ -99,11 +140,12 @@ internal object ClothingDatasetValidator {
             val name = id?.let { "раздел «$it»" } ?: owner
             errors += unknownFields(entry, SECTION_FIELDS, "$name:")
             if (id == null) errors += "$owner: id должен быть непустой строкой"
-            if ((entry["title"] as? String).isNullOrEmpty()) errors += "$name: нет названия «title»"
-            id
+            val title = (entry["title"] as? String)?.takeIf { it.isNotEmpty() }
+            if (title == null) errors += "$name: нет названия «title»"
+            id?.let { ParsedSection(it, title) }
         }
-        duplicates(sections).forEach { errors += "раздел «$it» объявлен несколько раз" }
-        return sections.distinct()
+        duplicates(sections.map { it.id }).forEach { errors += "раздел «$it» объявлен несколько раз" }
+        return sections.distinctBy { it.id }
     }
 
     private fun parseCategories(
@@ -112,7 +154,7 @@ internal object ClothingDatasetValidator {
         groups: List<String>,
         sections: List<String>,
         errors: MutableList<String>,
-    ): List<Category> {
+    ): List<ParsedCategory> {
         if (json !is Map<*, *>) {
             errors += "«categories» должен быть объектом"
             return emptyList()
@@ -122,31 +164,33 @@ internal object ClothingDatasetValidator {
             if (!name.isNfc()) errors += "ключ категории «$name» не в NFC"
             if (value !is Map<*, *>) {
                 errors += "«$name»: описание должно быть объектом"
-                return@map Category(name, level = null, group = null, section = null)
+                return@map ParsedCategory(name, slot = null, level = null, group = null, section = null)
             }
             errors += unknownFields(value, CATEGORY_FIELDS, "«$name»:")
 
             val slot = requireString(value, "slot", name, errors)
-            if (slot != null && slot !in SLOTS) {
-                errors += "«$name»: слот «$slot» не найден, допустимы: ${SLOTS.joinToString()}"
-            }
+                ?.let { requireKnown(it, SLOTS, "«$name»: слот «$it» не найден, допустимы: ${SLOTS.joinToString()}", errors) }
             val level = requireString(value, "level", name, errors)
                 ?.let { requireKnown(it, levels, "«$name»: уровень «$it» не найден", errors) }
             val section = requireString(value, "section", name, errors)
                 ?.let { requireKnown(it, sections, "«$name»: раздел «$it» не найден", errors) }
-            val group = when (val raw = value["group"]) {
-                null -> {
+            val group = when {
+                "group" !in value -> {
                     // Без группы категория образует собственную группу с id = имя категории.
                     if (name in groups) errors += "«$name»: неявная группа совпадает с явной группой «$name»"
                     null
                 }
-                is String -> requireKnown(raw, groups, "«$name»: группа «$raw» не найдена", errors)
-                else -> {
-                    errors += "«$name»: поле «group» должно быть строкой"
-                    null
+                // Явный null — не синоним отсутствия поля: у неявной группы один способ записи.
+                else -> when (val raw = value["group"]) {
+                    is String -> requireKnown(raw, groups, "«$name»: группа «$raw» не найдена", errors)
+                    else -> {
+                        errors += "«$name»: поле «group» должно быть строкой, сейчас «$raw»; " +
+                            "для собственной группы поле не указывают"
+                        null
+                    }
                 }
             }
-            Category(name, level, group, section)
+            ParsedCategory(name, slot, level, group, section)
         }
         duplicates(categories.map { it.name.toNfc() })
             .forEach { errors += "категория «$it» объявлена несколько раз в разных нормализациях" }
