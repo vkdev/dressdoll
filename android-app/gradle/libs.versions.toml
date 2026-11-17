@@ -5,6 +5,7 @@ compileSdk = "36"
 targetSdk = "36"
 minSdk = "26"
 activityCompose = "1.13.0"
+lifecycle = "2.10.0"
 coreSplashscreen = "1.2.0"
 composeBom = "2026.06.01"
 koin = "4.2.2"
@@ -19,6 +20,7 @@ jackson = "2.18.2"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui" }

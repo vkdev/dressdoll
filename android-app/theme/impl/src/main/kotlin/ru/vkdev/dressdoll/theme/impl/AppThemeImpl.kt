@@ -6,8 +6,8 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.vkdev.dressdoll.theme.api.AppTheme
 import ru.vkdev.dressdoll.theme.api.LocalThemePalette
 import ru.vkdev.dressdoll.theme.api.ThemeSelector
@@ -21,7 +21,7 @@ internal class AppThemeImpl(
 
     @Composable
     override fun Apply(content: @Composable () -> Unit) {
-        val choice by selector.choice.collectAsState()
+        val choice by selector.choice.collectAsStateWithLifecycle()
         val systemDark = isSystemInDarkTheme()
         // Структура дерева не зависит от choice: иначе при загрузке выбора контент
         // пересоздастся и потеряет восстановленное состояние.

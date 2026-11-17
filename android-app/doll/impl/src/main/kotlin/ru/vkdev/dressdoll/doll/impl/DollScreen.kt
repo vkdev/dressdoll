@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +47,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import ru.vkdev.dressdoll.catalog.api.Catalog
 import ru.vkdev.dressdoll.disco.api.DiscoSettingsRepository
@@ -75,9 +75,9 @@ internal fun DollScreen(
     )
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
     val scope = rememberCoroutineScope()
-    val worn by holder.worn.collectAsState()
+    val worn by holder.worn.collectAsStateWithLifecycle()
     val wornIds = remember(worn) { worn?.mapTo(HashSet()) { it.id } }
-    val scene by holder.scene.collectAsState()
+    val scene by holder.scene.collectAsStateWithLifecycle()
     val transition = remember { DollTransition() }
     // Пока грузятся картинки, нажатия отбрасывает holder, пока вещи летят — экран.
     val onToggle: (ClothingItemId) -> Unit = { if (!transition.isAnimating) holder.toggle(it) }
@@ -112,7 +112,7 @@ internal fun DollScreen(
         }
     }
     val colorScheme = MaterialTheme.colorScheme
-    val beamStyle by discoSettings.beamStyle.collectAsState()
+    val beamStyle by discoSettings.beamStyle.collectAsStateWithLifecycle()
     val discoLook = remember(colorScheme, beamStyle) { discoLook(colorScheme, beamStyle) }
     val backdropAlpha = { disco.dim.value }
 

@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +24,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.vkdev.dressdoll.catalog.api.Catalog
 import ru.vkdev.dressdoll.repository.api.CategoryId
 import ru.vkdev.dressdoll.repository.api.ClothingItem
@@ -44,7 +44,7 @@ internal class CatalogImpl(
     ) {
         var openCategory by rememberSaveable(saver = OpenCategorySaver) { mutableStateOf(null) }
         val categories by remember(repository) { repository.clothingCategories() }
-            .collectAsState(initial = null)
+            .collectAsStateWithLifecycle(initialValue = null)
         // Над AnimatedContent: иначе после возврата из категории список прокручен в начало.
         val categoriesState = rememberLazyGridState()
         // Повторно открытая категория сразу показывает вещи, пока поток присылает свежий список.

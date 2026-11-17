@@ -33,7 +33,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.vkdev.dressdoll.disco.api.BeamStyle
 import ru.vkdev.dressdoll.disco.api.DiscoSettingsRepository
 import ru.vkdev.dressdoll.theme.api.HeaderBar
@@ -77,8 +77,8 @@ internal fun ThemeSettingsScreen(
     discoSettings: DiscoSettingsRepository,
     onBack: (() -> Unit)?,
 ) {
-    val choice by selector.choice.collectAsState()
-    val beamStyle by discoSettings.beamStyle.collectAsState()
+    val choice by selector.choice.collectAsStateWithLifecycle()
+    val beamStyle by discoSettings.beamStyle.collectAsStateWithLifecycle()
     val palettes = selector.palettes
     val colors = MaterialTheme.colorScheme
     val insets = WindowInsets.safeDrawing
