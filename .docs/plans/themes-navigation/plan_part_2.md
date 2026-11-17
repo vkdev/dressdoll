@@ -20,7 +20,7 @@
 - `values-night/themes.xml` (тёмное окно до старта Compose) не трогали: это часть 3.
 
 ### ~~6. `:theme:api`~~
-- `ThemePalette`: `id: String`, `@StringRes titleRes: Int`, `colorScheme: ColorScheme`, `typography: Typography`, `uppercaseHeadlines: Boolean`.
+- `ThemePalette`: `id: String`, `@StringRes titleRes: Int`, `@StringRes taglineRes: Int`, `colorScheme: ColorScheme`, `typography: Typography`, `uppercaseHeadlines: Boolean`.
 - `ThemeChoice`: `System` или `Palette(id)`.
 - `ThemeSelector`: `choice: StateFlow<ThemeChoice?>` (`null` означает «ещё не загружено»), `palettes: List<ThemePalette>`, `select(choice)`.
 - `LocalThemePalette` и `HeadlineText(text, style)`. `HeadlineText` переводит текст в верхний регистр, если палитра этого требует: в `TextStyle` нет аналога `text-transform`.

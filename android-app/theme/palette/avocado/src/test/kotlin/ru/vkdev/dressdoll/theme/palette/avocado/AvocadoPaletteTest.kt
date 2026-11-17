@@ -6,4 +6,5 @@ class AvocadoPaletteTest : PaletteContractTest(
     module = avocadoPaletteModule,
     id = AVOCADO_ID,
     title = "Авокадо и горчица",
+    tagline = "Вельвет, трикотаж и урожайное золото — шьём сами.",
 )

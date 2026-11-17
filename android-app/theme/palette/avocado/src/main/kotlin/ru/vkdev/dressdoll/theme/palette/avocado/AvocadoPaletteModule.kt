@@ -11,6 +11,7 @@ val avocadoPaletteModule = module {
         ThemePalette(
             id = AVOCADO_ID,
             titleRes = R.string.theme_palette_avocado_title,
+            taglineRes = R.string.theme_palette_avocado_tagline,
             order = 2,
             colorScheme = AvocadoColors,
             typography = AvocadoTypography,

@@ -1,6 +1,5 @@
 package ru.vkdev.dressdoll.settings.theme.impl
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -58,18 +57,6 @@ import ru.vkdev.dressdoll.theme.api.ThemeChoice
 import ru.vkdev.dressdoll.theme.api.ThemeIds
 import ru.vkdev.dressdoll.theme.api.ThemePalette
 import ru.vkdev.dressdoll.theme.api.ThemeSelector
-
-// Фразы карточек живут здесь, а не в ThemePalette: это текст экрана выбора, а не свойство темы.
-// Id остальных палитр объявлены в их модулях, от которых экран не зависит, поэтому строками.
-@StringRes
-private fun taglineRes(paletteId: String): Int? = when (paletteId) {
-    ThemeIds.CINNAMON -> R.string.settings_theme_tagline_cinnamon
-    ThemeIds.DISCO -> R.string.settings_theme_tagline_disco
-    "avocado" -> R.string.settings_theme_tagline_avocado
-    "powder" -> R.string.settings_theme_tagline_powder
-    "denim" -> R.string.settings_theme_tagline_denim
-    else -> null
-}
 
 @Composable
 internal fun ThemeSettingsScreen(
@@ -255,13 +242,11 @@ private fun PaletteCard(
                         )
                         RadioButton(selected = selected, onClick = null)
                     }
-                    taglineRes(palette.id)?.let { res ->
-                        Text(
-                            text = stringResource(res),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = colors.onSurface,
-                        )
-                    }
+                    Text(
+                        text = stringResource(palette.taglineRes),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.onSurface,
+                    )
                     ColorStripe()
                     SampleControls()
                 }

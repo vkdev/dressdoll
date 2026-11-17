@@ -11,6 +11,7 @@ val denimPaletteModule = module {
         ThemePalette(
             id = DENIM_ID,
             titleRes = R.string.theme_palette_denim_title,
+            taglineRes = R.string.theme_palette_denim_tagline,
             order = 4,
             colorScheme = DenimColors,
             typography = DenimTypography,

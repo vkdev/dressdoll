@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="theme_palette_disco_title">Диско-ночь</string>
+    <string name="theme_palette_disco_tagline">Люрекс, сливовый бархат и золото — до самого утра.</string>
 </resources>

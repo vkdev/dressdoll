@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="theme_palette_cinnamon_title">Корица и бисквит</string>
+    <string name="theme_palette_cinnamon_tagline">Замша, терракота и верблюжья шерсть — образы этого сезона.</string>
 </resources>

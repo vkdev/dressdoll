@@ -7,4 +7,5 @@ class CinnamonPaletteTest : PaletteContractTest(
     module = cinnamonPaletteModule,
     id = ThemeIds.CINNAMON,
     title = "Корица и бисквит",
+    tagline = "Замша, терракота и верблюжья шерсть — образы этого сезона.",
 )

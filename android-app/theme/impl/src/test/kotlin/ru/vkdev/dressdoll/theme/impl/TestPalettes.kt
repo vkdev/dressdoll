@@ -7,6 +7,7 @@ import ru.vkdev.dressdoll.theme.api.ThemePalette
 internal fun testPalette(id: String, order: Int = 0) = ThemePalette(
     id = id,
     titleRes = 0,
+    taglineRes = 0,
     order = order,
     colorScheme = lightColorScheme(),
     typography = Typography(),

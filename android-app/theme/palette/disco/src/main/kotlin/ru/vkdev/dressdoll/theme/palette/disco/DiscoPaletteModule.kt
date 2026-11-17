@@ -10,6 +10,7 @@ val discoPaletteModule = module {
         ThemePalette(
             id = ThemeIds.DISCO,
             titleRes = R.string.theme_palette_disco_title,
+            taglineRes = R.string.theme_palette_disco_tagline,
             order = 1,
             colorScheme = DiscoColors,
             typography = DiscoTypography,

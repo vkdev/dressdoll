@@ -6,4 +6,5 @@ class PowderPaletteTest : PaletteContractTest(
     module = powderPaletteModule,
     id = POWDER_ID,
     title = "Пудра и бордо",
+    tagline = "Пыльная роза и винный бархат — вечер в бутике.",
 )

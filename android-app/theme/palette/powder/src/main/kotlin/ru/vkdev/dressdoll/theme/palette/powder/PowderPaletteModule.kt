@@ -11,6 +11,7 @@ val powderPaletteModule = module {
         ThemePalette(
             id = POWDER_ID,
             titleRes = R.string.theme_palette_powder_title,
+            taglineRes = R.string.theme_palette_powder_tagline,
             order = 3,
             colorScheme = PowderColors,
             typography = PowderTypography,

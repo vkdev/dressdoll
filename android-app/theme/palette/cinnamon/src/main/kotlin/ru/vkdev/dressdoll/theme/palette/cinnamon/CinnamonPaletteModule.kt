@@ -10,6 +10,7 @@ val cinnamonPaletteModule = module {
         ThemePalette(
             id = ThemeIds.CINNAMON,
             titleRes = R.string.theme_palette_cinnamon_title,
+            taglineRes = R.string.theme_palette_cinnamon_tagline,
             order = 0,
             colorScheme = CinnamonColors,
             typography = CinnamonTypography,

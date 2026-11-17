@@ -7,4 +7,5 @@ class DiscoPaletteTest : PaletteContractTest(
     module = discoPaletteModule,
     id = ThemeIds.DISCO,
     title = "Диско-ночь",
+    tagline = "Люрекс, сливовый бархат и золото — до самого утра.",
 )

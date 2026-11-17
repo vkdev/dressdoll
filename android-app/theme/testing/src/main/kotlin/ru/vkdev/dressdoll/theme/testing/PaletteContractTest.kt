@@ -22,6 +22,7 @@ abstract class PaletteContractTest(
     private val module: Module,
     private val id: String,
     private val title: String,
+    private val tagline: String,
     private val uppercaseHeadlines: Boolean = false,
 ) {
 
@@ -44,6 +45,11 @@ abstract class PaletteContractTest(
     @Test
     fun `title comes from resources`() {
         assertEquals(title, context.getString(palette.titleRes))
+    }
+
+    @Test
+    fun `tagline comes from resources`() {
+        assertEquals(tagline, context.getString(palette.taglineRes))
     }
 
     @Test
