@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.BottomSheetDefaults
@@ -23,18 +25,22 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntOffset
 import kotlinx.coroutines.launch
 import ru.vkdev.dressdoll.catalog.api.Catalog
 import ru.vkdev.dressdoll.theme.api.AppIcons
 import ru.vkdev.dressdoll.theme.api.HeaderBar
 import ru.vkdev.dressdoll.theme.api.IconActionButton
 import ru.vkdev.dressdoll.theme.api.Sizes
+import ru.vkdev.dressdoll.theme.api.Spacing
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -132,11 +138,28 @@ internal fun DollScreen(
             ) {
                 val contentTop = screenHeight - maxHeight
                 val density = LocalDensity.current
+                val availableHeight = { with(density) { sheetTop() - contentTop.toPx() } }
                 DollCanvas(
                     scene = scene,
-                    availableHeight = { with(density) { sheetTop() - contentTop.toPx() } },
+                    availableHeight = availableHeight,
                     modifier = Modifier.fillMaxSize(),
                 )
+                if (!worn.isNullOrEmpty()) {
+                    IconActionButton(
+                        icon = AppIcons.Hanger,
+                        contentDescription = stringResource(R.string.doll_clear_all),
+                        onClick = holder::clearAll,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            // Правый край — как у кнопки настроек в шапке. Кнопка едет вместе со
+                            // шторкой: офсет читается при размещении, без рекомпозиции.
+                            .padding(end = Spacing.small)
+                            .offset {
+                                val bottom = availableHeight() - Spacing.small.toPx()
+                                IntOffset(0, (bottom - Sizes.touchTarget.toPx()).roundToInt())
+                            },
+                    )
+                }
             }
         }
     }

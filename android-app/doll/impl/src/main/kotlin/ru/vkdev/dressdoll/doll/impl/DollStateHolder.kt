@@ -77,6 +77,12 @@ internal class DollStateHolder(
         outfit.save(toggle(dataset.normalize(saved), item, dataset.categories))
     }
 
+    /** Снимает всё. Пока образ не прочитан, игнорируется: иначе пустой образ затёр бы сохранённый. */
+    fun clearAll() {
+        if (worn.value == null) return
+        outfit.save(emptyList())
+    }
+
     private suspend fun loadScene(order: List<WornItem>): DollScene = coroutineScope {
         val figure = async { repository.figure() }
         val loaded = order.map { worn -> async { worn.id to loadImages(worn.id) } }.awaitAll()

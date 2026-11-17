@@ -67,6 +67,26 @@ class DollStateHolderTest {
     }
 
     @Test
+    fun `убрать всё снимает все вещи`() = runTest(UnconfinedTestDispatcher()) {
+        outfit.worn.value = listOf(PANTIES, SHIRT, BLAZER).worn()
+        val holder = holder()
+
+        holder.clearAll()
+
+        assertEquals(emptyList<WornItem>(), holder.worn.value)
+        assertEquals(emptyList<DollLayer>(), holder.scene.value!!.layers)
+    }
+
+    @Test
+    fun `убрать всё до чтения образа не затирает его`() = runTest(UnconfinedTestDispatcher()) {
+        val holder = holder()
+
+        holder.clearAll()
+
+        assertEquals(emptyList<List<WornItem>>(), outfit.saves)
+    }
+
+    @Test
     fun `нажатие надевает по правилам и сохраняет`() = runTest(UnconfinedTestDispatcher()) {
         outfit.worn.value = emptyList()
         val holder = holder()
