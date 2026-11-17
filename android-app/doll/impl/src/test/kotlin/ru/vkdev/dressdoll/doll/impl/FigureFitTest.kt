@@ -1,5 +1,8 @@
 package ru.vkdev.dressdoll.doll.impl
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import ru.vkdev.dressdoll.repository.api.CanvasRect
@@ -31,6 +34,14 @@ class FigureFitTest {
     @Test
     fun `область меньше полей — масштаб ноль, а не отрицательный`() {
         assertEquals(0f, fitFigure(bounds, areaWidth = 40f, areaHeight = 40f, margin = 30f).scale, EPS)
+    }
+
+    @Test
+    fun `прямоугольник фигурки, пока кукла не помещается — середина области`() {
+        val figure = CanvasRect(left = 100, top = 0, width = 200, height = 1000)
+        assertEquals(Rect(100f, 0f, 300f, 1000f), figureRect(figure, areaWidth = 400f, availableHeight = 1000f, margin = 0f))
+        assertEquals(Rect(Offset(200f, 5f), Size.Zero), figureRect(figure, areaWidth = 400f, availableHeight = 10f, margin = 20f))
+        assertEquals(Rect(Offset(200f, 500f), Size.Zero), figureRect(null, areaWidth = 400f, availableHeight = 1000f, margin = 0f))
     }
 
     private fun assertFigureAt(fit: FigureFit, left: Float, top: Float, right: Float) {

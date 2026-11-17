@@ -1,18 +1,20 @@
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.dressdoll.android.library.compose)
 }
 
 android {
     namespace = "ru.vkdev.dressdoll.disco.impl"
-    compileSdk = libs.versions.compileSdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-    }
 }
 
 dependencies {
     api(project(":disco:api"))
+    implementation(project(":settings:api"))
+    implementation(project(":theme:api"))
 
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.coroutines.core)
 

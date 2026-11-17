@@ -1,15 +1,13 @@
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.dressdoll.android.library.compose)
 }
 
 android {
     namespace = "ru.vkdev.dressdoll.disco.api"
-    compileSdk = libs.versions.compileSdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-    }
 }
 
 dependencies {
-    api(libs.kotlinx.coroutines.core)
+    // Modifier и Rect входят в публичный API.
+    api(platform(libs.androidx.compose.bom))
+    api(libs.androidx.compose.ui)
 }

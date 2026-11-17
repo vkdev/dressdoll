@@ -33,7 +33,7 @@ dependencies {
     implementation(project(":disco:impl"))
     implementation(project(":repository:impl"))
     implementation(project(":navigation:impl"))
-    implementation(project(":settings:settings-theme:impl"))
+    implementation(project(":settings:impl"))
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.splashscreen)

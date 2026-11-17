@@ -15,7 +15,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import ru.vkdev.dressdoll.disco.api.BeamStyle
 import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)

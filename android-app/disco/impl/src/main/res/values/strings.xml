@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="disco_settings_section">Дискотека</string>
+    <string name="disco_settings_paper">Бумажные конусы</string>
+    <string name="disco_settings_paper_hint">Ровные цветные конусы, будто вырезанные из бумаги.</string>
+    <string name="disco_settings_soft">Мягкий свет</string>
+    <string name="disco_settings_soft_hint">Лучи в дымке: края и низ растворяются.</string>
+</resources>

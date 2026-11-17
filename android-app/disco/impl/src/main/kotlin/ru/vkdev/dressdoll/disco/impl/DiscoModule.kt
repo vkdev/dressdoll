@@ -9,7 +9,8 @@ import kotlinx.coroutines.SupervisorJob
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import ru.vkdev.dressdoll.disco.api.DiscoSettingsRepository
+import ru.vkdev.dressdoll.disco.api.Disco
+import ru.vkdev.dressdoll.settings.api.SettingsSection
 
 private val DiscoDataStore = named("disco")
 
@@ -25,4 +26,6 @@ val discoModule = module {
             scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
         )
     }
+    single<Disco> { DiscoImpl(settings = get()) }
+    single<SettingsSection>(named("disco")) { DiscoSettingsSection(settings = get()) }
 }

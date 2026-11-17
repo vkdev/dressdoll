@@ -16,8 +16,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.vkdev.dressdoll.disco.api.BeamStyle
-import ru.vkdev.dressdoll.disco.api.DiscoSettingsRepository
 import java.io.File
 import java.io.IOException
 

@@ -27,7 +27,7 @@ dependencies {
     implementation(project(":catalog:api"))
     implementation(project(":disco:api"))
     implementation(project(":theme:api"))
-    implementation(project(":settings:settings-theme:api"))
+    implementation(project(":settings:api"))
 
     implementation(libs.kotlinx.coroutines.core)
     implementation(platform(libs.androidx.compose.bom))

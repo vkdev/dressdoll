@@ -67,7 +67,7 @@
 
 | Иконка | Где используется | Статус |
 |---|---|---|
-| `ArrowBack` | `BackButton` | есть. Перенесена из `ThemeSettingsScreen` как есть: уголок «<» с `autoMirror = true` |
+| `ArrowBack` | `BackButton` | есть. Перенесена из экрана настроек (тогда `ThemeSettingsScreen`) как есть: уголок «<» с `autoMirror = true` |
 | `ChevronRight` | `NavigationTile` | есть |
 | `Check` | значок выбора в `ChoiceTile` | есть |
 | `Settings` | шестерёнка: 8 зубов, ось-кружок. Кнопка настроек в шапке экрана куклы | есть |
@@ -85,7 +85,7 @@
 | `HeaderBar(title, onBack, supportingText, titleStyle, minHeight, actions)` | шапка экрана или панели: `BackButton`, если `onBack != null`, иначе отступ до выравнивания с контентом; заголовок через `HeadlineText` с `heading()`; справа поясняющий текст и кнопки `actions` (`IconActionButton`) | заголовок `titleStyle` (по умолчанию `headlineSmall`) / `onSurface`, пояснение `bodySmall` / `onSurfaceVariant`. `minHeight` по умолчанию `touchTarget` | каталог; экран выбора темы и экран куклы (`headlineMedium`, `topBarHeight`) | есть |
 | `SelectableCard(selected, onClick, role, color, content)` | карточка выбора. `role: SelectionRole`: `Single` (по умолчанию) — один из многих, `selectable(role = Role.RadioButton)`; `Multiple` — независимый флажок, `toggleable(role = Role.Checkbox)`. Фигура `large`, рамка `Strokes.thick` `primary` у выбранной и `Strokes.thin` `outline` у остальных. Содержимое и индикатор выбора задаёт вызывающий | фон `color` (по умолчанию `surface`) | `ChoiceTile`; экран выбора темы: карточки палитр, `OptionCard` | есть |
 | `ChoiceTile(selected, onClick, role, content)` | `SelectableCard` с круглым значком `badge` и `Check` в правом верхнем углу у выбранной; `role` передаётся в `SelectableCard` | фон `surfaceContainerLowest`, значок `primary` / `onPrimary` | каталог: вещи (`SelectionRole.Multiple`) | есть |
-| `OptionCard(title, selected, onClick, supportingText, leading)` | вариант настройки «один из многих»: `SelectableCard` с полями `large`, слева необязательный `leading`, заголовок и пояснение, справа `RadioButton` без своего нажатия. Группу `selectableGroup()` задаёт вызывающий | фон `surface`, заголовок `titleMedium` SemiBold, пояснение `bodySmall` / `onSurfaceVariant` | экран настроек: «Как в системе», стиль лучей дискотеки | есть |
+| `OptionCard(title, selected, onClick, supportingText, leading)` | вариант настройки «один из многих»: `SelectableCard` с полями `large`, слева необязательный `leading`, заголовок и пояснение, справа `RadioButton` без своего нажатия. Группу `selectableGroup()` задаёт вызывающий | фон `surface`, заголовок `titleMedium` SemiBold, пояснение `bodySmall` / `onSurfaceVariant` | экран настроек: «Как в системе» (раздел темы, `:settings:impl`), стиль лучей (раздел дискотеки, `:disco:impl`) | есть |
 | `NavigationTile(text, onClick)` | плашка-переход: текст в одну строку с многоточием, справа `ChevronRight`. Высота `tileHeight`, фигура `large` | фон `surfaceContainerHigh`, текст `titleSmall` / `onSurface` | каталог: категории | есть |
 | `SectionLabel(text)` | надзаголовок раздела: капс, разрядка, `heading()` | `labelMedium` полужирный с разрядкой 0.18em / `onSurfaceVariant` | экран выбора темы: «Тема оформления» | есть |
 

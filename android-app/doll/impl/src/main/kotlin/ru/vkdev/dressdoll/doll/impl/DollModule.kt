@@ -9,7 +9,7 @@ import org.koin.dsl.module
 import org.koin.dsl.navigation3.navigation
 import ru.vkdev.dressdoll.doll.api.DollRoute
 import ru.vkdev.dressdoll.navigation.api.LocalNavigator
-import ru.vkdev.dressdoll.settings.theme.api.ThemeSettingsRoute
+import ru.vkdev.dressdoll.settings.api.SettingsRoute
 
 @OptIn(KoinExperimentalAPI::class)
 val dollModule = module {
@@ -25,8 +25,8 @@ val dollModule = module {
         DollScreen(
             holder = koinInject(),
             catalog = koinInject(),
-            discoSettings = koinInject(),
-            onOpenSettings = { navigator.navigate(ThemeSettingsRoute) },
+            disco = koinInject(),
+            onOpenSettings = { navigator.navigate(SettingsRoute) },
         )
     }
 }
