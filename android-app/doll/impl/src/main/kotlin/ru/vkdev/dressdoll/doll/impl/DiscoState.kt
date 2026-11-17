@@ -50,6 +50,9 @@ internal class DiscoState(initiallyOn: Boolean, private val random: Random = Ran
                 launch { sway() }
             }
             while (true) {
+                // После ON_STOP рекомпозиция на паузе и не отменит цикл до возврата, а delay от паузы кадров
+                // не зависит: без ожидания кадра цикл будил бы приложение в фоне.
+                withFrameMillis {}
                 launch { switchTo(nextSpots(random)) }
                 delay(SPOT_CHANGE_MILLIS)
             }

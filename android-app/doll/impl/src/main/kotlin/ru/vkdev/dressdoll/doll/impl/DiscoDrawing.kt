@@ -9,8 +9,7 @@ import android.graphics.SweepGradient
 import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -24,6 +23,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -31,9 +31,7 @@ import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.unit.toSize
 import ru.vkdev.dressdoll.disco.api.BeamStyle
 import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
+import kotlin.math.tan
 
 @Immutable
 internal class DiscoLook(
@@ -97,7 +95,10 @@ internal class DiscoStage {
 /** На весь экран под содержимым: фон затемняется везде, кроме конусов. */
 internal fun Modifier.discoScreen(state: DiscoState, stage: DiscoStage, look: DiscoLook): Modifier =
     onPlaced { stage.screen = it }
-        .drawBehind { drawDisco(state, stage, look, Offset.Zero, look.airAlpha, BlendMode.SrcOver) }
+        .drawWithCache {
+            val painter = BeamPainter()
+            onDrawBehind { drawDisco(painter, state, stage, look, Offset.Zero, look.airAlpha, BlendMode.SrcOver) }
+        }
 
 internal fun Modifier.discoFigureArea(stage: DiscoStage): Modifier = onPlaced { stage.figureArea = it }
 
@@ -105,9 +106,12 @@ internal fun Modifier.discoFigureArea(stage: DiscoStage): Modifier = onPlaced { 
 internal fun Modifier.discoHeader(state: DiscoState, stage: DiscoStage, look: DiscoLook): Modifier =
     onPlaced { stage.header = it }
         .offscreenWhileDimmed(state)
-        .drawWithContent {
-            drawContent()
-            drawDisco(state, stage, look, stage.originOf(stage.header), look.figureAlpha, BlendMode.SrcAtop)
+        .drawWithCache {
+            val painter = BeamPainter()
+            onDrawWithContent {
+                drawContent()
+                drawDisco(painter, state, stage, look, stage.originOf(stage.header), look.figureAlpha, BlendMode.SrcAtop)
+            }
         }
 
 /**
@@ -116,9 +120,12 @@ internal fun Modifier.discoHeader(state: DiscoState, stage: DiscoStage, look: Di
  * растеризовал бы куклу до увеличения.
  */
 internal fun Modifier.discoLitFigure(state: DiscoState, stage: DiscoStage, look: DiscoLook): Modifier =
-    offscreenWhileDimmed(state).drawWithContent {
-        drawContent()
-        drawDisco(state, stage, look, stage.originOf(stage.figureArea), look.figureAlpha, BlendMode.SrcAtop)
+    offscreenWhileDimmed(state).drawWithCache {
+        val painter = BeamPainter()
+        onDrawWithContent {
+            drawContent()
+            drawDisco(painter, state, stage, look, stage.originOf(stage.figureArea), look.figureAlpha, BlendMode.SrcAtop)
+        }
     }
 
 private fun Modifier.offscreenWhileDimmed(state: DiscoState): Modifier = graphicsLayer {
@@ -130,6 +137,7 @@ private fun Modifier.offscreenWhileDimmed(state: DiscoState): Modifier = graphic
  * затемнения. Поверх — подкраска конуса цветом прожектора. [origin] — положение слоя на экране.
  */
 private fun DrawScope.drawDisco(
+    painter: BeamPainter,
     state: DiscoState,
     stage: DiscoStage,
     look: DiscoLook,
@@ -143,12 +151,12 @@ private fun DrawScope.drawDisco(
     translate(-origin.x, -origin.y) {
         val bounds = Rect(origin, size)
         drawIntoCanvas { canvas ->
-            canvas.saveLayer(bounds, Paint().apply { this.blendMode = blendMode })
+            canvas.saveLayer(bounds, painter.layerPaint(blendMode))
             drawRect(Color.Black, topLeft = origin, size = size, alpha = DIM_ALPHA * dim)
-            beams.forEach { drawBeam(it.beam, Color.Black, it.alpha, BlendMode.DstOut, look.style) }
+            beams.forEach { with(painter) { drawBeam(it.beam, Color.Black, it.alpha, BlendMode.DstOut, look.style) } }
             canvas.restore()
         }
-        beams.forEach { drawBeam(it.beam, it.color, tintAlpha * dim * it.alpha, blendMode, look.style) }
+        beams.forEach { with(painter) { drawBeam(it.beam, it.color, tintAlpha * dim * it.alpha, blendMode, look.style) } }
     }
 }
 
@@ -168,41 +176,64 @@ private fun litBeams(state: DiscoState, stage: DiscoStage, look: DiscoLook): Lis
         state.current.map { lit(it, descent = change, alpha = 1f) }
 }
 
-private fun DrawScope.drawBeam(beam: Beam, color: Color, alpha: Float, blendMode: BlendMode, style: BeamStyle) {
-    if (beam.length < 1f || alpha <= 0f) return
-    val apex = beam.apex
-    // Боковые стороны длиннее оси: дальний край треугольника касается окружности радиуса длины луча.
-    val side = beam.length / cos(BEAM_HALF_WIDTH)
-    val path = Path().apply {
-        moveTo(apex.x, apex.y)
-        lineTo(apex.x + side * sin(beam.angle - BEAM_HALF_WIDTH), apex.y + side * cos(beam.angle - BEAM_HALF_WIDTH))
-        lineTo(apex.x + side * sin(beam.angle + BEAM_HALF_WIDTH), apex.y + side * cos(beam.angle + BEAM_HALF_WIDTH))
-        close()
+/**
+ * Каждый луч рисуется одним и тем же треугольником единичной длины из вершины вниз по оси y,
+ * повёрнутым и растянутым преобразованием холста. Так путь, шейдеры и `Paint` создаются один раз,
+ * а не для каждого луча на каждом кадре.
+ */
+private class BeamPainter {
+    private val unitBeam = unitBeamPath()
+    private val brushes = HashMap<Color, ShaderBrush>()
+    private val layerPaint = Paint()
+
+    fun layerPaint(blendMode: BlendMode): Paint = layerPaint.apply { this.blendMode = blendMode }
+
+    fun DrawScope.drawBeam(beam: Beam, color: Color, alpha: Float, blendMode: BlendMode, style: BeamStyle) {
+        if (beam.length < 1f || alpha <= 0f) return
+        withTransform({
+            translate(beam.apex.x, beam.apex.y)
+            // Поворот холста по часовой стрелке уводит ось y влево, а положительный угол луча — вправо.
+            rotate(-Math.toDegrees(beam.angle.toDouble()).toFloat(), pivot = Offset.Zero)
+            scale(beam.length, beam.length, pivot = Offset.Zero)
+        }) {
+            when (style) {
+                BeamStyle.SOFT -> {
+                    val brush = brushes.getOrPut(color) { ShaderBrush(unitBeamShader(color)) }
+                    drawPath(unitBeam, brush, alpha = alpha, blendMode = blendMode)
+                }
+                BeamStyle.PAPER -> drawPath(unitBeam, color, alpha = alpha, blendMode = blendMode)
+            }
+        }
     }
-    when (style) {
-        BeamStyle.SOFT -> drawPath(path, ShaderBrush(beamShader(beam, color)), alpha = alpha, blendMode = blendMode)
-        BeamStyle.PAPER -> drawPath(path, color, alpha = alpha, blendMode = blendMode)
+}
+
+// Боковые стороны длиннее оси: дальний край треугольника касается окружности радиуса длины луча.
+private fun unitBeamPath(): Path {
+    val halfEnd = tan(BEAM_HALF_WIDTH)
+    return Path().apply {
+        moveTo(0f, 0f)
+        lineTo(-halfEnd, 1f)
+        lineTo(halfEnd, 1f)
+        close()
     }
 }
 
 /** Поперёк луча — угловой градиент из вершины, вдоль — радиальный; они перемножаются через `DST_IN`. */
-private fun beamShader(beam: Beam, color: Color): Shader {
-    val apex = beam.apex
+private fun unitBeamShader(color: Color): Shader {
     val solid = color.toArgb()
     val clear = color.copy(alpha = 0f).toArgb()
     val span = BEAM_HALF_WIDTH / PI.toFloat()
     // Ровная середина шириной 40% луча: с треугольным профилем луч выходил тусклым.
     val across = SweepGradient(
-        apex.x, apex.y,
+        0f, 0f,
         intArrayOf(clear, solid, solid, clear, clear),
         floatArrayOf(0f, span * 0.3f, span * 0.7f, span, 1f),
     )
-    // SweepGradient отсчитывает угол от оси x к оси y, а угол луча — от вертикали.
-    val axis = Math.toDegrees(atan2(cos(beam.angle), sin(beam.angle)).toDouble()).toFloat()
+    // SweepGradient отсчитывает угол от оси x, а ось луча — ось y, то есть 90°.
     val halfDegrees = Math.toDegrees(BEAM_HALF_WIDTH.toDouble()).toFloat()
-    across.setLocalMatrix(Matrix().apply { setRotate(axis - halfDegrees, apex.x, apex.y) })
+    across.setLocalMatrix(Matrix().apply { setRotate(90f - halfDegrees) })
     val along = RadialGradient(
-        apex.x, apex.y, beam.length,
+        0f, 0f, 1f,
         intArrayOf(0xFF000000.toInt(), 0xE6000000.toInt(), 0x00000000),
         floatArrayOf(0f, 0.6f, 1f),
         Shader.TileMode.CLAMP,

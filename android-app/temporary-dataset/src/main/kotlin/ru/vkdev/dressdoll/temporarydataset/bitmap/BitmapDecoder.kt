@@ -20,14 +20,16 @@ internal class AssetBitmapDecoder(
     constructor(assets: AssetManager) : this(assets::open)
 
     override fun decode(key: TDImageKey): Bitmap? {
-        val stream = try {
-            open(key.assetPath)
-        } catch (_: FileNotFoundException) {
-            return null
-        }
         // Options изменяемые (декодер пишет в поля out*), поэтому у каждого параллельного декодирования свои.
         // Одежде нужна прозрачность, поэтому не RGB_565.
         val options = BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.ARGB_8888 }
+        // Картинки куклы не уменьшаются: их позиции на холсте заданы в пикселях исходника.
+        if (!key.onDoll) {
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            (openOrNull(key) ?: return null).use { BitmapFactory.decodeStream(it, null, bounds) }
+            options.inSampleSize = catalogSampleSize(bounds.outWidth, bounds.outHeight)
+        }
+        val stream = openOrNull(key) ?: return null
         val bitmap = stream.use { BitmapFactory.decodeStream(it, null, options) }
             ?: throw IOException("Cannot decode ${key.assetPath}")
         // В альбомной ориентации с открытой шторкой кукла уменьшается сильнее чем вдвое,
@@ -35,4 +37,22 @@ internal class AssetBitmapDecoder(
         if (key.onDoll) bitmap.setHasMipMap(true)
         return bitmap
     }
+
+    private fun openOrNull(key: TDImageKey): InputStream? = try {
+        open(key.assetPath)
+    } catch (_: FileNotFoundException) {
+        null
+    }
 }
+
+/** Степень двойки для `inSampleSize`: наибольшая, при которой длинная сторона не короче [CATALOG_MIN_SIDE]. */
+internal fun catalogSampleSize(width: Int, height: Int): Int {
+    val side = maxOf(width, height)
+    var sample = 1
+    while (side / (sample * 2) >= CATALOG_MIN_SIDE) sample *= 2
+    return sample
+}
+
+// Шторка не шире 640 dp, а в ней две колонки: картинка плитки не больше ~250 dp по длинной стороне.
+// 512 px хватает телефону до xxxhdpi и планшету до xhdpi, а исходник 768×1024 занимает вчетверо меньше памяти.
+internal const val CATALOG_MIN_SIDE = 512

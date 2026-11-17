@@ -185,6 +185,14 @@ class TemporaryDatasetTest {
     }
 
     @Test
+    fun `catalog bitmaps are downsampled`() = runTest(dispatcher) {
+        val catalog = dataset.catalogImage(TDItemId(CategoryName("блузка"), "01"))!!
+
+        assertEquals(384, catalog.width)
+        assertEquals(512, catalog.height)
+    }
+
+    @Test
     fun `allClothingItems lists items of all categories in category order`() = runTest(dispatcher) {
         val all = dataset.allClothingItems().first()
 
