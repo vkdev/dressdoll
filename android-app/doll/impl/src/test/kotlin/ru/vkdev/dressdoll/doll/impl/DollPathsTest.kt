@@ -59,7 +59,6 @@ class DollPathsTest {
         val length = start.getDistance()
         val deviations = (0..100).map { step ->
             val point = Entry(EntryZone.MIDDLE, MAX_ARC).offset(step / 100f, item, viewport)
-            // Расстояние до прямой через ноль и start.
             abs(start.x * point.y - start.y * point.x) / length
         }
         assertEquals(MAX_ARC * length, deviations.max(), 1f)
@@ -123,7 +122,6 @@ class DollPathsTest {
                 assertEquals(count, angles.size)
                 assertTrue("$count: $angles", angles.all { it in TOSS_MIN_ANGLE..TOSS_MAX_ANGLE })
                 assertTrue("$count: $angles", angles.first() < PI / 2 && angles.last() > PI / 2)
-                // Разброс не сводит соседние углы ближе чем на полсектора.
                 assertTrue("$count: $angles", angles.zipWithNext().all { (a, b) -> b - a > sector * 0.3f })
             }
         }

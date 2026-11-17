@@ -76,7 +76,6 @@ internal fun DollScreen(
         val navigationBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
         // Язычок M3 вместе с полями высотой ровно в touchTarget.
         val peekHeight = Sizes.touchTarget + navigationBarHeight
-        // Офсет шторки — от верха scaffold, то есть от верха экрана.
         val sheetTop: Density.() -> Float = {
             // На первом кадре слой собирается раньше, чем шторка выставила офсет.
             runCatching { sheetState.requireOffset() }.getOrElse {
@@ -157,8 +156,7 @@ internal fun DollScreen(
                         onClick = onClearAll,
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            // Правый край — как у кнопки настроек в шапке. Кнопка едет вместе со
-                            // шторкой: офсет читается при размещении, без рекомпозиции.
+                            // Офсет читается при размещении: кнопка едет за шторкой без рекомпозиции.
                             .padding(end = Spacing.small)
                             .offset {
                                 val bottom = availableHeight() - Spacing.small.toPx()
@@ -171,6 +169,5 @@ internal fun DollScreen(
     }
 }
 
-/** Насколько шторка раскрыта: 0 — скрыта, 1 — открыта. */
 private fun openFraction(offset: Float, expandedOffset: Float, collapsedOffset: Float): Float =
     ((collapsedOffset - offset) / (collapsedOffset - expandedOffset)).coerceIn(0f, 1f)

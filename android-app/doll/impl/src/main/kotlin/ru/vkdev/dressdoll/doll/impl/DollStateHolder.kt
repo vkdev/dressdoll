@@ -60,7 +60,7 @@ internal class DollStateHolder(
         Dataset(categories.associateBy { it.id }, items.mapTo(mutableSetOf()) { it.id })
     }.stateIn(scope, SharingStarted.Eagerly, null)
 
-    /** Надетые вещи в порядке надевания, проверенные по датасету; `null`, пока образ или датасет читаются. */
+    /** В порядке надевания; `null`, пока образ или датасет читаются. */
     val worn: StateFlow<List<WornItem>?> = combine(outfit.worn.filterNotNull(), dataset.filterNotNull()) { saved, dataset ->
         dataset.normalize(saved).also { if (it != saved) outfit.save(it) }
     }.stateIn(scope, SharingStarted.Eagerly, null)
@@ -80,10 +80,7 @@ internal class DollStateHolder(
         outfit.save(toggle(current, item, dataset.categories))
     }
 
-    /**
-     * Снимает всё. Пока образ не прочитан, игнорируется: иначе пустой образ затёр бы сохранённый.
-     * Пока картинки прошлого нажатия не загружены — тоже, как и [toggle].
-     */
+    /** Пока образ не прочитан, игнорируется: иначе пустой образ затёр бы сохранённый. */
     fun clearAll() {
         val dataset = dataset.value ?: return
         settledOutfit(dataset) ?: return

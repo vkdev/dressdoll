@@ -23,15 +23,13 @@ import ru.vkdev.dressdoll.repository.api.ClothingItemId
 import ru.vkdev.dressdoll.theme.api.Spacing
 
 /**
- * Кукла, вписанная по прямоугольнику фигурки в область шириной с ограничения раскладки
- * и высотой [availableHeight] пикселей от верха, с полями [Spacing.overhang]. Одежда может
- * выходить за область: обрезает вызывающий. `scene == null` — пустая область, образ ещё читается.
+ * Одежда может выходить за область: обрезает вызывающий.
  *
  * [availableHeight] — лямбда: она читается при отрисовке слоя, поэтому перетаскивание шторки
  * не вызывает ни рекомпозиции, ни перекомпоновки.
  *
- * Смену сцены анимирует [transition]. Вещи летят из-за краёв всей области по высоте ограничений,
- * а не только [availableHeight]: снизу они выезжают из-под шторки.
+ * Вещи летят из-за краёв всей области по высоте ограничений, а не только [availableHeight]:
+ * снизу они выезжают из-под шторки.
  */
 @Composable
 internal fun DollCanvas(
@@ -64,7 +62,6 @@ internal fun DollCanvas(
             // фильтруются в итоговом разрешении. Поэтому у этого слоя нельзя alpha < 1 и Offscreen.
             canvas.placeWithLayer(0, 0) {
                 val fit = fitFigure(shown.figure.bounds, width.toFloat(), availableHeight(), overhang)
-                // С началом в левом верхнем углу сдвиг считается прямо в пикселях холста.
                 transformOrigin = TransformOrigin(0f, 0f)
                 scaleX = fit.scale
                 scaleY = fit.scale
@@ -75,10 +72,6 @@ internal fun DollCanvas(
     }
 }
 
-/**
- * Слои в пикселях холста: каждый своего размера в своей точке, задние под фигуркой, передние над ней,
- * улетающие вещи поверх всего. [viewport] — видимая область в пикселях холста.
- */
 @Composable
 private fun DollLayers(scene: DollScene, transition: DollTransition, viewport: () -> Rect?) {
     val figure = scene.figure
@@ -135,7 +128,7 @@ private class AreaSize {
     var width = 0f
     var height = 0f
 
-    /** Видимая область в пикселях холста; `null`, пока кукла не помещается и масштаб нулевой. */
+    /** `null`, пока кукла не помещается и масштаб нулевой. */
     fun viewport(bounds: CanvasRect, availableHeight: Float, overhang: Float): Rect? {
         val fit = fitFigure(bounds, width, availableHeight, overhang)
         if (fit.scale <= 0f) return null

@@ -10,21 +10,17 @@ import androidx.compose.runtime.setValue
 import ru.vkdev.dressdoll.repository.api.ClothingItemId
 import kotlin.random.Random
 
-/**
- * Переход между сценами куклы: какая сцена на экране, какие вещи улетают и как летит каждая.
- * Живёт, пока экран куклы в композиции: вернулись на экран — первая сцена показывается без анимации.
- */
+/** Живёт, пока экран куклы в композиции: вернулись на экран — первая сцена показывается без анимации. */
 @Stable
 internal class DollTransition(private val random: Random = Random.Default) {
 
     var shown: DollScene? by mutableStateOf(null)
         private set
 
-    /** Слои снятых вещей: рисуются поверх сцены, пока не улетят. */
     var leaving: List<DollLayer> by mutableStateOf(emptyList())
         private set
 
-    /** Вещи, которые сейчас летят. Прогресс общий: все анимации перехода идут одновременно. */
+    /** Прогресс общий: все анимации перехода идут одновременно. */
     var flights: Map<ClothingItemId, Flight> by mutableStateOf(emptyMap())
         private set
 
@@ -32,10 +28,7 @@ internal class DollTransition(private val random: Random = Random.Default) {
 
     val isAnimating: Boolean get() = flights.isNotEmpty()
 
-    /**
-     * Показывает [scene]. Вещи, которых не было в прошлой сцене, прилетают, пропавшие улетают.
-     * Возвращается, когда анимация доиграла; отмена оставляет состояние для следующего вызова.
-     */
+    /** Отмена оставляет состояние для следующего вызова. */
     suspend fun show(scene: DollScene?) {
         val previous = shown
         if (previous == null || scene == null) {

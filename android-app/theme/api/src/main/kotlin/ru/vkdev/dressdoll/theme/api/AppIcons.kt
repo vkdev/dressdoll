@@ -33,7 +33,6 @@ object AppIcons {
         lineTo(4f, 12f)
     }
 
-    /** Вешалка: крючок и треугольные плечики. */
     val Hanger: ImageVector = lineIcon("Hanger") {
         moveTo(9.5f, 7f)
         arcTo(2.5f, 2.5f, 0f, isMoreThanHalf = false, isPositiveArc = true, x1 = 14.5f, y1 = 7f)
