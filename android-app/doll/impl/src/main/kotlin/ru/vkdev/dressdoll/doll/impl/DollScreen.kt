@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import kotlinx.coroutines.launch
 import ru.vkdev.dressdoll.catalog.api.Catalog
+import ru.vkdev.dressdoll.repository.api.ClothingItemId
 import ru.vkdev.dressdoll.theme.api.AppIcons
 import ru.vkdev.dressdoll.theme.api.HeaderBar
 import ru.vkdev.dressdoll.theme.api.IconActionButton
@@ -59,6 +60,10 @@ internal fun DollScreen(
     val worn by holder.worn.collectAsState()
     val wornIds = remember(worn) { worn?.mapTo(HashSet()) { it.id } }
     val scene by holder.scene.collectAsState()
+    val transition = remember { DollTransition() }
+    // Пока грузятся картинки, нажатия отбрасывает holder, пока вещи летят — экран.
+    val onToggle: (ClothingItemId) -> Unit = { if (!transition.isAnimating) holder.toggle(it) }
+    val onClearAll = { if (!transition.isAnimating) holder.clearAll() }
     val isOpen = sheetState.currentValue == SheetValue.Expanded
 
     // Регистрируется раньше обработчика каталога, поэтому срабатывает, только когда каталог
@@ -108,7 +113,7 @@ internal fun DollScreen(
             sheetContent = {
                 catalog.Content(
                     worn = wornIds,
-                    onToggle = holder::toggle,
+                    onToggle = onToggle,
                     isOpen = isOpen,
                     // Фиксированная высота делает раскрытую шторку вместе с язычком ровно половиной
                     // экрана: состояния выше половины нет.
@@ -141,6 +146,7 @@ internal fun DollScreen(
                 val availableHeight = { with(density) { sheetTop() - contentTop.toPx() } }
                 DollCanvas(
                     scene = scene,
+                    transition = transition,
                     availableHeight = availableHeight,
                     modifier = Modifier.fillMaxSize(),
                 )
@@ -148,7 +154,7 @@ internal fun DollScreen(
                     IconActionButton(
                         icon = AppIcons.Hanger,
                         contentDescription = stringResource(R.string.doll_clear_all),
-                        onClick = holder::clearAll,
+                        onClick = onClearAll,
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             // Правый край — как у кнопки настроек в шапке. Кнопка едет вместе со

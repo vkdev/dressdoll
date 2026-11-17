@@ -18,6 +18,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import ru.vkdev.dressdoll.outfit.api.OutfitRepository
 import ru.vkdev.dressdoll.outfit.api.WornItem
+import ru.vkdev.dressdoll.repository.api.BodySlot
 import ru.vkdev.dressdoll.repository.api.CanvasPoint
 import ru.vkdev.dressdoll.repository.api.CanvasRect
 import ru.vkdev.dressdoll.repository.api.CatalogSection
@@ -99,17 +100,35 @@ class DollStateHolderTest {
     }
 
     @Test
-    fun `два быстрых нажатия не теряют первое`() = runTest(StandardTestDispatcher()) {
+    fun `второе нажатие до загрузки первого игнорируется`() = runTest(StandardTestDispatcher()) {
         outfit.worn.value = emptyList()
         val holder = holder()
         runCurrent()
 
-        // Без runCurrent между нажатиями holder.worn ещё не видит первое.
+        // Без runCurrent между нажатиями holder.worn и сцена ещё не видят первое.
         holder.toggle(PANTIES)
         holder.toggle(SHIRT)
+        holder.clearAll()
         runCurrent()
 
-        assertEquals(listOf(PANTIES, SHIRT).worn(), holder.worn.value)
+        assertEquals(listOf(PANTIES).worn(), holder.worn.value)
+        assertEquals(listOf(listOf(PANTIES).worn()), outfit.saves)
+    }
+
+    @Test
+    fun `после загрузки сцены нажатия снова работают`() = runTest(UnconfinedTestDispatcher()) {
+        outfit.worn.value = emptyList()
+        val holder = holder()
+        val gate = CompletableDeferred<Unit>()
+        repository.gates[SHIRT] = gate
+
+        holder.toggle(SHIRT)
+        holder.toggle(PANTIES)
+        gate.complete(Unit)
+        runCurrent()
+        holder.toggle(PANTIES)
+
+        assertEquals(listOf(SHIRT, PANTIES).worn(), holder.worn.value)
     }
 
     @Test
@@ -131,6 +150,31 @@ class DollStateHolderTest {
             scene.layers.map { it.item to it.plane },
         )
         assertEquals(CanvasPoint(1, 2), scene.layers.first().topLeft)
+    }
+
+    @Test
+    fun `сцена помнит свой образ, слой — слот категории`() = runTest(UnconfinedTestDispatcher()) {
+        outfit.worn.value = listOf(SHIRT, TIGHTS).worn()
+
+        val scene = checkNotNull(holder().scene.value)
+
+        assertEquals(listOf(SHIRT, TIGHTS).worn(), scene.worn)
+        assertEquals(
+            mapOf(SHIRT to BodySlot.TORSO, TIGHTS to BodySlot.LEGS),
+            scene.layers.associate { it.item to it.slot },
+        )
+    }
+
+    @Test
+    fun `пока картинки грузятся, образ сцены отстаёт от образа`() = runTest(UnconfinedTestDispatcher()) {
+        outfit.worn.value = emptyList()
+        val holder = holder()
+        repository.gates[SHIRT] = CompletableDeferred()
+
+        holder.toggle(SHIRT)
+
+        assertEquals(listOf(SHIRT).worn(), holder.worn.value)
+        assertEquals(emptyList<WornItem>(), holder.scene.value!!.worn)
     }
 
     @Test
@@ -164,7 +208,8 @@ class DollStateHolderTest {
         repository.gates[SHIRT] = CompletableDeferred()
 
         holder.toggle(SHIRT)
-        holder.toggle(SHIRT)
+        // Нажатия до загрузки игнорируются, поэтому новый образ приходит не из toggle.
+        outfit.worn.value = emptyList()
 
         assertEquals(emptyList<DollLayer>(), holder.scene.value!!.layers)
     }

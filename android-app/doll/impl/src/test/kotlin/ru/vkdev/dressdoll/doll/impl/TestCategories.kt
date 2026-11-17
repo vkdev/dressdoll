@@ -24,8 +24,8 @@ private val JACKETS_GROUP = ReplacementGroup(ReplacementGroupId("jackets"), limi
 internal val CATEGORIES: Map<CategoryId, ClothingCategory> = listOf(
     category("трусы", UNDERWEAR, ownGroup("трусы")),
     category("бюстгальтер", UNDERWEAR, ownGroup("бюстгальтер")),
-    category("колготки", TIGHTS_LEVEL, TIGHTS_GROUP),
-    category("чулки", TIGHTS_LEVEL, TIGHTS_GROUP),
+    category("колготки", TIGHTS_LEVEL, TIGHTS_GROUP, BodySlot.LEGS),
+    category("чулки", TIGHTS_LEVEL, TIGHTS_GROUP, BodySlot.LEGS),
     category("носки", SOCKS_LEVEL, ownGroup("носки")),
     category("майка", UNDERSHIRTS_LEVEL, UNDERSHIRTS),
     category("футболка", UNDERSHIRTS_LEVEL, UNDERSHIRTS),
@@ -39,10 +39,15 @@ private fun level(id: String, position: Int) = DrawLevel(DrawLevelId(id), positi
 
 private fun ownGroup(category: String) = ReplacementGroup(ReplacementGroupId(category), limit = 1)
 
-private fun category(name: String, level: DrawLevel, group: ReplacementGroup) = ClothingCategory(
+private fun category(
+    name: String,
+    level: DrawLevel,
+    group: ReplacementGroup,
+    slot: BodySlot = BodySlot.TORSO,
+) = ClothingCategory(
     id = CategoryId(name),
     title = name,
-    slot = BodySlot.TORSO,
+    slot = slot,
     level = level,
     group = group,
     section = CatalogSectionId("s"),
