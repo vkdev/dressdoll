@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
@@ -18,20 +19,18 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Density
 import kotlinx.coroutines.launch
 import ru.vkdev.dressdoll.catalog.api.Catalog
-import ru.vkdev.dressdoll.repository.api.CategoryId
-import ru.vkdev.dressdoll.repository.api.ClothingItemId
 import ru.vkdev.dressdoll.theme.api.AppIcons
 import ru.vkdev.dressdoll.theme.api.HeaderBar
 import ru.vkdev.dressdoll.theme.api.IconActionButton
@@ -40,6 +39,7 @@ import ru.vkdev.dressdoll.theme.api.Sizes
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun DollScreen(
+    holder: DollStateHolder,
     catalog: Catalog,
     onOpenSettings: () -> Unit,
 ) {
@@ -50,7 +50,9 @@ internal fun DollScreen(
     )
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = sheetState)
     val scope = rememberCoroutineScope()
-    var selected by rememberSaveable(saver = SelectedItemSaver) { mutableStateOf(null) }
+    val worn by holder.worn.collectAsState()
+    val wornIds = remember(worn) { worn?.mapTo(HashSet()) { it.id } }
+    val scene by holder.scene.collectAsState()
     val isOpen = sheetState.currentValue == SheetValue.Expanded
 
     // Регистрируется раньше обработчика каталога, поэтому срабатывает, только когда каталог
@@ -63,6 +65,17 @@ internal fun DollScreen(
         val navigationBarHeight = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
         // Язычок M3 вместе с полями высотой ровно в touchTarget.
         val peekHeight = Sizes.touchTarget + navigationBarHeight
+        // Офсет шторки — от верха scaffold, то есть от верха экрана.
+        val sheetTop: Density.() -> Float = {
+            // На первом кадре слой собирается раньше, чем шторка выставила офсет.
+            runCatching { sheetState.requireOffset() }.getOrElse {
+                if (sheetState.currentValue == SheetValue.Expanded) {
+                    (screenHeight - sheetHeight).toPx()
+                } else {
+                    (screenHeight - peekHeight).toPx()
+                }
+            }
+        }
         BottomSheetScaffold(
             scaffoldState = scaffoldState,
             sheetPeekHeight = peekHeight,
@@ -88,8 +101,8 @@ internal fun DollScreen(
             },
             sheetContent = {
                 catalog.Content(
-                    selected = selected,
-                    onSelect = { selected = it },
+                    worn = wornIds,
+                    onToggle = holder::toggle,
                     isOpen = isOpen,
                     // Фиксированная высота делает раскрытую шторку вместе с язычком ровно половиной
                     // экрана: состояния выше половины нет.
@@ -98,32 +111,37 @@ internal fun DollScreen(
                         // Скрытая шторка выглядывает и под панелью навигации: без затухания там
                         // видна верхушка каталога, а должен быть только язычок.
                         .graphicsLayer {
-                            // На первом кадре слой собирается раньше, чем шторка выставила офсет.
-                            val offset = runCatching { sheetState.requireOffset() }.getOrNull()
-                            alpha = if (offset == null) {
-                                if (sheetState.currentValue == SheetValue.Expanded) 1f else 0f
-                            } else {
-                                openFraction(
-                                    offset = offset,
-                                    expandedOffset = (screenHeight - sheetHeight).toPx(),
-                                    collapsedOffset = (screenHeight - peekHeight).toPx(),
-                                )
-                            }
+                            alpha = openFraction(
+                                offset = sheetTop(),
+                                expandedOffset = (screenHeight - sheetHeight).toPx(),
+                                collapsedOffset = (screenHeight - peekHeight).toPx(),
+                            )
                         },
                 )
             },
-        ) {}
+        ) {
+            // Не innerPadding: в нём только нижний отступ под язычок, а верх контента — всегда 0.
+            // Scaffold ставит контент под шапку и даёт ему высоту экрана без шапки.
+            BoxWithConstraints(
+                Modifier
+                    .fillMaxSize()
+                    // Шляпа или воротник за полями уходят под край шапки, а не рисуются поверх неё.
+                    .clipToBounds()
+                    // Вырез камеры сбоку в альбомной ориентации.
+                    .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
+            ) {
+                val contentTop = screenHeight - maxHeight
+                val density = LocalDensity.current
+                DollCanvas(
+                    scene = scene,
+                    availableHeight = { with(density) { sheetTop() - contentTop.toPx() } },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+        }
     }
 }
 
 /** Насколько шторка раскрыта: 0 — скрыта, 1 — открыта. */
 private fun openFraction(offset: Float, expandedOffset: Float, collapsedOffset: Float): Float =
     ((collapsedOffset - offset) / (collapsedOffset - expandedOffset)).coerceIn(0f, 1f)
-
-// ClothingItemId не Parcelable, поэтому категория и ключ лежат списком строк; пустой список — ничего не выбрано.
-private val SelectedItemSaver = Saver<MutableState<ClothingItemId?>, List<String>>(
-    save = { state -> state.value?.let { arrayListOf(it.category.value, it.key) } ?: arrayListOf() },
-    restore = { saved ->
-        mutableStateOf(saved.takeIf { it.size == 2 }?.let { ClothingItemId(CategoryId(it[0]), it[1]) })
-    },
-)

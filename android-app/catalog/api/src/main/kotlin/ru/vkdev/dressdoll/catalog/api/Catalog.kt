@@ -9,13 +9,15 @@ interface Catalog {
     /**
      * Содержимое шторки: категории или вещи одной категории.
      *
+     * @param worn надетые вещи, отмечаются в каталоге; `null`, пока образ не прочитан.
+     * @param onToggle нажатие на вещь: надеть или снять решает вызывающий.
      * @param isOpen шторка открыта и каталог виден. Пока `false`, системный «Назад»
      * не закрывает категорию: шторка держит содержимое в композиции и скрытой.
      */
     @Composable
     fun Content(
-        selected: ClothingItemId?,
-        onSelect: (ClothingItemId) -> Unit,
+        worn: Set<ClothingItemId>?,
+        onToggle: (ClothingItemId) -> Unit,
         isOpen: Boolean,
         modifier: Modifier = Modifier,
     )

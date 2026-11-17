@@ -28,7 +28,11 @@ internal class AssetBitmapDecoder(
         // Options изменяемые (декодер пишет в поля out*), поэтому у каждого параллельного декодирования свои.
         // Одежде нужна прозрачность, поэтому не RGB_565.
         val options = BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.ARGB_8888 }
-        return stream.use { BitmapFactory.decodeStream(it, null, options) }
+        val bitmap = stream.use { BitmapFactory.decodeStream(it, null, options) }
             ?: throw IOException("Cannot decode ${key.assetPath}")
+        // В альбомной ориентации с открытой шторкой кукла уменьшается сильнее чем вдвое,
+        // и без mipmap мелкие детали рябят. Mipmap строится при загрузке в GPU.
+        if (key.onDoll) bitmap.setHasMipMap(true)
+        return bitmap
     }
 }

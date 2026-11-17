@@ -8,7 +8,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
-import ru.vkdev.dressdoll.temporarydataset.TDImageKind
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -34,7 +33,7 @@ internal class BitmapRepository(
 
     /** `null`, если картинки нет. */
     suspend fun load(key: TDImageKey): Bitmap? {
-        val cache = cacheFor(key.kind)
+        val cache = cacheFor(key)
         val deferred = synchronized(inFlight) {
             cache.get(key)?.let { return it }
             if (key in missing) return null
@@ -68,10 +67,7 @@ internal class BitmapRepository(
             }
         }
 
-    private fun cacheFor(kind: TDImageKind): LruCache<TDImageKey, Bitmap> = when (kind) {
-        TDImageKind.CATALOG -> catalogCache
-        TDImageKind.FRONT, TDImageKind.BACK -> dollCache
-    }
+    private fun cacheFor(key: TDImageKey): LruCache<TDImageKey, Bitmap> = if (key.onDoll) dollCache else catalogCache
 }
 
 internal fun bitmapLruCache(maxBytes: Int): LruCache<TDImageKey, Bitmap> =

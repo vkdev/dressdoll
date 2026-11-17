@@ -4,6 +4,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import ru.vkdev.dressdoll.repository.api.BodySlot
+import ru.vkdev.dressdoll.repository.api.CanvasPoint
+import ru.vkdev.dressdoll.repository.api.CanvasRect
 import ru.vkdev.dressdoll.repository.api.CatalogSection
 import ru.vkdev.dressdoll.repository.api.CatalogSectionId
 import ru.vkdev.dressdoll.repository.api.CategoryId
@@ -15,6 +17,8 @@ import ru.vkdev.dressdoll.repository.api.DrawLevelId
 import ru.vkdev.dressdoll.repository.api.ReplacementGroup
 import ru.vkdev.dressdoll.repository.api.ReplacementGroupId
 import ru.vkdev.dressdoll.temporarydataset.CategoryName
+import ru.vkdev.dressdoll.temporarydataset.TDCanvasPoint
+import ru.vkdev.dressdoll.temporarydataset.TDCanvasRect
 import ru.vkdev.dressdoll.temporarydataset.TDClothingCategory
 import ru.vkdev.dressdoll.temporarydataset.TDClothingItem
 import ru.vkdev.dressdoll.temporarydataset.TDGroup
@@ -89,6 +93,15 @@ class TemporaryDatasetMappersTest {
         assertEquals(
             ClothingItem(id = ClothingItemId(CategoryId("сапоги"), "01"), title = "сапоги 01"),
             item.toClothingItem(),
+        )
+    }
+
+    @Test
+    fun `canvas point and rect keep coordinates`() {
+        assertEquals(CanvasPoint(x = -4, y = 1178), TDCanvasPoint(x = -4, y = 1178).toCanvasPoint())
+        assertEquals(
+            CanvasRect(left = 221, top = 66, width = 329, height = 1226),
+            TDCanvasRect(left = 221, top = 66, width = 329, height = 1226).toCanvasRect(),
         )
     }
 

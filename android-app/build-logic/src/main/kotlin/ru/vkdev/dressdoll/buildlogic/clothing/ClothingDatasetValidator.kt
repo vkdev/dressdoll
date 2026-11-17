@@ -53,13 +53,21 @@ internal object ClothingDatasetValidator {
 
         if (errors.isNotEmpty()) return ValidationResult(errors, config = null)
 
+        // Запись без папки допустима: правила категории описаны заранее, контент появится позже.
+        // В приложение такая категория не попадает, иначе каталог показал бы пустой раздел.
+        val folderNames = categoryFolders.mapTo(mutableSetOf()) { it.toNfc() }
+        val present = categories.filter { it.name.toNfc() in folderNames }
+        val presentSections = present.mapNotNullTo(mutableSetOf()) { it.section }
+
         // Без ошибок все поля разобраны: null остаётся только рядом с ошибкой в отчёте.
         val sectionOrder = sections.map { it.id }
         val config = DatasetConfig(
             levels = levels,
             groups = groups.map { DatasetGroup(it.id, checkNotNull(it.limit)) },
-            sections = sections.map { DatasetSection(it.id, checkNotNull(it.title)) },
-            categories = categories
+            sections = sections
+                .filter { it.id in presentSections }
+                .map { DatasetSection(it.id, checkNotNull(it.title)) },
+            categories = present
                 .map {
                     DatasetCategory(
                         name = it.name,
@@ -202,7 +210,6 @@ internal object ClothingDatasetValidator {
         val folderNames = folders.mapTo(mutableSetOf()) { it.toNfc() }
         val configNames = categoryNames.mapTo(mutableSetOf()) { it.toNfc() }
         (folderNames - configNames).sorted().forEach { errors += "папка «$it» есть, записи в categories нет" }
-        (configNames - folderNames).sorted().forEach { errors += "запись «$it» есть, папки в cloth-src нет" }
     }
 
     private fun requireString(entry: Map<*, *>, field: String, name: String, errors: MutableList<String>): String? {

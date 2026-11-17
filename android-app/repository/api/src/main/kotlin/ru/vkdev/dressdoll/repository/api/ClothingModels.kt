@@ -20,7 +20,10 @@ data class ClothingCategory(
     val section: CatalogSectionId,
 )
 
-/** Якорная точка вещи на фигурке. */
+/**
+ * Часть тела, к которой относится вещь. Позицию вещи на кукле задаёт не слот, а [DollImages.topLeft];
+ * слот — задел для креплений и аксессуаров: брошь крепится к вещи торса, шарф — к шее.
+ */
 enum class BodySlot {
     FEET,
     LEGS,
@@ -69,8 +72,26 @@ data class ClothingItem(
     val category: CategoryId get() = id.category
 }
 
-/** [back] — `null`, если у вещи нет задней плоскости. */
+/** Координаты в пикселях холста куклы. */
+data class CanvasPoint(val x: Int, val y: Int)
+
+data class CanvasRect(val left: Int, val top: Int, val width: Int, val height: Int)
+
+/** [image] — холст куклы целиком, размером [canvasWidth] × [canvasHeight]. */
+data class DollFigure(
+    val image: Bitmap,
+    val canvasWidth: Int,
+    val canvasHeight: Int,
+    /** Где на холсте сама фигурка: по ней считается масштаб. */
+    val bounds: CanvasRect,
+)
+
+/**
+ * [back] — `null`, если у вещи нет задней плоскости.
+ * [topLeft] — левый верхний угол [front] и [back] на холсте куклы.
+ */
 data class DollImages(
     val front: Bitmap,
     val back: Bitmap?,
+    val topLeft: CanvasPoint,
 )

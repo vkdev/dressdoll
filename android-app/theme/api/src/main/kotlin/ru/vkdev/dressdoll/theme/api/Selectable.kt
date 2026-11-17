@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -17,15 +18,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 
+/** Как озвучивается выбор в [SelectableCard]. */
+enum class SelectionRole {
+    /** Один из многих: `selectable`, роль радиокнопки. Группу `selectableGroup()` задаёт вызывающий. */
+    Single,
+
+    /** Независимый флажок: `toggleable`, роль флажка. */
+    Multiple,
+}
+
 /**
- * Карточка выбора одного из многих. Индикатор выбора рисует [content];
- * `selectableGroup()` и пропорции задаёт вызывающий.
+ * Карточка выбора. Индикатор выбора рисует [content], пропорции задаёт вызывающий.
+ * [role] — один из многих или независимый флажок.
  */
 @Composable
 fun SelectableCard(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    role: SelectionRole = SelectionRole.Single,
     color: Color = MaterialTheme.colorScheme.surface,
     content: @Composable () -> Unit,
 ) {
@@ -41,7 +52,12 @@ fun SelectableCard(
         },
         modifier = modifier
             .clip(shape)
-            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick),
+            .then(
+                when (role) {
+                    SelectionRole.Single -> Modifier.selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+                    SelectionRole.Multiple -> Modifier.toggleable(value = selected, role = Role.Checkbox) { onClick() }
+                },
+            ),
         content = content,
     )
 }
@@ -52,12 +68,14 @@ fun ChoiceTile(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    role: SelectionRole = SelectionRole.Single,
     content: @Composable () -> Unit,
 ) {
     SelectableCard(
         selected = selected,
         onClick = onClick,
         modifier = modifier,
+        role = role,
         color = MaterialTheme.colorScheme.surfaceContainerLowest,
     ) {
         Box(Modifier.padding(Spacing.small)) {
@@ -69,7 +87,7 @@ fun ChoiceTile(
     }
 }
 
-// Без contentDescription: выбор уже озвучен через selectable.
+// Без contentDescription: выбор уже озвучен через selectable или toggleable.
 @Composable
 private fun SelectedBadge(modifier: Modifier = Modifier) {
     val colors = MaterialTheme.colorScheme

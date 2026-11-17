@@ -37,8 +37,8 @@ internal class CatalogImpl(
 
     @Composable
     override fun Content(
-        selected: ClothingItemId?,
-        onSelect: (ClothingItemId) -> Unit,
+        worn: Set<ClothingItemId>?,
+        onToggle: (ClothingItemId) -> Unit,
         isOpen: Boolean,
         modifier: Modifier,
     ) {
@@ -84,8 +84,8 @@ internal class CatalogImpl(
                     repository = repository,
                     category = category,
                     loadedItems = loadedItems,
-                    selected = selected,
-                    onSelect = onSelect,
+                    worn = worn,
+                    onToggle = onToggle,
                     bottomInset = bottomInset,
                     onBack = { openCategory = null },
                 )

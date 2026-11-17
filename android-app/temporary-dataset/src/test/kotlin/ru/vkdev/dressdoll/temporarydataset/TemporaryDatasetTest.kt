@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -42,8 +43,8 @@ class TemporaryDatasetTest {
         val categories = dataset.clothingCategories().first()
         val names = categories.map { it.name.value }
 
-        assertEquals(34, names.size)
-        assertEquals(listOf("трусы", "бюстгальтер", "бельевая-майка", "майка"), names.take(4))
+        assertEquals(DATASET_DIR.listFiles()!!.count { it.isDirectory }, names.size)
+        assertEquals(listOf("бельевая-майка", "водолазка", "блузка"), names.take(3))
         assertEquals("галстук", names.last())
         assertNotEquals(names.sorted(), names)
         val sectionOrder = dataset.catalogSections().first().map { it.id }
@@ -52,19 +53,19 @@ class TemporaryDatasetTest {
     }
 
     @Test
-    fun `socks are drawn above tights`() = runTest(dispatcher) {
+    fun `knee socks are drawn above underwear`() = runTest(dispatcher) {
         val categories = dataset.clothingCategories().first().associateBy { it.name.value }
 
-        assertTrue(categories.getValue("носки").level.position > categories.getValue("колготки").level.position)
+        assertTrue(categories.getValue("гольфы").level.position > categories.getValue("бельевая-майка").level.position)
     }
 
     @Test
-    fun `tights and stockings share one group with limit 1`() = runTest(dispatcher) {
+    fun `turtleneck is in undershirts group with limit 2`() = runTest(dispatcher) {
         val categories = dataset.clothingCategories().first().associateBy { it.name.value }
 
-        val tights = categories.getValue("колготки").group
-        assertEquals(tights, categories.getValue("чулки").group)
-        assertEquals(1, tights.limit)
+        val group = categories.getValue("водолазка").group
+        assertEquals("undershirts", group.id.value)
+        assertEquals(2, group.limit)
     }
 
     @Test
@@ -82,11 +83,11 @@ class TemporaryDatasetTest {
 
     @Test
     fun `clothingItems names items as category plus folder`() = runTest(dispatcher) {
-        val category = CategoryName("сапоги")
+        val category = CategoryName("ботинки")
 
         val items = dataset.clothingItems(category).first()
 
-        assertEquals(listOf("сапоги 01", "сапоги 02", "сапоги 03"), items.map { it.name })
+        assertEquals(listOf("ботинки 01", "ботинки 02", "ботинки 03"), items.map { it.name })
         assertTrue(items.all { it.parentCategory == category })
     }
 
@@ -101,7 +102,7 @@ class TemporaryDatasetTest {
             items.size
         }
 
-        assertEquals(102, total)
+        assertEquals(itemFolderCount(), total)
     }
 
     @Test
@@ -111,7 +112,7 @@ class TemporaryDatasetTest {
 
     @Test
     fun `clothingItems id points to item folder`() = runTest(dispatcher) {
-        val items = dataset.clothingItems(CategoryName("сапоги")).first()
+        val items = dataset.clothingItems(CategoryName("ботинки")).first()
 
         assertEquals(listOf("01", "02", "03"), items.map { it.id.folder })
     }
@@ -126,7 +127,7 @@ class TemporaryDatasetTest {
             assertTrue("empty catalog ${item.name}", catalog.width > 0 && catalog.height > 0)
             assertTrue("empty front ${item.name}", doll.front.width > 0 && doll.front.height > 0)
         }
-        assertEquals(102, items.size)
+        assertEquals(itemFolderCount(), items.size)
     }
 
     @Test
@@ -144,10 +145,66 @@ class TemporaryDatasetTest {
     }
 
     @Test
+    fun `dollImages places item at offset from scale json`() = runTest(dispatcher) {
+        val images = dataset.dollImages(TDItemId(CategoryName("блузка"), "01"))
+
+        assertEquals(TDCanvasPoint(x = 215, y = 266), images.topLeft)
+    }
+
+    @Test
+    fun `every item has a placement`() = runTest(dispatcher) {
+        val placed = allItems().map { it.id }.toSet()
+
+        assertEquals(placed, itemPlacements.keys)
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `dollImages for item without placement throws`() = runTest(dispatcher) {
+        dataset.dollImages(TDItemId(CategoryName("нет-такой"), "01"))
+    }
+
+    @Test
+    fun `figure is the whole doll canvas with figure bounds inside`() = runTest(dispatcher) {
+        val figure = dataset.figure()
+
+        assertEquals(768, figure.canvasWidth)
+        assertEquals(1376, figure.canvasHeight)
+        assertEquals(figure.canvasWidth, figure.image.width)
+        assertEquals(figure.canvasHeight, figure.image.height)
+        assertEquals(TDCanvasRect(left = 221, top = 66, width = 329, height = 1226), figure.bounds)
+    }
+
+    @Test
+    fun `doll bitmaps have mipmaps, catalog bitmaps do not`() = runTest(dispatcher) {
+        val id = TDItemId(CategoryName("блузка"), "01")
+
+        assertTrue(dataset.figure().image.hasMipMap())
+        assertTrue(dataset.dollImages(id).front.hasMipMap())
+        assertTrue(dataset.dollImages(id).back!!.hasMipMap())
+        assertFalse(dataset.catalogImage(id)!!.hasMipMap())
+    }
+
+    @Test
+    fun `allClothingItems lists items of all categories in category order`() = runTest(dispatcher) {
+        val all = dataset.allClothingItems().first()
+
+        assertEquals(allItems(), all)
+        assertEquals(itemFolderCount(), all.size)
+    }
+
+    @Test
     fun `catalogImage for unknown item is null`() = runTest(dispatcher) {
         assertNull(dataset.catalogImage(TDItemId(CategoryName("нет-такой"), "01")))
     }
 
     private suspend fun allItems(): List<TDClothingItem> =
         dataset.clothingCategories().first().flatMap { dataset.clothingItems(it.name).first() }
+
+    private fun itemFolderCount(): Int =
+        DATASET_DIR.listFiles()!!.filter { it.isDirectory }.sumOf { category -> category.listFiles()!!.count { it.isDirectory } }
+
+    private companion object {
+        // Датасет меняется вместе с контентом, поэтому количества сверяются с папками, а не с числами.
+        val DATASET_DIR = File("src/main/assets/$DATASET_ROOT")
+    }
 }

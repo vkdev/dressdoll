@@ -65,7 +65,7 @@ class ClothingDatasetValidatorTest {
 
     @Test
     fun `при ошибках конфига нет`() {
-        val result = ClothingDatasetValidator.validate(CONFIG, FOLDERS - "трусы")
+        val result = ClothingDatasetValidator.validate(CONFIG, FOLDERS + "галстук-бабочка")
 
         assertEquals(null, result.config)
     }
@@ -112,10 +112,15 @@ class ClothingDatasetValidatorTest {
     }
 
     @Test
-    fun `запись без папки`() {
-        val errors = validate(folders = FOLDERS - "трусы")
+    fun `запись без папки допустима, но в конфиг не попадает`() {
+        val result = ClothingDatasetValidator.validate(CONFIG, FOLDERS - "трусы")
 
-        assertEquals(listOf("запись «трусы» есть, папки в cloth-src нет"), errors)
+        assertEquals(emptyList<String>(), result.errors)
+        assertEquals(listOf("носки"), result.config!!.categories.map { it.name })
+        // Раздел остался без категорий с папками, поэтому в каталог тоже не попадает.
+        assertEquals(listOf("hosiery"), result.config!!.sections.map { it.id })
+        // Уровни и группы — правила надевания, они не зависят от наличия контента.
+        assertEquals(listOf("underwear", "socks"), result.config!!.levels)
     }
 
     @Test

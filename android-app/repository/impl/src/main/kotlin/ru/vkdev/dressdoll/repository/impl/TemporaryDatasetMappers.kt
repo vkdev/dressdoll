@@ -1,20 +1,26 @@
 package ru.vkdev.dressdoll.repository.impl
 
 import ru.vkdev.dressdoll.repository.api.BodySlot
+import ru.vkdev.dressdoll.repository.api.CanvasPoint
+import ru.vkdev.dressdoll.repository.api.CanvasRect
 import ru.vkdev.dressdoll.repository.api.CatalogSection
 import ru.vkdev.dressdoll.repository.api.CatalogSectionId
 import ru.vkdev.dressdoll.repository.api.CategoryId
 import ru.vkdev.dressdoll.repository.api.ClothingCategory
 import ru.vkdev.dressdoll.repository.api.ClothingItem
 import ru.vkdev.dressdoll.repository.api.ClothingItemId
+import ru.vkdev.dressdoll.repository.api.DollFigure
 import ru.vkdev.dressdoll.repository.api.DollImages
 import ru.vkdev.dressdoll.repository.api.DrawLevel
 import ru.vkdev.dressdoll.repository.api.DrawLevelId
 import ru.vkdev.dressdoll.repository.api.ReplacementGroup
 import ru.vkdev.dressdoll.repository.api.ReplacementGroupId
 import ru.vkdev.dressdoll.temporarydataset.CategoryName
+import ru.vkdev.dressdoll.temporarydataset.TDCanvasPoint
+import ru.vkdev.dressdoll.temporarydataset.TDCanvasRect
 import ru.vkdev.dressdoll.temporarydataset.TDClothingCategory
 import ru.vkdev.dressdoll.temporarydataset.TDClothingItem
+import ru.vkdev.dressdoll.temporarydataset.TDDollFigure
 import ru.vkdev.dressdoll.temporarydataset.TDDollImages
 import ru.vkdev.dressdoll.temporarydataset.TDGroup
 import ru.vkdev.dressdoll.temporarydataset.TDItemId
@@ -62,7 +68,15 @@ internal fun TDItemId.toClothingItemId(): ClothingItemId =
 internal fun TDClothingItem.toClothingItem(): ClothingItem =
     ClothingItem(id = id.toClothingItemId(), title = name)
 
-internal fun TDDollImages.toDollImages(): DollImages = DollImages(front = front, back = back)
+internal fun TDDollImages.toDollImages(): DollImages =
+    DollImages(front = front, back = back, topLeft = topLeft.toCanvasPoint())
+
+internal fun TDCanvasPoint.toCanvasPoint(): CanvasPoint = CanvasPoint(x = x, y = y)
+
+internal fun TDCanvasRect.toCanvasRect(): CanvasRect = CanvasRect(left = left, top = top, width = width, height = height)
+
+internal fun TDDollFigure.toDollFigure(): DollFigure =
+    DollFigure(image = image, canvasWidth = canvasWidth, canvasHeight = canvasHeight, bounds = bounds.toCanvasRect())
 
 internal fun CategoryId.toCategoryName(): CategoryName = CategoryName(value)
 

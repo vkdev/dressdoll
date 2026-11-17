@@ -83,8 +83,28 @@ enum class TDImageKind(val fileName: String) {
     BACK("back.png"),
 }
 
-/** [back] — `null`, если у вещи нет задней плоскости. */
+/** [back] — `null`, если у вещи нет задней плоскости. [topLeft] — левый верхний угол [front] и [back] на холсте куклы. */
 data class TDDollImages(
     val front: Bitmap,
     val back: Bitmap?,
+    val topLeft: TDCanvasPoint,
+)
+
+/** Координаты в пикселях холста куклы, `doll_1.png`. */
+data class TDCanvasPoint(val x: Int, val y: Int)
+
+data class TDCanvasRect(val left: Int, val top: Int, val width: Int, val height: Int)
+
+/** Генерируется при сборке из `doll_1.png` (`dollConfig`). [figure] — где на холсте сама фигурка. */
+internal data class TDDollConfig(
+    val canvasWidth: Int,
+    val canvasHeight: Int,
+    val figure: TDCanvasRect,
+)
+
+data class TDDollFigure(
+    val image: Bitmap,
+    val canvasWidth: Int,
+    val canvasHeight: Int,
+    val bounds: TDCanvasRect,
 )

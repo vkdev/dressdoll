@@ -20,7 +20,7 @@ class CategoriesConfigCodegenTest {
 
         assertEquals(
             """
-            // Сгенерировано из categories.json задачей generateCategoriesConfig, не редактировать.
+            // Сгенерировано из categories.json задачей generateDatasetConfig, не редактировать.
             package ru.vkdev.dressdoll.temporarydataset
 
             private val level1 = TDLevel(TDLevelId("underwear"), position = 1)

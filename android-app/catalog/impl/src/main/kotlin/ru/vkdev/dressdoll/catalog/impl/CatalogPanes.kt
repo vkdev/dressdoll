@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +37,7 @@ import ru.vkdev.dressdoll.repository.api.DollRepository
 import ru.vkdev.dressdoll.theme.api.ChoiceTile
 import ru.vkdev.dressdoll.theme.api.HeaderBar
 import ru.vkdev.dressdoll.theme.api.NavigationTile
+import ru.vkdev.dressdoll.theme.api.SelectionRole
 import ru.vkdev.dressdoll.theme.api.Spacing
 import java.io.IOException
 
@@ -82,8 +82,8 @@ internal fun ItemsPane(
     repository: DollRepository,
     category: OpenCategory,
     loadedItems: MutableMap<CategoryId, List<ClothingItem>>,
-    selected: ClothingItemId?,
-    onSelect: (ClothingItemId) -> Unit,
+    worn: Set<ClothingItemId>?,
+    onToggle: (ClothingItemId) -> Unit,
     bottomInset: Dp,
     onBack: () -> Unit,
 ) {
@@ -102,15 +102,15 @@ internal fun ItemsPane(
         if (items == null) return@Column
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            modifier = Modifier.selectableGroup(),
             contentPadding = gridPadding(bottomInset),
             horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
             verticalArrangement = Arrangement.spacedBy(Spacing.medium),
         ) {
             items(items, key = { it.id.key }) { item ->
                 ChoiceTile(
-                    selected = item.id == selected,
-                    onClick = { onSelect(item.id) },
+                    selected = worn != null && item.id in worn,
+                    onClick = { if (worn != null) onToggle(item.id) },
+                    role = SelectionRole.Multiple,
                     modifier = Modifier.aspectRatio(1f),
                 ) {
                     ItemTileContent(repository = repository, item = item)

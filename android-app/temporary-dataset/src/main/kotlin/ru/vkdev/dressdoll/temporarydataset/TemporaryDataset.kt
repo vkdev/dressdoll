@@ -15,10 +15,12 @@ import ru.vkdev.dressdoll.temporarydataset.bitmap.TDImageKey
 import java.io.FileNotFoundException
 
 internal const val DATASET_ROOT = "cloth-src"
+internal const val DOLL_IMAGE = "doll_1.png"
 
 /**
- * Датасет одежды в ассетах: картинки в `cloth-src/<category>/<item>/`.
- * Свойства категорий сгенерированы при сборке из `categories.json` модуля.
+ * Датасет одежды в ассетах: картинки в `cloth-src/<category>/<item>/`, кукла — `doll_1.png`.
+ * Свойства категорий сгенерированы при сборке из `categories.json` модуля,
+ * холст куклы и позиции вещей — из `doll_1.png` и `scale.json` вещей.
  */
 class TemporaryDataset internal constructor(
     private val assets: AssetManager,
@@ -48,20 +50,30 @@ class TemporaryDataset internal constructor(
     fun catalogSections(): Flow<List<TDSection>> = flowOf(categoriesConfig.sections)
 
     fun clothingItems(category: CategoryName): Flow<List<TDClothingItem>> = flow {
-        emit(
-            list("$DATASET_ROOT/${category.value}").map { folder ->
-                TDClothingItem(id = TDItemId(category, folder), name = "${category.value} $folder")
-            },
-        )
+        emit(itemsOf(category))
     }.flowOn(ioDispatcher)
 
-    suspend fun catalogImage(item: TDItemId): Bitmap? = bitmaps.load(TDImageKey(item, TDImageKind.CATALOG))
+    /** Все вещи датасета в порядке [clothingCategories], внутри категории — по имени папки. */
+    fun allClothingItems(): Flow<List<TDClothingItem>> = flow {
+        emit(categories.flatMap { itemsOf(it.name) })
+    }.flowOn(ioDispatcher)
 
+    suspend fun catalogImage(item: TDItemId): Bitmap? = bitmaps.load(TDImageKey.Item(item, TDImageKind.CATALOG))
+
+    /** @throws IllegalStateException если у вещи нет позиции: сборка генерирует её для каждой папки вещи. */
     suspend fun dollImages(item: TDItemId): TDDollImages = coroutineScope {
-        val front = async { require(TDImageKey(item, TDImageKind.FRONT)) }
-        val back = async { bitmaps.load(TDImageKey(item, TDImageKind.BACK)) }
-        TDDollImages(front = front.await(), back = back.await())
+        val topLeft = checkNotNull(itemPlacements[item]) { "No placement for ${item.category.value}/${item.folder}" }
+        val front = async { require(TDImageKey.Item(item, TDImageKind.FRONT)) }
+        val back = async { bitmaps.load(TDImageKey.Item(item, TDImageKind.BACK)) }
+        TDDollImages(front = front.await(), back = back.await(), topLeft = topLeft)
     }
+
+    suspend fun figure(): TDDollFigure = TDDollFigure(
+        image = require(TDImageKey.Figure),
+        canvasWidth = dollConfig.canvasWidth,
+        canvasHeight = dollConfig.canvasHeight,
+        bounds = dollConfig.figure,
+    )
 
     /** Вызывать из `Application.onTrimMemory`. */
     fun trimMemory(level: Int) = bitmaps.trimMemory(level)
@@ -76,6 +88,11 @@ class TemporaryDataset internal constructor(
         }
         return configured
     }
+
+    private fun itemsOf(category: CategoryName): List<TDClothingItem> =
+        list("$DATASET_ROOT/${category.value}").map { folder ->
+            TDClothingItem(id = TDItemId(category, folder), name = "${category.value} $folder")
+        }
 
     private suspend fun require(key: TDImageKey): Bitmap =
         bitmaps.load(key) ?: throw FileNotFoundException("No image ${key.assetPath}")

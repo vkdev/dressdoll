@@ -9,6 +9,7 @@ import ru.vkdev.dressdoll.repository.api.CategoryId
 import ru.vkdev.dressdoll.repository.api.ClothingCategory
 import ru.vkdev.dressdoll.repository.api.ClothingItem
 import ru.vkdev.dressdoll.repository.api.ClothingItemId
+import ru.vkdev.dressdoll.repository.api.DollFigure
 import ru.vkdev.dressdoll.repository.api.DollImages
 import ru.vkdev.dressdoll.repository.api.DollRepository
 import ru.vkdev.dressdoll.temporarydataset.TemporaryDataset
@@ -26,11 +27,16 @@ internal class DollRepositoryImpl(
     override fun clothingItems(category: CategoryId): Flow<List<ClothingItem>> =
         dataset.clothingItems(category.toCategoryName()).map { items -> items.map { it.toClothingItem() } }
 
+    override fun allClothingItems(): Flow<List<ClothingItem>> =
+        dataset.allClothingItems().map { items -> items.map { it.toClothingItem() } }
+
     override suspend fun catalogImage(item: ClothingItemId): Bitmap? =
         dataset.catalogImage(item.toTDItemId())
 
     override suspend fun dollImages(item: ClothingItemId): DollImages =
         dataset.dollImages(item.toTDItemId()).toDollImages()
+
+    override suspend fun figure(): DollFigure = dataset.figure().toDollFigure()
 
     override fun onTrimMemory(level: Int) = dataset.trimMemory(level)
 

@@ -39,6 +39,7 @@
 | `large` | 16dp | поля контейнеров, списков и сеток, поля `NavigationTile` и `SelectableCard`, поля `HeaderBar` справа без кнопок действий и слева без кнопки «Назад» | есть |
 | `extraLarge` | 24dp | — | есть |
 | `extraExtraLarge` | 32dp | запас под последним элементом прокручиваемого экрана | есть |
+| `overhang` | 30dp | запас вокруг содержимого, которое выступает за свои границы: поля вокруг фигурки на экране куклы, куда выходит одежда | есть |
 
 ### Размеры — `object Sizes`
 
@@ -79,12 +80,12 @@
 | `IconActionButton(icon, contentDescription, onClick)` | `IconButton` размером `touchTarget` с иконкой `icon` | иконка `onSurface` | `BackButton`; шапка экрана куклы: настройки | есть |
 | `BackButton(onClick)` | `IconActionButton` с `AppIcons.ArrowBack`. `contentDescription` «Назад» из ресурсов `:theme:api` | как у `IconActionButton` | `HeaderBar` | есть |
 | `HeaderBar(title, onBack, supportingText, titleStyle, minHeight, actions)` | шапка экрана или панели: `BackButton`, если `onBack != null`, иначе отступ до выравнивания с контентом; заголовок через `HeadlineText` с `heading()`; справа поясняющий текст и кнопки `actions` (`IconActionButton`) | заголовок `titleStyle` (по умолчанию `headlineSmall`) / `onSurface`, пояснение `bodySmall` / `onSurfaceVariant`. `minHeight` по умолчанию `touchTarget` | каталог; экран выбора темы и экран куклы (`headlineMedium`, `topBarHeight`) | есть |
-| `SelectableCard(selected, onClick, color, content)` | карточка выбора одного из многих: `selectable(role = Role.RadioButton)`, фигура `large`, рамка `Strokes.thick` `primary` у выбранной и `Strokes.thin` `outline` у остальных. Содержимое и индикатор выбора задаёт вызывающий | фон `color` (по умолчанию `surface`) | `ChoiceTile`; экран выбора темы: «Как в системе» и карточки палитр | есть |
-| `ChoiceTile(selected, onClick, content)` | `SelectableCard` с круглым значком `badge` и `Check` в правом верхнем углу у выбранной | фон `surfaceContainerLowest`, значок `primary` / `onPrimary` | каталог: вещи | есть |
+| `SelectableCard(selected, onClick, role, color, content)` | карточка выбора. `role: SelectionRole`: `Single` (по умолчанию) — один из многих, `selectable(role = Role.RadioButton)`; `Multiple` — независимый флажок, `toggleable(role = Role.Checkbox)`. Фигура `large`, рамка `Strokes.thick` `primary` у выбранной и `Strokes.thin` `outline` у остальных. Содержимое и индикатор выбора задаёт вызывающий | фон `color` (по умолчанию `surface`) | `ChoiceTile`; экран выбора темы: «Как в системе» и карточки палитр | есть |
+| `ChoiceTile(selected, onClick, role, content)` | `SelectableCard` с круглым значком `badge` и `Check` в правом верхнем углу у выбранной; `role` передаётся в `SelectableCard` | фон `surfaceContainerLowest`, значок `primary` / `onPrimary` | каталог: вещи (`SelectionRole.Multiple`) | есть |
 | `NavigationTile(text, onClick)` | плашка-переход: текст в одну строку с многоточием, справа `ChevronRight`. Высота `tileHeight`, фигура `large` | фон `surfaceContainerHigh`, текст `titleSmall` / `onSurface` | каталог: категории | есть |
 | `SectionLabel(text)` | надзаголовок раздела: капс, разрядка, `heading()` | `labelMedium` полужирный с разрядкой 0.18em / `onSurfaceVariant` | экран выбора темы: «Тема оформления» | есть |
 
-Компоненты выбора не знают про пропорции и группу: квадратность (`aspectRatio`) и `selectableGroup()` задаёт вызывающий. В `SelectableCard` индикатором может быть M3 `RadioButton(onClick = null)`, как на экране выбора темы, или значок, как в `ChoiceTile`.
+Компоненты выбора не знают про пропорции и группу: квадратность (`aspectRatio`) и `selectableGroup()` задаёт вызывающий. `selectableGroup()` — только для `SelectionRole.Single`: это семантика группы радиокнопок, а флажки независимы. В `SelectableCard` индикатором может быть M3 `RadioButton(onClick = null)`, как на экране выбора темы, или значок, как в `ChoiceTile`.
 
 Рамку `SelectableCard` рисует цветами текущей `MaterialTheme`. Если содержимое карточки показано в другой палитре (превью на экране выбора темы), `SelectableCard` ставят снаружи `MaterialTheme` этой палитры, а внутрь — только содержимое: тогда рамка выбора остаётся цвета активной темы и одинаково заметна на любой карточке.
 

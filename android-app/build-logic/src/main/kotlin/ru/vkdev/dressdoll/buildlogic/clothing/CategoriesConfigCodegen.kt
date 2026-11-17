@@ -11,7 +11,7 @@ internal object CategoriesConfigCodegen {
         val levelRefs = config.levels.withIndex().associate { (index, id) -> id to "level${index + 1}" }
         val groupRefs = config.groups.withIndex().associate { (index, group) -> group.id to "group${index + 1}" }
 
-        appendLine("// Сгенерировано из categories.json задачей generateCategoriesConfig, не редактировать.")
+        appendLine("// Сгенерировано из categories.json задачей generateDatasetConfig, не редактировать.")
         appendLine("package $PACKAGE")
         appendLine()
         config.levels.forEachIndexed { index, id ->
@@ -46,7 +46,7 @@ internal object CategoriesConfigCodegen {
         appendLine(")")
     }
 
-    private fun literal(value: String): String = buildString {
+    fun literal(value: String): String = buildString {
         append('"')
         value.forEach { char ->
             when (char) {

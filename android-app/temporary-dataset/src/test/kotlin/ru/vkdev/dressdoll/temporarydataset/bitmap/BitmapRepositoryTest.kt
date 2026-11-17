@@ -127,7 +127,7 @@ class BitmapRepositoryTest {
         const val BITMAP_BYTES = 10 * 10 * 4
         const val CACHE_BYTES = 100 * BITMAP_BYTES
 
-        fun key(folder: String, kind: TDImageKind) = TDImageKey(TDItemId(CategoryName("x"), folder), kind)
+        fun key(folder: String, kind: TDImageKind) = TDImageKey.Item(TDItemId(CategoryName("x"), folder), kind)
 
         val A_FRONT = key("a", TDImageKind.FRONT)
         val A_BACK = key("a", TDImageKind.BACK)
