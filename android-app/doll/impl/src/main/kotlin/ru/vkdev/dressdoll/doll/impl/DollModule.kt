@@ -25,6 +25,7 @@ val dollModule = module {
         DollScreen(
             holder = koinInject(),
             catalog = koinInject(),
+            discoSettings = koinInject(),
             onOpenSettings = { navigator.navigate(ThemeSettingsRoute) },
         )
     }

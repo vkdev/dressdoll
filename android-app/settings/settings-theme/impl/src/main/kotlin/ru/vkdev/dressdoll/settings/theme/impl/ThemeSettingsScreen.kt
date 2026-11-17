@@ -43,9 +43,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import ru.vkdev.dressdoll.disco.api.BeamStyle
+import ru.vkdev.dressdoll.disco.api.DiscoSettingsRepository
 import ru.vkdev.dressdoll.theme.api.HeaderBar
 import ru.vkdev.dressdoll.theme.api.HeadlineText
 import ru.vkdev.dressdoll.theme.api.LocalThemePalette
+import ru.vkdev.dressdoll.theme.api.OptionCard
 import ru.vkdev.dressdoll.theme.api.SectionLabel
 import ru.vkdev.dressdoll.theme.api.SelectableCard
 import ru.vkdev.dressdoll.theme.api.Sizes
@@ -71,9 +74,11 @@ private fun taglineRes(paletteId: String): Int? = when (paletteId) {
 @Composable
 internal fun ThemeSettingsScreen(
     selector: ThemeSelector,
+    discoSettings: DiscoSettingsRepository,
     onBack: (() -> Unit)?,
 ) {
     val choice by selector.choice.collectAsState()
+    val beamStyle by discoSettings.beamStyle.collectAsState()
     val palettes = selector.palettes
     val colors = MaterialTheme.colorScheme
     val insets = WindowInsets.safeDrawing
@@ -135,7 +140,37 @@ internal fun ThemeSettingsScreen(
                         ),
                     )
                 }
+                item(key = "disco_section") {
+                    SectionLabel(
+                        text = stringResource(R.string.settings_disco_section),
+                        modifier = Modifier.padding(start = Spacing.extraSmall, top = Spacing.large),
+                    )
+                }
+                item(key = "disco_styles") {
+                    BeamStyleOptions(selected = beamStyle, onSelect = discoSettings::setBeamStyle)
+                }
             }
+        }
+    }
+}
+
+@Composable
+private fun BeamStyleOptions(selected: BeamStyle, onSelect: (BeamStyle) -> Unit) {
+    Column(
+        modifier = Modifier.selectableGroup(),
+        verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+    ) {
+        BeamStyle.entries.forEach { style ->
+            val (title, hint) = when (style) {
+                BeamStyle.PAPER -> R.string.settings_disco_paper to R.string.settings_disco_paper_hint
+                BeamStyle.SOFT -> R.string.settings_disco_soft to R.string.settings_disco_soft_hint
+            }
+            OptionCard(
+                title = stringResource(title),
+                supportingText = stringResource(hint),
+                selected = selected == style,
+                onClick = { onSelect(style) },
+            )
         }
     }
 }
@@ -149,17 +184,20 @@ private fun SystemItem(
     val day = palettes.firstOrNull { it.id == ThemeIds.CINNAMON }
     val night = palettes.firstOrNull { it.id == ThemeIds.DISCO }
     val colors = MaterialTheme.colorScheme
-    SelectableCard(
+    OptionCard(
+        title = stringResource(R.string.settings_theme_system),
         selected = selected,
         onClick = onClick,
-        color = colors.surface,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Row(
-            modifier = Modifier.padding(Spacing.large),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
-        ) {
+        supportingText = if (day != null && night != null) {
+            stringResource(
+                R.string.settings_theme_system_hint,
+                stringResource(day.titleRes),
+                stringResource(night.titleRes),
+            )
+        } else {
+            null
+        },
+        leading = {
             Row(
                 modifier = Modifier
                     .size(DayNightSize)
@@ -175,30 +213,8 @@ private fun SystemItem(
                     )
                 }
             }
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(Spacing.extraSmall),
-            ) {
-                Text(
-                    text = stringResource(R.string.settings_theme_system),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                if (day != null && night != null) {
-                    Text(
-                        text = stringResource(
-                            R.string.settings_theme_system_hint,
-                            stringResource(day.titleRes),
-                            stringResource(night.titleRes),
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = colors.onSurfaceVariant,
-                    )
-                }
-            }
-            RadioButton(selected = selected, onClick = null)
-        }
-    }
+        },
+    )
 }
 
 @Composable

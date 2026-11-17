@@ -43,6 +43,24 @@ object AppIcons {
         close()
     }
 
+    // Параллели прогнуты вниз: шар виден чуть сверху.
+    val DiscoBall: ImageVector = lineIcon("DiscoBall") {
+        moveTo(12f, 1f)
+        lineTo(12f, 4f)
+        arcTo(9f, 9f, 0f, isMoreThanHalf = true, isPositiveArc = true, x1 = 12f, y1 = 22f)
+        arcTo(9f, 9f, 0f, isMoreThanHalf = true, isPositiveArc = true, x1 = 12f, y1 = 4f)
+        close()
+        lineTo(12f, 22f)
+        moveTo(12f, 4f)
+        arcTo(4.5f, 9f, 0f, isMoreThanHalf = false, isPositiveArc = true, x1 = 12f, y1 = 22f)
+        moveTo(12f, 4f)
+        arcTo(4.5f, 9f, 0f, isMoreThanHalf = false, isPositiveArc = false, x1 = 12f, y1 = 22f)
+        moveTo(4.21f, 8.5f)
+        quadTo(12f, 10f, 19.79f, 8.5f)
+        moveTo(4.21f, 17.5f)
+        quadTo(12f, 19f, 19.79f, 17.5f)
+    }
+
     val Settings: ImageVector = lineIcon("Settings") {
         gearOutline(teeth = 8, outerRadius = 10f, innerRadius = 7.5f)
         moveTo(15f, 12f)

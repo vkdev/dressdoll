@@ -25,6 +25,7 @@ dependencies {
     implementation(project(":repository:api"))
     implementation(project(":outfit:api"))
     implementation(project(":catalog:api"))
+    implementation(project(":disco:api"))
     implementation(project(":theme:api"))
     implementation(project(":settings:settings-theme:api"))
 

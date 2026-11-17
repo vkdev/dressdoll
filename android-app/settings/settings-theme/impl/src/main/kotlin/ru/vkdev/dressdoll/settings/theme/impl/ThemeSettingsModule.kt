@@ -15,6 +15,7 @@ val themeSettingsModule = module {
         val canGoBack = remember { navigator.canGoBack }
         ThemeSettingsScreen(
             selector = koinInject(),
+            discoSettings = koinInject(),
             onBack = if (canGoBack) ({ navigator.back() }) else null,
         )
     }

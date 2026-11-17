@@ -30,6 +30,7 @@ dependencies {
     implementation(project(":doll:impl"))
     implementation(project(":catalog:impl"))
     implementation(project(":outfit:impl"))
+    implementation(project(":disco:impl"))
     implementation(project(":repository:impl"))
     implementation(project(":navigation:impl"))
     implementation(project(":settings:settings-theme:impl"))

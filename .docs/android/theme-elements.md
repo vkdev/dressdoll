@@ -34,7 +34,7 @@
 | Токен | Значение | Где используется | Статус |
 |---|---|---|---|
 | `extraSmall` | 4dp | промежуток между кнопкой «Назад» и заголовком в `HeaderBar`, отступ подписи раздела и подвала от края списка, промежуток между строками текста в карточке | есть |
-| `small` | 8dp | промежутки между `NavigationTile`, внутренние поля `ChoiceTile`, отступ значка выбора, поле `HeaderBar` слева перед кнопкой «Назад» и справа после кнопок действий, промежуток между текстом и шевроном в `NavigationTile`, промежутки между образцами-чипсами, отступ подвала списка сверху, поля кнопки «Снять всё» справа и над шторкой | есть |
+| `small` | 8dp | промежутки между `NavigationTile`, внутренние поля `ChoiceTile`, отступ значка выбора, поле `HeaderBar` слева перед кнопкой «Назад» и справа после кнопок действий, промежуток между текстом и шевроном в `NavigationTile`, промежутки между образцами-чипсами, отступ подвала списка сверху, поля кнопки «Снять всё» справа и над шторкой, поля кнопки дискотеки слева и над шторкой | есть |
 | `medium` | 12dp | промежутки между `ChoiceTile` и между карточками в списке, промежутки внутри карточек, отступ подписи раздела сверху | есть |
 | `large` | 16dp | поля контейнеров, списков и сеток, поля `NavigationTile` и `SelectableCard`, поля `HeaderBar` справа без кнопок действий и слева без кнопки «Назад» | есть |
 | `extraLarge` | 24dp | — | есть |
@@ -45,9 +45,9 @@
 
 | Токен | Значение | Где используется | Статус |
 |---|---|---|---|
-| `touchTarget` | 48dp | `IconActionButton` и любые иконочные кнопки, высота язычка скрытой шторки, минимальная высота `HeaderBar` по умолчанию | есть |
+| `touchTarget` | 48dp | `IconActionButton`, `IconToggleActionButton` и их круглая подложка, любые иконочные кнопки, высота язычка скрытой шторки, минимальная высота `HeaderBar` по умолчанию | есть |
 | `topBarHeight` | 64dp | минимальная высота `HeaderBar` в шапке полноэкранного экрана: выбор темы, кукла | есть |
-| `icon` | 24dp | иконка в `IconActionButton` | есть |
+| `icon` | 24dp | иконка в `IconActionButton` и `IconToggleActionButton` | есть |
 | `iconSmall` | 18dp | шеврон в `NavigationTile`, галочка в значке выбора | есть |
 | `badge` | 24dp | значок выбора в `ChoiceTile` | есть |
 | `tileHeight` | 56dp | высота `NavigationTile` | есть |
@@ -72,17 +72,20 @@
 | `Check` | значок выбора в `ChoiceTile` | есть |
 | `Settings` | шестерёнка: 8 зубов, ось-кружок. Кнопка настроек в шапке экрана куклы | есть |
 | `Hanger` | вешалка: крючок и треугольные плечики. Кнопка «Снять всё» на экране куклы | есть |
+| `DiscoBall` | диско-шар: круг с двумя параллелями и тремя меридианами, сверху нитка. Кнопка дискотеки слева внизу на экране куклы | есть |
 
 ## Компоненты
 
 | Компонент | Что это | Цвета и типографика | Где используется | Статус |
 |---|---|---|---|---|
 | `HeadlineText(text, style, …)` | текст заголовка с регистром палитры (`uppercaseHeadlines`) | стиль задаёт вызывающий | экран выбора темы, `HeaderBar` | есть |
-| `IconActionButton(icon, contentDescription, onClick)` | `IconButton` размером `touchTarget` с иконкой `icon` | иконка `onSurface` | `BackButton`; шапка экрана куклы: настройки; экран куклы: «Снять всё» справа над шторкой | есть |
+| `IconActionButton(icon, contentDescription, onClick, backdropAlpha)` | `IconButton` размером `touchTarget` с иконкой `icon`. `backdropAlpha: () -> Float` — непрозрачность круглой подложки под иконкой, по умолчанию 0; читается при отрисовке | иконка `onSurface`, подложка `surface` | `BackButton`; шапка экрана куклы: настройки; экран куклы: «Снять всё» справа над шторкой, с подложкой во время дискотеки | есть |
+| `IconToggleActionButton(icon, contentDescription, checked, onCheckedChange, backdropAlpha)` | иконочная кнопка-переключатель размером `touchTarget` с иконкой `icon`: `toggleable` с ролью `Switch` (M3 `IconToggleButton` озвучивается как флажок), круглая рябь. `backdropAlpha` — как у `IconActionButton` | иконка `onSurface`, во включённом состоянии `primary`; подложка `surface` | экран куклы: дискотека слева над шторкой | есть |
 | `BackButton(onClick)` | `IconActionButton` с `AppIcons.ArrowBack`. `contentDescription` «Назад» из ресурсов `:theme:api` | как у `IconActionButton` | `HeaderBar` | есть |
 | `HeaderBar(title, onBack, supportingText, titleStyle, minHeight, actions)` | шапка экрана или панели: `BackButton`, если `onBack != null`, иначе отступ до выравнивания с контентом; заголовок через `HeadlineText` с `heading()`; справа поясняющий текст и кнопки `actions` (`IconActionButton`) | заголовок `titleStyle` (по умолчанию `headlineSmall`) / `onSurface`, пояснение `bodySmall` / `onSurfaceVariant`. `minHeight` по умолчанию `touchTarget` | каталог; экран выбора темы и экран куклы (`headlineMedium`, `topBarHeight`) | есть |
-| `SelectableCard(selected, onClick, role, color, content)` | карточка выбора. `role: SelectionRole`: `Single` (по умолчанию) — один из многих, `selectable(role = Role.RadioButton)`; `Multiple` — независимый флажок, `toggleable(role = Role.Checkbox)`. Фигура `large`, рамка `Strokes.thick` `primary` у выбранной и `Strokes.thin` `outline` у остальных. Содержимое и индикатор выбора задаёт вызывающий | фон `color` (по умолчанию `surface`) | `ChoiceTile`; экран выбора темы: «Как в системе» и карточки палитр | есть |
+| `SelectableCard(selected, onClick, role, color, content)` | карточка выбора. `role: SelectionRole`: `Single` (по умолчанию) — один из многих, `selectable(role = Role.RadioButton)`; `Multiple` — независимый флажок, `toggleable(role = Role.Checkbox)`. Фигура `large`, рамка `Strokes.thick` `primary` у выбранной и `Strokes.thin` `outline` у остальных. Содержимое и индикатор выбора задаёт вызывающий | фон `color` (по умолчанию `surface`) | `ChoiceTile`; экран выбора темы: карточки палитр, `OptionCard` | есть |
 | `ChoiceTile(selected, onClick, role, content)` | `SelectableCard` с круглым значком `badge` и `Check` в правом верхнем углу у выбранной; `role` передаётся в `SelectableCard` | фон `surfaceContainerLowest`, значок `primary` / `onPrimary` | каталог: вещи (`SelectionRole.Multiple`) | есть |
+| `OptionCard(title, selected, onClick, supportingText, leading)` | вариант настройки «один из многих»: `SelectableCard` с полями `large`, слева необязательный `leading`, заголовок и пояснение, справа `RadioButton` без своего нажатия. Группу `selectableGroup()` задаёт вызывающий | фон `surface`, заголовок `titleMedium` SemiBold, пояснение `bodySmall` / `onSurfaceVariant` | экран настроек: «Как в системе», стиль лучей дискотеки | есть |
 | `NavigationTile(text, onClick)` | плашка-переход: текст в одну строку с многоточием, справа `ChevronRight`. Высота `tileHeight`, фигура `large` | фон `surfaceContainerHigh`, текст `titleSmall` / `onSurface` | каталог: категории | есть |
 | `SectionLabel(text)` | надзаголовок раздела: капс, разрядка, `heading()` | `labelMedium` полужирный с разрядкой 0.18em / `onSurfaceVariant` | экран выбора темы: «Тема оформления» | есть |
 

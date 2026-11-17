@@ -5,6 +5,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import ru.vkdev.dressdoll.catalog.impl.catalogModule
+import ru.vkdev.dressdoll.disco.impl.discoModule
 import ru.vkdev.dressdoll.doll.impl.dollModule
 import ru.vkdev.dressdoll.navigation.impl.navigationModule
 import ru.vkdev.dressdoll.outfit.impl.outfitModule
@@ -36,6 +37,7 @@ class DressDollApplication : Application() {
                 navigationModule,
                 repositoryModule,
                 outfitModule,
+                discoModule,
                 catalogModule,
                 dollModule,
                 themeSettingsModule,
