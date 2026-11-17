@@ -15,7 +15,12 @@ import java.io.OutputStream
 internal object OutfitSerializer : Serializer<OutfitFile> {
 
     // Поля, добавленные новыми версиями приложения, не ломают чтение старой.
-    private val json = Json { ignoreUnknownKeys = true }
+    // encodeDefaults: без него version со значением по умолчанию не попадает в файл,
+    // и будущая миграция не отличит старый формат от нового.
+    private val json = Json {
+        ignoreUnknownKeys = true
+        encodeDefaults = true
+    }
 
     override val defaultValue: OutfitFile = OutfitFile()
 

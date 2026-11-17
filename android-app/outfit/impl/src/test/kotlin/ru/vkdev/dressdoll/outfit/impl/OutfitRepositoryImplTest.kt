@@ -12,6 +12,10 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
@@ -156,6 +160,16 @@ class OutfitRepositoryImplTest {
         withRepository { repository, _ ->
             assertEquals(listOf(boots), repository.worn.first { it != null })
         }
+    }
+
+    @Test
+    fun `written file contains format version`() = runTest {
+        withRepository { repository, dataStore ->
+            repository.save(listOf(boots))
+            dataStore.awaitSaved(listOf(boots))
+        }
+        val written = Json.parseToJsonElement(file.readText()).jsonObject
+        assertEquals(1, written["version"]?.jsonPrimitive?.int)
     }
 
     private fun item(category: String, key: String) = WornItem(ClothingItemId(CategoryId(category), key))
