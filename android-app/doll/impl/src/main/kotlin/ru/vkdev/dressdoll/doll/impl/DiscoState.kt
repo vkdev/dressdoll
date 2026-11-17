@@ -50,8 +50,7 @@ internal class DiscoState(initiallyOn: Boolean, private val random: Random = Ran
                 launch { sway() }
             }
             while (true) {
-                // После ON_STOP рекомпозиция на паузе и не отменит цикл до возврата, а delay от паузы кадров
-                // не зависит: без ожидания кадра цикл будил бы приложение в фоне.
+                // После ON_STOP цикл не отменяется до возврата, а delay, в отличие от кадров, не встаёт на паузу.
                 withFrameMillis {}
                 launch { switchTo(nextSpots(random)) }
                 delay(SPOT_CHANGE_MILLIS)
@@ -73,10 +72,14 @@ internal class DiscoState(initiallyOn: Boolean, private val random: Random = Ran
         leaving = emptyList()
     }
 
+    // Кадр, в который время не записано, ничего не перерисовывает.
     private suspend fun sway() {
         val start = withFrameMillis { it } - timeMillis
         while (true) {
-            withFrameMillis { timeMillis = it - start }
+            withFrameMillis { now ->
+                val time = now - start
+                if (time - timeMillis >= SWAY_STEP_MILLIS) timeMillis = time
+            }
         }
     }
 

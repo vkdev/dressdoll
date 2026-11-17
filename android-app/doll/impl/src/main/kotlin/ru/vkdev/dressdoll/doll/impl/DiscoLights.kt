@@ -86,6 +86,12 @@ internal const val SPOT_CHANGE_MILLIS = 5000L
 internal const val MAX_SPOT_SHIFT = 0.08f
 
 internal const val MAX_SWAY = (PI / 18).toFloat()
+/**
+ * Около 30 обновлений качания в секунду: медленное качание реже кадров незаметно, а каждое обновление
+ * перерисовывает три offscreen-слоя. Чуть меньше 1000/30, потому что время кадров округлено до мс.
+ */
+internal const val SWAY_STEP_MILLIS = 30L
+
 internal const val MIN_SWAY_PERIOD_MILLIS = 4000
 internal const val MAX_SWAY_PERIOD_MILLIS = 6000
 

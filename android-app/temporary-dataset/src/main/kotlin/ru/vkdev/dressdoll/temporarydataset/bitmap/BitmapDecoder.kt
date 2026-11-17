@@ -45,7 +45,6 @@ internal class AssetBitmapDecoder(
     }
 }
 
-/** Степень двойки для `inSampleSize`: наибольшая, при которой длинная сторона не короче [CATALOG_MIN_SIDE]. */
 internal fun catalogSampleSize(width: Int, height: Int): Int {
     val side = maxOf(width, height)
     var sample = 1
@@ -54,5 +53,5 @@ internal fun catalogSampleSize(width: Int, height: Int): Int {
 }
 
 // Шторка не шире 640 dp, а в ней две колонки: картинка плитки не больше ~250 dp по длинной стороне.
-// 512 px хватает телефону до xxxhdpi и планшету до xhdpi, а исходник 768×1024 занимает вчетверо меньше памяти.
+// 512 px хватает телефону до xxxhdpi и планшету до xhdpi.
 internal const val CATALOG_MIN_SIDE = 512
