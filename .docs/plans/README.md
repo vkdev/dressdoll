@@ -11,3 +11,5 @@
 | План | Создан | Части | Статус |
 |---|---|---|---|
 | Темы 70-х и навигация (`themes-navigation`) | 2026-11-15 21:01 | [1. Общее и навигация](themes-navigation/plan_part_1.md) · [2. Темы](themes-navigation/plan_part_2.md) · [3. Заставка и бары](themes-navigation/plan_part_3.md) · [4. Экран выбора темы](themes-navigation/plan_part_4.md) | все части выполнены и закоммичены |
+| Образ куклы: хранение и отрисовка (`doll-outfit`) | 2026-11-17 11:52 | [1. Репозиторий образа](doll-outfit/plan_part_1.md) · [2. Отрисовка куклы](doll-outfit/plan_part_2.md) | часть 1 выполнена, часть 2 не начата |
+| Тема через репозиторий (`theme-repository`) | 2026-11-17 11:52 | [1. Репозиторий и селектор](theme-repository/plan_part_1.md) | спроектирован, не начат |
