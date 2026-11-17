@@ -3,7 +3,11 @@ package ru.vkdev.dressdoll.doll.impl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import ru.vkdev.dressdoll.repository.api.BodySlot
+import kotlin.math.PI
+import kotlin.math.cos
 import kotlin.math.min
+import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.random.Random
 
 // Пути полёта вещей. Все координаты — в пикселях холста куклы: [item] — прямоугольник картинки вещи
@@ -49,8 +53,8 @@ internal data class Entry(val zone: EntryZone, val bulge: Float) : Flight {
 }
 
 /**
- * Снятие: половина параболы вправо от вершины с ускорением. [drop] — глубина падения в долях
- * горизонтального пути.
+ * Снятие одной вещи: половина параболы вправо от вершины с ускорением. [drop] — глубина падения
+ * в долях горизонтального пути.
  */
 internal data class Exit(val drop: Float) : Flight {
 
@@ -61,10 +65,43 @@ internal data class Exit(val drop: Float) : Flight {
     }
 }
 
+/**
+ * Подбрасывание при «Снять всё»: вещь летит вверх под углом [angle] (радианы от горизонтали вправо,
+ * против часовой стрелки) на высоту [apex] в долях высоты видимой области и падает за нижний край.
+ * Время линейное, ускорение даёт само падение.
+ */
+internal data class Toss(val angle: Float, val apex: Float) : Flight {
+
+    override fun offset(progress: Float, item: Rect, viewport: Rect): Offset {
+        val t = progress.coerceIn(0f, 1f)
+        val height = apex * viewport.height
+        val fall = (viewport.bottom - item.top).coerceAtLeast(0f)
+        // Скорость вверх vy и ускорение g подобраны так, чтобы вершина была на height,
+        // а к концу вещь опустилась на fall: vy² = 2·g·height и g/2 − vy = fall.
+        val vy = 2 * height + 2 * sqrt(height * height + height * fall)
+        val g = 2 * (fall + vy)
+        val vx = vy * cos(angle) / sin(angle)
+        return Offset(vx * t, -vy * t + g * t * t / 2)
+    }
+}
+
 internal fun entryFlight(slot: BodySlot, random: Random): Entry =
     Entry(slot.entryZone(), bulge = random.nextFloat() * 2 * MAX_ARC - MAX_ARC)
 
-internal fun exitFlight(random: Random): Exit = Exit(drop = random.nextFloat() * MAX_ARC)
+/**
+ * Пути для [count] вещей, снятых разом. Одна вещь улетает вправо по [Exit]. Несколько, то есть
+ * «Снять всё», подбрасываются веером: углы делят веер поровну с небольшим разбросом и раздаются
+ * вещам случайно. Случайный угол у каждой мог бы отправить все вещи в одну сторону.
+ */
+internal fun exitFlights(count: Int, random: Random): List<Flight> {
+    if (count == 1) return listOf(Exit(drop = random.nextFloat() * MAX_ARC))
+    val sector = (TOSS_MAX_ANGLE - TOSS_MIN_ANGLE) / count
+    return List(count) { index ->
+        val jitter = (random.nextFloat() - 0.5f) * sector * TOSS_JITTER
+        val angle = TOSS_MIN_ANGLE + sector * (index + 0.5f) + jitter
+        Toss(angle, apex = TOSS_MIN_APEX + random.nextFloat() * (TOSS_MAX_APEX - TOSS_MIN_APEX))
+    }.shuffled(random)
+}
 
 /** Сдвиг, при котором вещь целиком за краем [viewport]. */
 internal fun entryStart(zone: EntryZone, item: Rect, viewport: Rect): Offset = when (zone) {
@@ -94,3 +131,14 @@ internal const val MAX_ARC = 0.2f
 
 /** Сдвиг вправо для верхней зоны, в долях ширины видимой области. */
 private const val TOP_SHIFT = 0.15f
+
+/** Веер подбрасывания при «Снять всё», радианы от горизонтали вправо. Почти горизонтальные края веера не берём. */
+internal const val TOSS_MIN_ANGLE = (PI / 9).toFloat()
+internal const val TOSS_MAX_ANGLE = (PI * 8 / 9).toFloat()
+
+/** Разброс угла в долях сектора одной вещи: соседние вещи не меняются местами. */
+private const val TOSS_JITTER = 0.6f
+
+/** Высота подброса в долях высоты видимой области. */
+internal const val TOSS_MIN_APEX = 0.1f
+internal const val TOSS_MAX_APEX = 0.25f

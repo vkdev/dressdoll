@@ -52,8 +52,9 @@ internal class DollTransition(private val random: Random = Random.Default) {
         }
         // Всё до первой приостановки попадает в один кадр: прилетающие вещи не мелькают на месте.
         progress.snapTo(0f)
+        val leftItems = left.map { it.item }.distinct()
         flights = entering.mapValues { (_, slot) -> entryFlight(slot, random) } +
-            left.map { it.item }.distinct().associateWith { exitFlight(random) }
+            leftItems.zip(exitFlights(leftItems.size, random)).toMap()
         leaving = left
         shown = scene
         progress.animateTo(1f, tween(FLIGHT_MILLIS, easing = LinearEasing))

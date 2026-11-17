@@ -6,6 +6,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import ru.vkdev.dressdoll.repository.api.BodySlot
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -85,11 +86,56 @@ class DollPathsTest {
     }
 
     @Test
-    fun `случайные параметры в пределах 20 процентов`() {
+    fun `одна снятая вещь улетает вправо по половине параболы`() {
+        repeat(100) { seed ->
+            assertTrue(exitFlights(1, Random(seed)).single() is Exit)
+        }
+    }
+
+    @Test
+    fun `подброшенная вещь взлетает на заданную высоту и падает за нижний край`() {
+        listOf(TOSS_MIN_ANGLE, PI.toFloat() / 2, TOSS_MAX_ANGLE).forEach { angle ->
+            listOf(TOSS_MIN_APEX, TOSS_MAX_APEX).forEach { apex ->
+                val flight = Toss(angle, apex)
+                val path = (0..1000).map { flight.offset(it / 1000f, item, viewport) }
+
+                assertEquals(0f, path.first().getDistance(), EPS)
+                assertEquals("$angle $apex", -apex * viewport.height, path.minOf { it.y }, 1f)
+                assertTrue("$angle $apex", item.translate(path.last()).top >= viewport.bottom)
+            }
+        }
+    }
+
+    @Test
+    fun `подброс влево и вправо по углу`() {
+        assertTrue(Toss(TOSS_MIN_ANGLE, TOSS_MIN_APEX).offset(1f, item, viewport).x > 0f)
+        assertTrue(Toss(TOSS_MAX_ANGLE, TOSS_MIN_APEX).offset(1f, item, viewport).x < 0f)
+        assertEquals(0f, Toss(PI.toFloat() / 2, TOSS_MIN_APEX).offset(1f, item, viewport).x, 1e-2f)
+    }
+
+    @Test
+    fun `несколько снятых вещей подбрасываются веером в разные стороны`() {
+        (2..7).forEach { count ->
+            repeat(100) { seed ->
+                val angles = exitFlights(count, Random(seed)).map { (it as Toss).angle }.sorted()
+                val sector = (TOSS_MAX_ANGLE - TOSS_MIN_ANGLE) / count
+
+                assertEquals(count, angles.size)
+                assertTrue("$count: $angles", angles.all { it in TOSS_MIN_ANGLE..TOSS_MAX_ANGLE })
+                assertTrue("$count: $angles", angles.first() < PI / 2 && angles.last() > PI / 2)
+                // Разброс не сводит соседние углы ближе чем на полсектора.
+                assertTrue("$count: $angles", angles.zipWithNext().all { (a, b) -> b - a > sector * 0.3f })
+            }
+        }
+    }
+
+    @Test
+    fun `случайные параметры в пределах`() {
         val random = Random(42)
         repeat(1000) {
             assertTrue(abs(entryFlight(BodySlot.TORSO, random).bulge) <= MAX_ARC)
-            assertTrue(exitFlight(random).drop in 0f..MAX_ARC)
+            assertTrue((exitFlights(1, random).single() as Exit).drop in 0f..MAX_ARC)
+            assertTrue(exitFlights(3, random).all { (it as Toss).apex in TOSS_MIN_APEX..TOSS_MAX_APEX })
         }
     }
 
