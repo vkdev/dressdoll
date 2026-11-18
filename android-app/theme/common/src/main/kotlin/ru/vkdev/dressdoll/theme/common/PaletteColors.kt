@@ -27,10 +27,10 @@ fun paletteColorScheme(base: PaletteBaseColors, dark: Boolean): ColorScheme = wi
     val lightOn = if (dark) onSurface else Color.White
     val darkOn = if (dark) background else onSurface
     val containerBase = if (dark) background else surface
-    val containerMix = if (dark) DARK_CONTAINER_MIX else LIGHT_CONTAINER_MIX
+    val containerMix = if (dark) PaletteColorsConfig.DARK_CONTAINER_MIX else PaletteColorsConfig.LIGHT_CONTAINER_MIX
 
     fun container(color: Color) = mix(color, containerBase, containerMix)
-    fun onContainer(color: Color) = deepen(color, toward = onSurface, CONTAINER_CONTRAST, container(color))
+    fun onContainer(color: Color) = deepen(color, toward = onSurface, PaletteColorsConfig.CONTAINER_CONTRAST, container(color))
 
     val surfaces = if (dark) {
         SurfaceSteps(
@@ -54,7 +54,7 @@ fun paletteColorScheme(base: PaletteBaseColors, dark: Boolean): ColorScheme = wi
         )
     }
     val inversePrimary = if (dark) mix(primary, Color.Black, 0.35f) else mix(primary, Color.White, 0.45f)
-    val onSurfaceVariant = deepen(mix(onSurface, surfaceVariant, 0.35f), onSurface, VARIANT_CONTRAST, surfaceVariant)
+    val onSurfaceVariant = deepen(mix(onSurface, surfaceVariant, 0.35f), onSurface, PaletteColorsConfig.VARIANT_CONTRAST, surfaceVariant)
 
     val scheme = if (dark) darkColorScheme() else lightColorScheme()
     scheme.copy(
@@ -92,14 +92,6 @@ fun paletteColorScheme(base: PaletteBaseColors, dark: Boolean): ColorScheme = wi
     )
 }
 
-const val CONTAINER_CONTRAST = 6f
-
-const val VARIANT_CONTRAST = 4.8f
-
-private const val LIGHT_CONTAINER_MIX = 0.72f
-private const val DARK_CONTAINER_MIX = 0.62f
-private const val DEEPEN_STEPS = 50
-
 private class SurfaceSteps(
     val dim: Color,
     val bright: Color,
@@ -127,8 +119,8 @@ private fun higherContrast(color: Color, light: Color, dark: Color): Color =
     if (contrast(color, light) >= contrast(color, dark)) light else dark
 
 private fun deepen(color: Color, toward: Color, minContrast: Float, background: Color): Color {
-    for (step in 0..DEEPEN_STEPS) {
-        val candidate = mix(color, toward, step.toFloat() / DEEPEN_STEPS)
+    for (step in 0..PaletteColorsConfig.DEEPEN_STEPS) {
+        val candidate = mix(color, toward, step.toFloat() / PaletteColorsConfig.DEEPEN_STEPS)
         if (contrast(candidate, background) >= minContrast) return candidate
     }
     return toward

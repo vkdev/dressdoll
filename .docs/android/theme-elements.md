@@ -7,7 +7,7 @@
 - Фигуры, отступы, размеры и линии одни на все палитры. Это константы, а не часть `ThemePalette`.
 - Цвета берутся только из ролей M3 активной палитры (`MaterialTheme.colorScheme`). Новых цветов в палитры ради компонента не добавляем.
 - Стили текста — роли M3 `Typography` без правки размера (`.copy(fontSize = …)`). Поясняющий текст — `bodySmall` / `onSurfaceVariant`.
-- Всё лежит в `:theme:api` (пакет `ru.vkdev.dressdoll.theme.api`), кроме значений `Shapes`: они задаются в `AppShapes` модуля `:theme:impl`. Отдельный модуль компонентов заведём, когда их станет много.
+- Всё лежит в `:theme:ui` (пакет `ru.vkdev.dressdoll.theme.ui`), кроме значений `Shapes`: они задаются в `AppShapes` модуля `:theme:impl`. `:theme:ui` не зависит от `:theme:api`: экраны видят элементы темы, но не выбор темы (`ThemeSelector`).
 - Размеры, которые есть только у одного экрана и не повторяются (например, полоса цветов 10dp в превью палитры), остаются в модуле экрана: это не общие элементы.
 
 Статус:
@@ -78,10 +78,11 @@
 
 | Компонент | Что это | Цвета и типографика | Где используется | Статус |
 |---|---|---|---|---|
-| `HeadlineText(text, style, …)` | текст заголовка с регистром палитры (`uppercaseHeadlines`) | стиль задаёт вызывающий | экран выбора темы, `HeaderBar` | есть |
+| `HeadlineText(text, style, …)` | текст заголовка с регистром палитры: в верхнем регистре, если `LocalUppercaseHeadlines` — `true` | стиль задаёт вызывающий | экран выбора темы, `HeaderBar` | есть |
+| `LocalUppercaseHeadlines` | регистр заголовков `HeadlineText`. Задаёт `AppThemeImpl` из `ThemePalette.uppercaseHeadlines`, карточка палитры в настройках — из своей палитры | — | `HeadlineText` | есть |
 | `IconActionButton(icon, contentDescription, onClick, backdropAlpha)` | `IconButton` размером `touchTarget` с иконкой `icon`. `backdropAlpha: () -> Float` — непрозрачность круглой подложки под иконкой, по умолчанию 0; читается при отрисовке | иконка `onSurface`, подложка `surface` | `BackButton`; шапка экрана куклы: настройки; экран куклы: «Снять всё» справа над шторкой, с подложкой во время дискотеки | есть |
 | `IconToggleActionButton(icon, contentDescription, checked, onCheckedChange, backdropAlpha)` | иконочная кнопка-переключатель размером `touchTarget` с иконкой `icon`: `toggleable` с ролью `Switch` (M3 `IconToggleButton` озвучивается как флажок), круглая рябь. `backdropAlpha` — как у `IconActionButton` | иконка `onSurface`, во включённом состоянии `primary`; подложка `surface` | экран куклы: дискотека слева над шторкой | есть |
-| `BackButton(onClick)` | `IconActionButton` с `AppIcons.ArrowBack`. `contentDescription` «Назад» из ресурсов `:theme:api` | как у `IconActionButton` | `HeaderBar` | есть |
+| `BackButton(onClick)` | `IconActionButton` с `AppIcons.ArrowBack`. `contentDescription` «Назад» из ресурсов `:theme:ui` | как у `IconActionButton` | `HeaderBar` | есть |
 | `HeaderBar(title, onBack, supportingText, titleStyle, minHeight, actions)` | шапка экрана или панели: `BackButton`, если `onBack != null`, иначе отступ до выравнивания с контентом; заголовок через `HeadlineText` с `heading()`; справа поясняющий текст и кнопки `actions` (`IconActionButton`) | заголовок `titleStyle` (по умолчанию `headlineSmall`) / `onSurface`, пояснение `bodySmall` / `onSurfaceVariant`. `minHeight` по умолчанию `touchTarget` | каталог; экран выбора темы и экран куклы (`headlineMedium`, `topBarHeight`) | есть |
 | `SelectableCard(selected, onClick, role, color, content)` | карточка выбора. `role: SelectionRole`: `Single` (по умолчанию) — один из многих, `selectable(role = Role.RadioButton)`; `Multiple` — независимый флажок, `toggleable(role = Role.Checkbox)`. Фигура `large`, рамка `Strokes.thick` `primary` у выбранной и `Strokes.thin` `outline` у остальных. Содержимое и индикатор выбора задаёт вызывающий | фон `color` (по умолчанию `surface`) | `ChoiceTile`; экран выбора темы: карточки палитр, `OptionCard` | есть |
 | `ChoiceTile(selected, onClick, role, content)` | `SelectableCard` с круглым значком `badge` и `Check` в правом верхнем углу у выбранной; `role` передаётся в `SelectableCard` | фон `surfaceContainerLowest`, значок `primary` / `onPrimary` | каталог: вещи (`SelectionRole.Multiple`) | есть |

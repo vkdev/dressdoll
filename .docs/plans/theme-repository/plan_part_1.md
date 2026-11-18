@@ -51,8 +51,8 @@ internal interface ThemeRepository {
 - `palettes` сортируются по `order`, как сейчас;
 - `choice` — свой `MutableStateFlow`, а не `repository.saved.map { … }.stateIn(…)`: `stateIn` публикует значение только после перехода на поток `scope`, и выбор перестал бы применяться сразу;
 - `select(choice)` сначала пишет в `current.value`, затем вызывает `repository.save(choice)`;
-- фоновый сборщик переносит `repository.saved` в `current`: `null` → `null`, `Saved(null)` → `DEFAULT_CHOICE`, `Saved(choice)` → `choice`. Сборщик может на мгновение вернуть значение, прочитанное до `select`, но следом всегда придёт `Saved(choice)`: `save` уже поменял `saved`;
-- `DEFAULT_CHOICE` остаётся в селекторе.
+- фоновый сборщик переносит `repository.saved` в `current`: `null` → `null`, `Saved(null)` → `defaultChoice`, `Saved(choice)` → `choice`. Сборщик может на мгновение вернуть значение, прочитанное до `select`, но следом всегда придёт `Saved(choice)`: `save` уже поменял `saved`;
+- `defaultChoice` (палитра с ролью `SystemDefault.LIGHT`, без неё — «Как в системе») остаётся в селекторе.
 
 ### 3. Koin
 

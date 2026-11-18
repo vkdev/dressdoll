@@ -8,9 +8,10 @@ android {
 
 dependencies {
     api(project(":disco:api"))
+    implementation(project(":core:coroutines"))
     implementation(project(":settings:api"))
     implementation(project(":core:datastore"))
-    implementation(project(":theme:api"))
+    implementation(project(":theme:ui"))
 
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.material3)

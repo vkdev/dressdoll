@@ -8,6 +8,8 @@ android {
 
 dependencies {
     api(project(":theme:api"))
+    implementation(project(":core:coroutines"))
+    implementation(project(":theme:ui"))
 
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.material3)
@@ -22,4 +24,9 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(project(":theme:palette:cinnamon"))
+    testImplementation(project(":theme:palette:disco"))
+    testImplementation(project(":theme:palette:avocado"))
+    testImplementation(project(":theme:palette:powder"))
+    testImplementation(project(":theme:palette:denim"))
 }

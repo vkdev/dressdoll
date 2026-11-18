@@ -15,6 +15,7 @@ import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.koinApplication
 import org.robolectric.RobolectricTestRunner
+import ru.vkdev.dressdoll.theme.api.SystemDefault
 import ru.vkdev.dressdoll.theme.api.ThemePalette
 
 @RunWith(RobolectricTestRunner::class)
@@ -24,6 +25,7 @@ abstract class PaletteContractTest(
     private val title: String,
     private val tagline: String,
     private val uppercaseHeadlines: Boolean = false,
+    private val systemDefault: SystemDefault? = null,
 ) {
 
     private val context: Context = ApplicationProvider.getApplicationContext()
@@ -55,6 +57,11 @@ abstract class PaletteContractTest(
     @Test
     fun `headline case matches palette`() {
         assertEquals(uppercaseHeadlines, palette.uppercaseHeadlines)
+    }
+
+    @Test
+    fun `system default role matches palette`() {
+        assertEquals(systemDefault, palette.systemDefault)
     }
 
     @OptIn(ExperimentalTextApi::class)

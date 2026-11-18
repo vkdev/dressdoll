@@ -11,6 +11,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.vkdev.dressdoll.theme.api.AppTheme
 import ru.vkdev.dressdoll.theme.api.LocalThemePalette
 import ru.vkdev.dressdoll.theme.api.ThemeSelector
+import ru.vkdev.dressdoll.theme.ui.LocalUppercaseHeadlines
 
 private val DefaultColors = lightColorScheme()
 private val DefaultTypography = Typography()
@@ -31,7 +32,11 @@ internal class AppThemeImpl(
             typography = palette?.typography ?: DefaultTypography,
             shapes = AppShapes,
         ) {
-            CompositionLocalProvider(LocalThemePalette provides palette, content = content)
+            CompositionLocalProvider(
+                LocalThemePalette provides palette,
+                LocalUppercaseHeadlines provides (palette?.uppercaseHeadlines == true),
+                content = content,
+            )
         }
     }
 }

@@ -16,7 +16,8 @@
 ## Принятые решения
 
 - Модуль `:core:coroutines` (`android.library`, корутины, Koin): квалификатор `ApplicationScope` и класс `AppDispatchers(io, default)`, Koin-модуль `coroutinesModule` с одним `SupervisorJob`-скоупом на всё приложение.
-- Классы получают скоуп и диспетчер параметрами, как сейчас; меняется только Koin-модуль: `get(ApplicationScope) + get<AppDispatchers>().io` вместо нового скоупа.
+- Классы получают скоуп и диспетчер параметрами, как сейчас; меняется только Koin-модуль: `get(ApplicationScope) + get<AppDispatchers>().io` вместо нового скоупа. В коде это помощник `applicationScope { io }`.
+- `CatalogStateHolder` из части 6 тоже на общем скоупе.
 - `BitmapRepository` и `TemporaryDataset` получают скоуп параметром.
 
 ## Открытые вопросы
@@ -25,6 +26,6 @@
 
 ## Шаги
 
-1. `:core:coroutines`, подключение в `:app`.
-2. Перевести Koin-модули `theme`, `outfit`, `disco`, `doll`, `clothing` на общий скоуп и диспетчеры; скоуп в `BitmapRepository` и `TemporaryDataset` — параметром.
-3. Сборка и тесты.
+1. ~~`:core:coroutines`, подключение в `:app`.~~
+2. ~~Перевести Koin-модули `theme`, `outfit`, `disco`, `doll`, `clothing` на общий скоуп и диспетчеры; скоуп в `BitmapRepository` и `TemporaryDataset` — параметром.~~
+3. ~~Сборка и тесты.~~

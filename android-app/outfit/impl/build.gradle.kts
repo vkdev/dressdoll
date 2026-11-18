@@ -9,6 +9,7 @@ android {
 
 dependencies {
     api(project(":outfit:api"))
+    implementation(project(":core:coroutines"))
     implementation(project(":core:datastore"))
 
     implementation(libs.androidx.datastore)

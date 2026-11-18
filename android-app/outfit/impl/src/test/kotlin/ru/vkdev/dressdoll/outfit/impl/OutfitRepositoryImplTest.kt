@@ -16,9 +16,9 @@ import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import ru.vkdev.dressdoll.clothing.api.CategoryId
+import ru.vkdev.dressdoll.clothing.api.ClothingItemId
 import ru.vkdev.dressdoll.outfit.api.WornItem
-import ru.vkdev.dressdoll.repository.api.CategoryId
-import ru.vkdev.dressdoll.repository.api.ClothingItemId
 import java.io.File
 
 class OutfitRepositoryImplTest {

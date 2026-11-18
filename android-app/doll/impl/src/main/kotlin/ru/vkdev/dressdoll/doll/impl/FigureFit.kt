@@ -3,7 +3,7 @@ package ru.vkdev.dressdoll.doll.impl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import ru.vkdev.dressdoll.repository.api.CanvasRect
+import ru.vkdev.dressdoll.clothing.api.CanvasRect
 import kotlin.math.max
 import kotlin.math.min
 

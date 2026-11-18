@@ -18,9 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import ru.vkdev.dressdoll.settings.api.SettingsSection
-import ru.vkdev.dressdoll.theme.api.HeaderBar
-import ru.vkdev.dressdoll.theme.api.Sizes
-import ru.vkdev.dressdoll.theme.api.Spacing
+import ru.vkdev.dressdoll.theme.ui.HeaderBar
+import ru.vkdev.dressdoll.theme.ui.Sizes
+import ru.vkdev.dressdoll.theme.ui.Spacing
 
 @Composable
 internal fun SettingsScreen(

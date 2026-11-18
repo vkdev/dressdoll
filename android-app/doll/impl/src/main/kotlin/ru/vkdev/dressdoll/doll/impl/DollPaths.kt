@@ -2,8 +2,7 @@ package ru.vkdev.dressdoll.doll.impl
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import ru.vkdev.dressdoll.repository.api.BodySlot
-import kotlin.math.PI
+import ru.vkdev.dressdoll.clothing.api.BodySlot
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
@@ -71,22 +70,22 @@ internal data class Toss(val angle: Float, val apex: Float) : Flight {
 }
 
 internal fun entryFlight(slot: BodySlot, random: Random): Entry =
-    Entry(slot.entryZone(), bulge = random.nextFloat() * 2 * MAX_ARC - MAX_ARC)
+    Entry(slot.entryZone(), bulge = random.nextFloat() * 2 * DollConfig.MAX_ARC - DollConfig.MAX_ARC)
 
 // Углы делят веер поровну, а не выбираются случайно: случайные углы могли бы отправить все вещи в одну сторону.
 internal fun exitFlights(count: Int, random: Random): List<Flight> {
-    if (count == 1) return listOf(Exit(drop = random.nextFloat() * MAX_ARC))
-    val sector = (TOSS_MAX_ANGLE - TOSS_MIN_ANGLE) / count
+    if (count == 1) return listOf(Exit(drop = random.nextFloat() * DollConfig.MAX_ARC))
+    val sector = (DollConfig.TOSS_MAX_ANGLE - DollConfig.TOSS_MIN_ANGLE) / count
     return List(count) { index ->
-        val jitter = (random.nextFloat() - 0.5f) * sector * TOSS_JITTER
-        val angle = TOSS_MIN_ANGLE + sector * (index + 0.5f) + jitter
-        Toss(angle, apex = TOSS_MIN_APEX + random.nextFloat() * (TOSS_MAX_APEX - TOSS_MIN_APEX))
+        val jitter = (random.nextFloat() - 0.5f) * sector * DollConfig.TOSS_JITTER
+        val angle = DollConfig.TOSS_MIN_ANGLE + sector * (index + 0.5f) + jitter
+        Toss(angle, apex = DollConfig.TOSS_MIN_APEX + random.nextFloat() * (DollConfig.TOSS_MAX_APEX - DollConfig.TOSS_MIN_APEX))
     }.shuffled(random)
 }
 
 internal fun entryStart(zone: EntryZone, item: Rect, viewport: Rect): Offset = when (zone) {
     EntryZone.BOTTOM -> Offset(0f, (viewport.bottom - item.top).coerceAtLeast(0f))
-    EntryZone.TOP -> Offset(viewport.width * TOP_SHIFT, (viewport.top - item.bottom).coerceAtMost(0f))
+    EntryZone.TOP -> Offset(viewport.width * DollConfig.TOP_SHIFT, (viewport.top - item.bottom).coerceAtMost(0f))
     EntryZone.MIDDLE -> {
         // По диагонали до ближайшего края: левого или верхнего, за любым из них вещь уже не видна.
         val distance = min(item.right - viewport.left, item.bottom - viewport.top).coerceAtLeast(0f)
@@ -103,20 +102,3 @@ internal fun accelerate(t: Float): Float {
     val clamped = t.coerceIn(0f, 1f)
     return clamped * clamped
 }
-
-internal const val FLIGHT_MILLIS = 400
-
-/** Наибольшее отклонение дуги прилёта и глубина падения при снятии, в долях пути. */
-internal const val MAX_ARC = 0.2f
-
-private const val TOP_SHIFT = 0.15f
-
-/** Почти горизонтальные края веера не берём. */
-internal const val TOSS_MIN_ANGLE = (PI / 9).toFloat()
-internal const val TOSS_MAX_ANGLE = (PI * 8 / 9).toFloat()
-
-/** Разброс угла в долях сектора одной вещи: соседние вещи не меняются местами. */
-private const val TOSS_JITTER = 0.6f
-
-internal const val TOSS_MIN_APEX = 0.1f
-internal const val TOSS_MAX_APEX = 0.25f

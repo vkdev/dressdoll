@@ -17,8 +17,9 @@ import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import ru.vkdev.dressdoll.theme.api.SystemDefault
 import ru.vkdev.dressdoll.theme.api.ThemeChoice
-import ru.vkdev.dressdoll.theme.api.ThemeIds
+import ru.vkdev.dressdoll.theme.api.ThemePalette
 import java.io.File
 import java.io.IOException
 
@@ -31,13 +32,12 @@ class ThemeSelectorImplTest {
 
     // Свой экземпляр DataStore закрывается после block: следующий вызов читает файл, а не кэш.
     private suspend fun TestScope.withSelector(
-        palettesOrder: List<Int> = emptyList(),
+        palettes: List<ThemePalette> = DAY_NIGHT,
         block: suspend (selector: ThemeSelectorImpl, dataStore: DataStore<Preferences>) -> Unit,
     ) {
         val job = Job(backgroundScope.coroutineContext[Job])
         val scope = CoroutineScope(backgroundScope.coroutineContext + job)
         val dataStore = createThemeDataStore(scope) { file }
-        val palettes = palettesOrder.mapIndexed { index, order -> testPalette("p$index", order) }
         block(ThemeSelectorImpl(dataStore, palettes, scope), dataStore)
         job.cancelAndJoin()
     }
@@ -47,10 +47,17 @@ class ThemeSelectorImplTest {
     }
 
     @Test
-    fun `choice is null until loaded, then defaults to cinnamon`() = runTest {
+    fun `choice is null until loaded, then defaults to light palette`() = runTest {
         withSelector { selector, _ ->
             assertNull(selector.choice.value)
-            assertEquals(ThemeChoice.Palette(ThemeIds.CINNAMON), selector.choice.first { it != null })
+            assertEquals(ThemeChoice.Palette("day"), selector.choice.first { it != null })
+        }
+    }
+
+    @Test
+    fun `without light palette defaults to system`() = runTest {
+        withSelector(palettes = listOf(testPalette("plain"))) { selector, _ ->
+            assertEquals(ThemeChoice.System, selector.choice.first { it != null })
         }
     }
 
@@ -70,7 +77,7 @@ class ThemeSelectorImplTest {
     @Test
     fun `last of quick selections wins`() = runTest {
         withSelector { selector, dataStore ->
-            selector.select(ThemeChoice.Palette(ThemeIds.DISCO))
+            selector.select(ThemeChoice.Palette("night"))
             selector.select(ThemeChoice.System)
             selector.select(ThemeChoice.Palette("denim"))
             dataStore.awaitSaved(ThemeChoice.Palette("denim"))
@@ -85,7 +92,7 @@ class ThemeSelectorImplTest {
     fun `corrupted file falls back to default and can be overwritten`() = runTest {
         file.writeBytes(byteArrayOf(0x7f, 0x01, 0x02, 0x03))
         withSelector { selector, dataStore ->
-            assertEquals(ThemeChoice.Palette(ThemeIds.CINNAMON), selector.choice.first { it != null })
+            assertEquals(ThemeChoice.Palette("day"), selector.choice.first { it != null })
             selector.select(ThemeChoice.System)
             dataStore.awaitSaved(ThemeChoice.System)
         }
@@ -110,9 +117,9 @@ class ThemeSelectorImplTest {
 
     @Test
     fun `read error falls back to default and later choices still apply`() = runTest {
-        val selector = ThemeSelectorImpl(FailingReadsDataStore(), emptyList(), backgroundScope)
+        val selector = ThemeSelectorImpl(FailingReadsDataStore(), DAY_NIGHT, backgroundScope)
 
-        assertEquals(ThemeSelectorImpl.DEFAULT_CHOICE, selector.choice.first { it != null })
+        assertEquals(ThemeChoice.Palette("day"), selector.choice.first { it != null })
         selector.select(ThemeChoice.System)
         advanceUntilIdle()
         assertEquals(ThemeChoice.System, selector.choice.value)
@@ -120,7 +127,8 @@ class ThemeSelectorImplTest {
 
     @Test
     fun `palettes are sorted by order`() = runTest {
-        withSelector(palettesOrder = listOf(2, 0, 1)) { selector, _ ->
+        val palettes = listOf(2, 0, 1).mapIndexed { index, order -> testPalette("p$index", order) }
+        withSelector(palettes = palettes) { selector, _ ->
             assertEquals(listOf("p1", "p2", "p0"), selector.palettes.map { it.id })
         }
     }
@@ -136,6 +144,13 @@ class ThemeSelectorImplTest {
         listOf(ThemeChoice.System, ThemeChoice.Palette("powder")).forEach { choice ->
             assertEquals(choice, ThemeSelectorImpl.decode(ThemeSelectorImpl.encode(choice)))
         }
+    }
+
+    private companion object {
+        val DAY_NIGHT = listOf(
+            testPalette("day", systemDefault = SystemDefault.LIGHT),
+            testPalette("night", order = 1, systemDefault = SystemDefault.DARK),
+        )
     }
 
     private class FailingWritesDataStore : DataStore<Preferences> {

@@ -14,7 +14,7 @@
 - Палитра сама объявляет роль: `ThemePalette.systemDefault: SystemDefault?` (`LIGHT`, `DARK`, по умолчанию `null`). «Корица» — `LIGHT`, «Диско» — `DARK`.
 - `resolvePalette`, значение по умолчанию (палитра с ролью `LIGHT`) и превью «день/ночь» ищут палитру по роли. `ThemeIds` удаляется, «Корица» и «Диско» объявляют свои id сами, как остальные палитры.
 - Контрактный тест палитр проверяет роль; отдельный тест в `:theme:impl` — что среди палитр ровно одна `LIGHT` и одна `DARK`.
-- Знание о вёрстке остаётся во временном датасете: переносить его до замены датасета некуда. Рядом с `CATALOG_MIN_SIDE` и `setHasMipMap` — TODO: при замене датасета размер картинки каталога и mipmap задаёт потребитель.
+- ~~Знание о вёрстке остаётся во временном датасете: переносить его до замены датасета некуда. Рядом с `CATALOG_MIN_SIDE` и `setHasMipMap` — TODO: при замене датасета размер картинки каталога и mipmap задаёт потребитель.~~ Пересмотрено 2026-11-18: датасет получает `TemporaryDatasetConfig`, значения задаёт `ClothingConfig` в `:clothing:impl`. Настроечные константы куклы, дискотеки и палитр собраны в `DollConfig`, `DiscoConfig`, `PaletteColorsConfig`.
 - `android.graphics.Bitmap` в моделях `:clothing:api` оставляем: приложение только под Android, а кукла и каталог всё равно переводят его в `ImageBitmap`.
 
 ## Открытые вопросы
@@ -23,7 +23,7 @@
 
 ## Шаги
 
-1. `SystemDefault` и `ThemePalette.systemDefault`; роли у «Корицы» и «Диско».
-2. `resolvePalette`, `ThemeSelectorImpl.DEFAULT_CHOICE`, `SystemItem` в разделе темы — по роли; удалить `ThemeIds`. Тесты.
-3. TODO в `BitmapDecoder`.
-4. Сборка и тесты.
+1. ~~`SystemDefault` и `ThemePalette.systemDefault`; роли у «Корицы» и «Диско».~~
+2. ~~`resolvePalette`, `ThemeSelectorImpl.DEFAULT_CHOICE`, `SystemItem` в разделе темы — по роли; удалить `ThemeIds`. Тесты.~~
+3. ~~TODO в `BitmapDecoder`.~~
+4. ~~Сборка и тесты.~~

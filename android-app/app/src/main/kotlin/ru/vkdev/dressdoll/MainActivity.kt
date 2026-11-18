@@ -48,7 +48,6 @@ class MainActivity : ComponentActivity() {
                     applySystemBars(darkBackground)
                     onDispose {}
                 }
-                // Экран выбора темы зарегистрирован, но входа на него пока нет: вход в настройки — отдельная задача.
                 navigation.Host(startRoute = DollRoute)
             }
         }

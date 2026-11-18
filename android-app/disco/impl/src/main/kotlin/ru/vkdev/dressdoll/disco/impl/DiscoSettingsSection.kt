@@ -10,9 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.vkdev.dressdoll.settings.api.SettingsSection
-import ru.vkdev.dressdoll.theme.api.OptionCard
-import ru.vkdev.dressdoll.theme.api.SectionLabel
-import ru.vkdev.dressdoll.theme.api.Spacing
+import ru.vkdev.dressdoll.theme.ui.OptionCard
+import ru.vkdev.dressdoll.theme.ui.SectionLabel
+import ru.vkdev.dressdoll.theme.ui.Spacing
 
 internal class DiscoSettingsSection(private val settings: DiscoSettingsRepository) : SettingsSection {
 

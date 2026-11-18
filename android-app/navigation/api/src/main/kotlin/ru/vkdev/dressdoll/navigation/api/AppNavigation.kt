@@ -7,7 +7,7 @@ interface AppNavigation {
 
     /**
      * [startRoute] используется только при первом создании бэкстека: после восстановления
-     * из saved state новое значение игнорируется. Сменить экран — [Navigator.replaceAll].
+     * из saved state новое значение игнорируется.
      */
     @Composable
     fun Host(startRoute: NavKey)

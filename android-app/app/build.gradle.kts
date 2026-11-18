@@ -21,6 +21,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:coroutines"))
     implementation(project(":theme:impl"))
     implementation(project(":theme:palette:cinnamon"))
     implementation(project(":theme:palette:disco"))
@@ -31,7 +32,7 @@ dependencies {
     implementation(project(":catalog:impl"))
     implementation(project(":outfit:impl"))
     implementation(project(":disco:impl"))
-    implementation(project(":repository:impl"))
+    implementation(project(":clothing:impl"))
     implementation(project(":navigation:impl"))
     implementation(project(":settings:impl"))
 

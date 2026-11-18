@@ -1,7 +1,7 @@
 package ru.vkdev.dressdoll.theme.impl
 
+import ru.vkdev.dressdoll.theme.api.SystemDefault
 import ru.vkdev.dressdoll.theme.api.ThemeChoice
-import ru.vkdev.dressdoll.theme.api.ThemeIds
 import ru.vkdev.dressdoll.theme.api.ThemePalette
 
 internal fun resolvePalette(
@@ -9,9 +9,12 @@ internal fun resolvePalette(
     palettes: List<ThemePalette>,
     systemDark: Boolean,
 ): ThemePalette? {
-    val id = when (choice) {
-        ThemeChoice.System -> if (systemDark) ThemeIds.DISCO else ThemeIds.CINNAMON
-        is ThemeChoice.Palette -> choice.id
+    val chosen = when (choice) {
+        ThemeChoice.System -> {
+            val role = if (systemDark) SystemDefault.DARK else SystemDefault.LIGHT
+            palettes.firstOrNull { it.systemDefault == role }
+        }
+        is ThemeChoice.Palette -> palettes.firstOrNull { it.id == choice.id }
     }
-    return palettes.firstOrNull { it.id == id } ?: palettes.firstOrNull()
+    return chosen ?: palettes.firstOrNull()
 }

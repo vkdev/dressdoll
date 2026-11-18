@@ -8,6 +8,6 @@ android {
 
 dependencies {
     // ClothingItemId входит в публичный API.
-    api(project(":repository:api"))
+    api(project(":clothing:api"))
     implementation(libs.androidx.compose.ui)
 }

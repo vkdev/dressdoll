@@ -1,9 +1,9 @@
 package ru.vkdev.dressdoll.doll.impl
 
+import ru.vkdev.dressdoll.clothing.api.CategoryId
+import ru.vkdev.dressdoll.clothing.api.ClothingCategory
+import ru.vkdev.dressdoll.clothing.api.ClothingItemId
 import ru.vkdev.dressdoll.outfit.api.WornItem
-import ru.vkdev.dressdoll.repository.api.CategoryId
-import ru.vkdev.dressdoll.repository.api.ClothingCategory
-import ru.vkdev.dressdoll.repository.api.ClothingItemId
 
 // Правила из .docs/doll/z-index.md. Образ — список в порядке надевания: раньше надетая вещь ближе к началу.
 

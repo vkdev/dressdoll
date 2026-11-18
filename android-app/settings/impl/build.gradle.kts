@@ -9,6 +9,7 @@ android {
 dependencies {
     api(project(":settings:api"))
     implementation(project(":theme:api"))
+    implementation(project(":theme:ui"))
 
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.material3)

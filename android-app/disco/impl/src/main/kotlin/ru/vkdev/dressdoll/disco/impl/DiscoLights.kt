@@ -46,11 +46,11 @@ internal fun nextSpots(random: Random): List<Spot> {
     return slots.zip(colors) { slot, color ->
         Spot(
             slot = slot,
-            shift = (random.nextFloat() * 2 - 1) * MAX_SPOT_SHIFT,
+            shift = (random.nextFloat() * 2 - 1) * DiscoConfig.MAX_SPOT_SHIFT,
             color = color,
             aim = SpotAim.entries.random(random),
             phase = random.nextFloat() * 2 * PI.toFloat(),
-            periodMillis = random.nextInt(MIN_SWAY_PERIOD_MILLIS, MAX_SWAY_PERIOD_MILLIS + 1),
+            periodMillis = random.nextInt(DiscoConfig.MIN_SWAY_PERIOD_MILLIS, DiscoConfig.MAX_SWAY_PERIOD_MILLIS + 1),
         )
     }
 }
@@ -58,14 +58,14 @@ internal fun nextSpots(random: Random): List<Spot> {
 internal fun swayAngle(spot: Spot, timeMillis: Long): Float {
     // Остаток от периода, а не всё время: Float теряет точность на больших временах.
     val cycle = (timeMillis % spot.periodMillis).toFloat() / spot.periodMillis
-    return MAX_SWAY * sin(2 * PI.toFloat() * cycle + spot.phase)
+    return DiscoConfig.MAX_SWAY * sin(2 * PI.toFloat() * cycle + spot.phase)
 }
 
 /** Луч доходит до нижнего края [area] целиком, когда [descent] = 1. */
 internal fun beam(spot: Spot, area: Size, target: Offset, sway: Float, descent: Float): Beam {
-    val apex = Offset(area.width * (spot.slot.x + spot.shift), -area.height * APEX_ABOVE)
+    val apex = Offset(area.width * (spot.slot.x + spot.shift), -area.height * DiscoConfig.APEX_ABOVE)
     val angle = atan2(target.x - apex.x, target.y - apex.y) + sway
-    val fullLength = (area.height - apex.y) / max(cos(angle), MIN_COS)
+    val fullLength = (area.height - apex.y) / max(cos(angle), DiscoConfig.MIN_COS)
     return Beam(apex, angle, fullLength * decelerate(descent))
 }
 
@@ -76,25 +76,3 @@ private fun decelerate(t: Float): Float {
     val rest = 1 - t.coerceIn(0f, 1f)
     return 1 - rest * rest * rest
 }
-
-internal const val DISCO_FADE_MILLIS = 400
-internal const val SPOT_CHANGE_MILLIS = 5000L
-
-/** Доля ширины области. */
-internal const val MAX_SPOT_SHIFT = 0.08f
-
-internal const val MAX_SWAY = (PI / 18).toFloat()
-/**
- * Около 30 обновлений качания в секунду: медленное качание реже кадров незаметно, а каждое обновление
- * перерисовывает три offscreen-слоя. Чуть меньше 1000/30, потому что время кадров округлено до мс.
- */
-internal const val SWAY_STEP_MILLIS = 30L
-
-internal const val MIN_SWAY_PERIOD_MILLIS = 4000
-internal const val MAX_SWAY_PERIOD_MILLIS = 6000
-
-/** Вершина выше области на эту долю её высоты: лампы не видно. */
-internal const val APEX_ABOVE = 0.1f
-
-/** Почти горизонтальный луч иначе получил бы бесконечную длину. */
-private const val MIN_COS = 0.2f

@@ -68,9 +68,7 @@ data class TDItemId(
 data class TDClothingItem(
     val id: TDItemId,
     val name: String,
-) {
-    val parentCategory: CategoryName get() = id.category
-}
+)
 
 enum class TDImageKind(val fileName: String) {
     /** Вся вещь для каталога, с горловиной и бумажными клапанами. */

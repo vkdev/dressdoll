@@ -5,7 +5,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import ru.vkdev.dressdoll.repository.api.CanvasRect
+import ru.vkdev.dressdoll.clothing.api.CanvasRect
 
 class FigureFitTest {
 

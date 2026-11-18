@@ -52,10 +52,10 @@ class PaletteColorsTest {
     fun `text on containers is readable`() {
         listOf(light to false, dark to true).forEach { (base, isDark) ->
             val s = paletteColorScheme(base, isDark)
-            assertAtLeast(CONTAINER_CONTRAST, s.onPrimaryContainer, s.primaryContainer)
-            assertAtLeast(CONTAINER_CONTRAST, s.onSecondaryContainer, s.secondaryContainer)
-            assertAtLeast(CONTAINER_CONTRAST, s.onTertiaryContainer, s.tertiaryContainer)
-            assertAtLeast(VARIANT_CONTRAST, s.onSurfaceVariant, s.surfaceVariant)
+            assertAtLeast(PaletteColorsConfig.CONTAINER_CONTRAST, s.onPrimaryContainer, s.primaryContainer)
+            assertAtLeast(PaletteColorsConfig.CONTAINER_CONTRAST, s.onSecondaryContainer, s.secondaryContainer)
+            assertAtLeast(PaletteColorsConfig.CONTAINER_CONTRAST, s.onTertiaryContainer, s.tertiaryContainer)
+            assertAtLeast(PaletteColorsConfig.VARIANT_CONTRAST, s.onSurfaceVariant, s.surfaceVariant)
         }
     }
 

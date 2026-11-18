@@ -1,13 +1,12 @@
 package ru.vkdev.dressdoll.doll.impl
 
-import ru.vkdev.dressdoll.repository.api.BodySlot
-import ru.vkdev.dressdoll.repository.api.CatalogSectionId
-import ru.vkdev.dressdoll.repository.api.CategoryId
-import ru.vkdev.dressdoll.repository.api.ClothingCategory
-import ru.vkdev.dressdoll.repository.api.DrawLevel
-import ru.vkdev.dressdoll.repository.api.DrawLevelId
-import ru.vkdev.dressdoll.repository.api.ReplacementGroup
-import ru.vkdev.dressdoll.repository.api.ReplacementGroupId
+import ru.vkdev.dressdoll.clothing.api.BodySlot
+import ru.vkdev.dressdoll.clothing.api.CategoryId
+import ru.vkdev.dressdoll.clothing.api.ClothingCategory
+import ru.vkdev.dressdoll.clothing.api.DrawLevel
+import ru.vkdev.dressdoll.clothing.api.DrawLevelId
+import ru.vkdev.dressdoll.clothing.api.ReplacementGroup
+import ru.vkdev.dressdoll.clothing.api.ReplacementGroupId
 
 // Уровни и группы — подмножество categories.json, позиции уровней как в z-index.md.
 private val UNDERWEAR = level("underwear", 1)
@@ -50,5 +49,4 @@ private fun category(
     slot = slot,
     level = level,
     group = group,
-    section = CatalogSectionId("s"),
 )

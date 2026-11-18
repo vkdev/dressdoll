@@ -21,9 +21,9 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -45,26 +45,24 @@ internal class DiscoLook(
         SpotColor.TERTIARY -> tertiary
     }
 
-    /** Непрозрачность подкраски конуса цветом прожектора в воздухе. */
     val airAlpha: Float
         get() = when (style) {
-            BeamStyle.PAPER -> 0.3f
-            BeamStyle.SOFT -> 0.35f
+            BeamStyle.PAPER -> DiscoConfig.PAPER_AIR_ALPHA
+            BeamStyle.SOFT -> DiscoConfig.SOFT_AIR_ALPHA
         }
 
-    /** То же на кукле, одежде и шапке. */
     val figureAlpha: Float
         get() = when (style) {
-            BeamStyle.PAPER -> 0.25f
-            BeamStyle.SOFT -> 0.3f
+            BeamStyle.PAPER -> DiscoConfig.PAPER_FIGURE_ALPHA
+            BeamStyle.SOFT -> DiscoConfig.SOFT_FIGURE_ALPHA
         }
 }
 
 // Акцентные цвета светлых палитр тёмные, и на затемнённом фоне сами по себе не светят.
 internal fun discoLook(scheme: ColorScheme, style: BeamStyle) = DiscoLook(
-    primary = lerp(scheme.primary, Color.White, LIGHTEN),
-    secondary = lerp(scheme.secondary, Color.White, LIGHTEN),
-    tertiary = lerp(scheme.tertiary, Color.White, LIGHTEN),
+    primary = lerp(scheme.primary, Color.White, DiscoConfig.LIGHTEN),
+    secondary = lerp(scheme.secondary, Color.White, DiscoConfig.LIGHTEN),
+    tertiary = lerp(scheme.tertiary, Color.White, DiscoConfig.LIGHTEN),
     style = style,
 )
 
@@ -155,7 +153,7 @@ private fun DrawScope.drawDisco(
         val bounds = Rect(origin, size)
         drawIntoCanvas { canvas ->
             canvas.saveLayer(bounds, painter.layerPaint(blendMode))
-            drawRect(Color.Black, topLeft = origin, size = size, alpha = DIM_ALPHA * dim)
+            drawRect(Color.Black, topLeft = origin, size = size, alpha = DiscoConfig.DIM_ALPHA * dim)
             beams.forEach { with(painter) { drawBeam(it.beam, Color.Black, it.alpha, BlendMode.DstOut, look.style) } }
             canvas.restore()
         }
@@ -211,7 +209,7 @@ private class BeamPainter {
 
 // Боковые стороны длиннее оси: дальний край треугольника касается окружности радиуса длины луча.
 private fun unitBeamPath(): Path {
-    val halfEnd = tan(BEAM_HALF_WIDTH)
+    val halfEnd = tan(DiscoConfig.BEAM_HALF_WIDTH)
     return Path().apply {
         moveTo(0f, 0f)
         lineTo(-halfEnd, 1f)
@@ -224,28 +222,20 @@ private fun unitBeamPath(): Path {
 private fun unitBeamShader(color: Color): Shader {
     val solid = color.toArgb()
     val clear = color.copy(alpha = 0f).toArgb()
-    val span = BEAM_HALF_WIDTH / PI.toFloat()
-    // Ровная середина шириной 40% луча: с треугольным профилем луч выходил тусклым.
+    val span = DiscoConfig.BEAM_HALF_WIDTH / PI.toFloat()
     val across = SweepGradient(
         0f, 0f,
         intArrayOf(clear, solid, solid, clear, clear),
-        floatArrayOf(0f, span * 0.3f, span * 0.7f, span, 1f),
+        floatArrayOf(0f, span * DiscoConfig.BEAM_CORE_START, span * DiscoConfig.BEAM_CORE_END, span, 1f),
     )
     // SweepGradient отсчитывает угол от оси x, а ось луча — ось y, то есть 90°.
-    val halfDegrees = Math.toDegrees(BEAM_HALF_WIDTH.toDouble()).toFloat()
+    val halfDegrees = Math.toDegrees(DiscoConfig.BEAM_HALF_WIDTH.toDouble()).toFloat()
     across.setLocalMatrix(Matrix().apply { setRotate(90f - halfDegrees) })
     val along = RadialGradient(
         0f, 0f, 1f,
-        intArrayOf(0xFF000000.toInt(), 0xE6000000.toInt(), 0x00000000),
-        floatArrayOf(0f, 0.6f, 1f),
+        intArrayOf(0xFF000000.toInt(), DiscoConfig.BEAM_FADE_START_ALPHA shl 24, 0x00000000),
+        floatArrayOf(0f, DiscoConfig.BEAM_FADE_START, 1f),
         Shader.TileMode.CLAMP,
     )
     return ComposeShader(across, along, PorterDuff.Mode.DST_IN)
 }
-
-private const val DIM_ALPHA = 0.6f
-
-/** Доля белого в цвете луча. */
-private const val LIGHTEN = 0.45f
-
-private const val BEAM_HALF_WIDTH = (PI / 180 * 7).toFloat()

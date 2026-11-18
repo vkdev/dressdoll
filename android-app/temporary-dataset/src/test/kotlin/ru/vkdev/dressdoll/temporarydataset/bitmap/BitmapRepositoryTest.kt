@@ -2,6 +2,8 @@ package ru.vkdev.dressdoll.temporarydataset.bitmap
 
 import android.content.ComponentCallbacks2
 import android.graphics.Bitmap
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -93,7 +95,7 @@ class BitmapRepositoryTest {
         var fail = true
         val repo = BitmapRepository(
             decoder = { if (fail) throw IOException("broken") else Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888) },
-            ioDispatcher = dispatcher,
+            scope = CoroutineScope(SupervisorJob() + dispatcher),
             catalogCacheBytes = CACHE_BYTES,
             dollCacheBytes = CACHE_BYTES,
         )
@@ -121,7 +123,7 @@ class BitmapRepositoryTest {
     private fun repository(
         catalogCacheBytes: Int = CACHE_BYTES,
         dollCacheBytes: Int = CACHE_BYTES,
-    ) = BitmapRepository(decoder, dispatcher, catalogCacheBytes, dollCacheBytes)
+    ) = BitmapRepository(decoder, CoroutineScope(SupervisorJob() + dispatcher), catalogCacheBytes, dollCacheBytes)
 
     private companion object {
         const val BITMAP_BYTES = 10 * 10 * 4

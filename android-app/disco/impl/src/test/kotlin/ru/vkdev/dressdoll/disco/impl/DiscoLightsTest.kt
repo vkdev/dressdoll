@@ -40,8 +40,8 @@ class DiscoLightsTest {
         val random = Random(7)
         repeat(1000) {
             nextSpots(random).forEach {
-                assertTrue(abs(it.shift) <= MAX_SPOT_SHIFT)
-                assertTrue(it.periodMillis in MIN_SWAY_PERIOD_MILLIS..MAX_SWAY_PERIOD_MILLIS)
+                assertTrue(abs(it.shift) <= DiscoConfig.MAX_SPOT_SHIFT)
+                assertTrue(it.periodMillis in DiscoConfig.MIN_SWAY_PERIOD_MILLIS..DiscoConfig.MAX_SWAY_PERIOD_MILLIS)
             }
         }
     }
@@ -50,8 +50,8 @@ class DiscoLightsTest {
     fun `качание не выходит за 10 градусов и повторяется с периодом`() {
         val spot = nextSpots(Random(3)).first()
         val angles = (0L..12_000L step 10).map { swayAngle(spot, it) }
-        assertTrue(angles.all { abs(it) <= MAX_SWAY + 1e-6f })
-        assertEquals(MAX_SWAY, angles.max(), 1e-3f)
+        assertTrue(angles.all { abs(it) <= DiscoConfig.MAX_SWAY + 1e-6f })
+        assertEquals(DiscoConfig.MAX_SWAY, angles.max(), 1e-3f)
         assertEquals(swayAngle(spot, 1234), swayAngle(spot, 1234L + spot.periodMillis), 1e-5f)
     }
 

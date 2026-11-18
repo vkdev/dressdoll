@@ -14,16 +14,16 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
+import ru.vkdev.dressdoll.clothing.api.BodySlot
+import ru.vkdev.dressdoll.clothing.api.CanvasPoint
+import ru.vkdev.dressdoll.clothing.api.CategoryId
+import ru.vkdev.dressdoll.clothing.api.ClothingCategory
+import ru.vkdev.dressdoll.clothing.api.ClothingItemId
+import ru.vkdev.dressdoll.clothing.api.ClothingRepository
+import ru.vkdev.dressdoll.clothing.api.DollFigure
+import ru.vkdev.dressdoll.clothing.api.DollImages
 import ru.vkdev.dressdoll.outfit.api.OutfitRepository
 import ru.vkdev.dressdoll.outfit.api.WornItem
-import ru.vkdev.dressdoll.repository.api.BodySlot
-import ru.vkdev.dressdoll.repository.api.CanvasPoint
-import ru.vkdev.dressdoll.repository.api.CategoryId
-import ru.vkdev.dressdoll.repository.api.ClothingCategory
-import ru.vkdev.dressdoll.repository.api.ClothingItemId
-import ru.vkdev.dressdoll.repository.api.DollFigure
-import ru.vkdev.dressdoll.repository.api.DollImages
-import ru.vkdev.dressdoll.repository.api.DollRepository
 import java.io.IOException
 
 /**
@@ -49,7 +49,7 @@ internal enum class Plane { BACK, FRONT }
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class DollStateHolder(
     private val outfit: OutfitRepository,
-    private val repository: DollRepository,
+    private val repository: ClothingRepository,
     scope: CoroutineScope,
 ) {
 

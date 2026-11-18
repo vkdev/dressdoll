@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
@@ -26,13 +25,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.vkdev.dressdoll.catalog.api.Catalog
-import ru.vkdev.dressdoll.repository.api.CategoryId
-import ru.vkdev.dressdoll.repository.api.ClothingItem
-import ru.vkdev.dressdoll.repository.api.ClothingItemId
-import ru.vkdev.dressdoll.repository.api.DollRepository
+import ru.vkdev.dressdoll.clothing.api.CategoryId
+import ru.vkdev.dressdoll.clothing.api.ClothingItemId
 
 internal class CatalogImpl(
-    private val repository: DollRepository,
+    private val holder: CatalogStateHolder,
 ) : Catalog {
 
     @Composable
@@ -43,12 +40,9 @@ internal class CatalogImpl(
         modifier: Modifier,
     ) {
         var openCategory by rememberSaveable(saver = OpenCategorySaver) { mutableStateOf(null) }
-        val categories by remember(repository) { repository.clothingCategories() }
-            .collectAsStateWithLifecycle(initialValue = null)
+        val categories by holder.categories.collectAsStateWithLifecycle()
         // Над AnimatedContent: иначе после возврата из категории список прокручен в начало.
         val categoriesState = rememberLazyGridState()
-        // Повторно открытая категория сразу показывает вещи, пока поток присылает свежий список.
-        val loadedItems = remember(repository) { mutableStateMapOf<CategoryId, List<ClothingItem>>() }
 
         // Инсеты, которые уже применил кто-то выше, второй раз не добавляем.
         var consumedInsets by remember { mutableStateOf(WindowInsets(0, 0, 0, 0)) }
@@ -80,10 +74,11 @@ internal class CatalogImpl(
                     onOpen = { openCategory = OpenCategory(it.id, it.title) },
                 )
             } else {
+                val items by remember(category.id) { holder.items(category.id) }.collectAsStateWithLifecycle()
                 ItemsPane(
-                    repository = repository,
                     category = category,
-                    loadedItems = loadedItems,
+                    items = items,
+                    image = holder::image,
                     worn = worn,
                     onToggle = onToggle,
                     bottomInset = bottomInset,

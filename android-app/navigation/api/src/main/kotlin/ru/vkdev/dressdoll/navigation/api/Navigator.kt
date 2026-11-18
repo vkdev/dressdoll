@@ -11,8 +11,6 @@ interface Navigator {
 
     /** Возвращает false, если экран последний: он остаётся на месте. */
     fun back(): Boolean
-
-    fun replaceAll(route: NavKey)
 }
 
 val LocalNavigator = staticCompositionLocalOf<Navigator> { error("Navigator is not provided") }

@@ -18,7 +18,7 @@ class DiscoStateTest {
             val times = swayUpdatesInSecondSecond(hz)
 
             assertTrue("$hz Гц: ${times.size} обновлений", times.size in 29..31)
-            times.zipWithNext { a, b -> assertTrue("$hz Гц: шаг ${b - a} мс", b - a >= SWAY_STEP_MILLIS) }
+            times.zipWithNext { a, b -> assertTrue("$hz Гц: шаг ${b - a} мс", b - a >= DiscoConfig.SWAY_STEP_MILLIS) }
         }
     }
 
@@ -27,7 +27,7 @@ class DiscoStateTest {
         assertEquals(20, swayUpdatesInSecondSecond(hz = 20).size)
     }
 
-    // Качание начинается после затемнения, а оно длится DISCO_FADE_MILLIS даже при уже полном затемнении,
+    // Качание начинается после затемнения, а оно длится DiscoConfig.FADE_MILLIS даже при уже полном затемнении,
     // поэтому считается вторая секунда кадров.
     private fun TestScope.swayUpdatesInSecondSecond(hz: Int): List<Long> {
         val clock = BroadcastFrameClock()

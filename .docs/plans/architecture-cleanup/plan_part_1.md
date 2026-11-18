@@ -38,4 +38,4 @@
 3. ~~Раздел темы — `ThemeSettingsSection` в `:settings:impl`: текущие «Как в системе», карточки палитр и подпись.~~
 4. ~~Раздел дискотеки — `DiscoSettingsSection` в `:disco:impl` со строками; `:disco:impl` зависит от `:settings:api` и `:theme:api` (`SectionLabel`, `OptionCard`).~~
 5. ~~Каталог [theme-elements.md](../../android/theme-elements.md): у `ArrowBack` заменить `ThemeSettingsScreen` на `SettingsScreen`, у `OptionCard` указать, что раздел дискотеки отдаёт `:disco:impl`.~~
-6. ~~Сборка и тесты.~~ Проверка на эмуляторе не делалась: экран настроек с двумя разделами на вид не проверен.
+6. ~~Сборка и тесты.~~ ~~Проверка на эмуляторе~~: экран настроек с двумя разделами проверен 2026-11-18 (Pixel 10a).

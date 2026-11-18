@@ -2,7 +2,7 @@ package ru.vkdev.dressdoll.catalog.api
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import ru.vkdev.dressdoll.repository.api.ClothingItemId
+import ru.vkdev.dressdoll.clothing.api.ClothingItemId
 
 interface Catalog {
 

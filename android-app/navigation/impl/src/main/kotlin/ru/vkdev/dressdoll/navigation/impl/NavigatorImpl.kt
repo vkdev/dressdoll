@@ -19,9 +19,4 @@ internal class NavigatorImpl(
         backStack.removeAt(backStack.lastIndex)
         return true
     }
-
-    override fun replaceAll(route: NavKey) {
-        backStack.add(route)
-        backStack.subList(0, backStack.lastIndex).clear()
-    }
 }

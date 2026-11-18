@@ -2,6 +2,8 @@ package ru.vkdev.dressdoll.temporarydataset
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -31,8 +33,8 @@ class TemporaryDatasetTest {
         assets = assets,
         ioDispatcher = dispatcher,
         bitmaps = BitmapRepository(
-            decoder = AssetBitmapDecoder { path -> File("src/main/assets", path).inputStream() },
-            ioDispatcher = dispatcher,
+            decoder = AssetBitmapDecoder(catalogMinSide = 512, dollMipmap = true) { path -> File("src/main/assets", path).inputStream() },
+            scope = CoroutineScope(SupervisorJob() + dispatcher),
             catalogCacheBytes = 64 * 1024 * 1024,
             dollCacheBytes = 64 * 1024 * 1024,
         ),
@@ -47,7 +49,7 @@ class TemporaryDatasetTest {
         assertEquals(listOf("бельевая-майка", "водолазка", "блузка"), names.take(3))
         assertEquals("галстук", names.last())
         assertNotEquals(names.sorted(), names)
-        val sectionOrder = dataset.catalogSections().first().map { it.id }
+        val sectionOrder = categoriesConfig.sections.map { it.id }
         val sectionIndexes = categories.map { sectionOrder.indexOf(it.section) }
         assertEquals(sectionIndexes.sorted(), sectionIndexes)
     }
@@ -69,8 +71,8 @@ class TemporaryDatasetTest {
     }
 
     @Test
-    fun `catalogSections returns 10 sections in config order`() = runTest(dispatcher) {
-        val ids = dataset.catalogSections().first().map { it.id.value }
+    fun `config has 10 sections in file order`() {
+        val ids = categoriesConfig.sections.map { it.id.value }
 
         assertEquals(
             listOf(
@@ -88,7 +90,7 @@ class TemporaryDatasetTest {
         val items = dataset.clothingItems(category).first()
 
         assertEquals(listOf("ботинки 01", "ботинки 02", "ботинки 03"), items.map { it.name })
-        assertTrue(items.all { it.parentCategory == category })
+        assertTrue(items.all { it.id.category == category })
     }
 
     @Test
@@ -98,7 +100,7 @@ class TemporaryDatasetTest {
         val total = categories.sumOf { category ->
             val items = dataset.clothingItems(category.name).first()
             assertTrue("no items in ${category.name.value}", items.isNotEmpty())
-            assertTrue(items.all { it.parentCategory == category.name })
+            assertTrue(items.all { it.id.category == category.name })
             items.size
         }
 
@@ -198,6 +200,22 @@ class TemporaryDatasetTest {
 
         assertEquals(allItems(), all)
         assertEquals(itemFolderCount(), all.size)
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `figure without image throws`() = runTest(dispatcher) {
+        val empty = TemporaryDataset(
+            assets = assets,
+            ioDispatcher = dispatcher,
+            bitmaps = BitmapRepository(
+                decoder = { null },
+                scope = CoroutineScope(SupervisorJob() + dispatcher),
+                catalogCacheBytes = 1024,
+                dollCacheBytes = 1024,
+            ),
+        )
+
+        empty.figure()
     }
 
     @Test

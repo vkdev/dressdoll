@@ -5,7 +5,7 @@ import androidx.compose.ui.geometry.Rect
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import ru.vkdev.dressdoll.repository.api.BodySlot
+import ru.vkdev.dressdoll.clothing.api.BodySlot
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.random.Random
@@ -29,7 +29,7 @@ class DollPathsTest {
     @Test
     fun `в начале прилёта вещь целиком за краем`() {
         EntryZone.entries.forEach { zone ->
-            listOf(-MAX_ARC, 0f, MAX_ARC).forEach { bulge ->
+            listOf(-DollConfig.MAX_ARC, 0f, DollConfig.MAX_ARC).forEach { bulge ->
                 val start = item.translate(Entry(zone, bulge).offset(0f, item, viewport))
                 assertTrue("$zone $bulge: $start", !start.overlaps(viewport))
             }
@@ -47,7 +47,7 @@ class DollPathsTest {
     @Test
     fun `прилёт кончается на месте вещи`() {
         EntryZone.entries.forEach { zone ->
-            val end = Entry(zone, MAX_ARC).offset(1f, item, viewport)
+            val end = Entry(zone, DollConfig.MAX_ARC).offset(1f, item, viewport)
             assertEquals(0f, end.x, EPS)
             assertEquals(0f, end.y, EPS)
         }
@@ -58,10 +58,10 @@ class DollPathsTest {
         val start = entryStart(EntryZone.MIDDLE, item, viewport)
         val length = start.getDistance()
         val deviations = (0..100).map { step ->
-            val point = Entry(EntryZone.MIDDLE, MAX_ARC).offset(step / 100f, item, viewport)
+            val point = Entry(EntryZone.MIDDLE, DollConfig.MAX_ARC).offset(step / 100f, item, viewport)
             abs(start.x * point.y - start.y * point.x) / length
         }
-        assertEquals(MAX_ARC * length, deviations.max(), 1f)
+        assertEquals(DollConfig.MAX_ARC * length, deviations.max(), 1f)
     }
 
     @Test
@@ -73,13 +73,13 @@ class DollPathsTest {
 
     @Test
     fun `снятие уходит вправо за край и вниз, без подъёма, с ускорением`() {
-        val flight = Exit(drop = MAX_ARC)
+        val flight = Exit(drop = DollConfig.MAX_ARC)
         val path = (0..10).map { flight.offset(it / 10f, item, viewport) }
 
         assertEquals(Offset.Zero, path.first())
         assertTrue(item.translate(path.last()).left >= viewport.right)
         assertTrue(path.all { it.y >= 0f })
-        assertEquals(300f * MAX_ARC, path.last().y, EPS)
+        assertEquals(300f * DollConfig.MAX_ARC, path.last().y, EPS)
         val steps = path.zipWithNext { a, b -> b.x - a.x }
         assertTrue(steps.toString(), steps.zipWithNext().all { (a, b) -> a <= b })
     }
@@ -93,8 +93,8 @@ class DollPathsTest {
 
     @Test
     fun `подброшенная вещь взлетает на заданную высоту и падает за нижний край`() {
-        listOf(TOSS_MIN_ANGLE, PI.toFloat() / 2, TOSS_MAX_ANGLE).forEach { angle ->
-            listOf(TOSS_MIN_APEX, TOSS_MAX_APEX).forEach { apex ->
+        listOf(DollConfig.TOSS_MIN_ANGLE, PI.toFloat() / 2, DollConfig.TOSS_MAX_ANGLE).forEach { angle ->
+            listOf(DollConfig.TOSS_MIN_APEX, DollConfig.TOSS_MAX_APEX).forEach { apex ->
                 val flight = Toss(angle, apex)
                 val path = (0..1000).map { flight.offset(it / 1000f, item, viewport) }
 
@@ -107,9 +107,9 @@ class DollPathsTest {
 
     @Test
     fun `подброс влево и вправо по углу`() {
-        assertTrue(Toss(TOSS_MIN_ANGLE, TOSS_MIN_APEX).offset(1f, item, viewport).x > 0f)
-        assertTrue(Toss(TOSS_MAX_ANGLE, TOSS_MIN_APEX).offset(1f, item, viewport).x < 0f)
-        assertEquals(0f, Toss(PI.toFloat() / 2, TOSS_MIN_APEX).offset(1f, item, viewport).x, 1e-2f)
+        assertTrue(Toss(DollConfig.TOSS_MIN_ANGLE, DollConfig.TOSS_MIN_APEX).offset(1f, item, viewport).x > 0f)
+        assertTrue(Toss(DollConfig.TOSS_MAX_ANGLE, DollConfig.TOSS_MIN_APEX).offset(1f, item, viewport).x < 0f)
+        assertEquals(0f, Toss(PI.toFloat() / 2, DollConfig.TOSS_MIN_APEX).offset(1f, item, viewport).x, 1e-2f)
     }
 
     @Test
@@ -117,10 +117,10 @@ class DollPathsTest {
         (2..7).forEach { count ->
             repeat(100) { seed ->
                 val angles = exitFlights(count, Random(seed)).map { (it as Toss).angle }.sorted()
-                val sector = (TOSS_MAX_ANGLE - TOSS_MIN_ANGLE) / count
+                val sector = (DollConfig.TOSS_MAX_ANGLE - DollConfig.TOSS_MIN_ANGLE) / count
 
                 assertEquals(count, angles.size)
-                assertTrue("$count: $angles", angles.all { it in TOSS_MIN_ANGLE..TOSS_MAX_ANGLE })
+                assertTrue("$count: $angles", angles.all { it in DollConfig.TOSS_MIN_ANGLE..DollConfig.TOSS_MAX_ANGLE })
                 assertTrue("$count: $angles", angles.first() < PI / 2 && angles.last() > PI / 2)
                 assertTrue("$count: $angles", angles.zipWithNext().all { (a, b) -> b - a > sector * 0.3f })
             }
@@ -131,9 +131,9 @@ class DollPathsTest {
     fun `случайные параметры в пределах`() {
         val random = Random(42)
         repeat(1000) {
-            assertTrue(abs(entryFlight(BodySlot.TORSO, random).bulge) <= MAX_ARC)
-            assertTrue((exitFlights(1, random).single() as Exit).drop in 0f..MAX_ARC)
-            assertTrue(exitFlights(3, random).all { (it as Toss).apex in TOSS_MIN_APEX..TOSS_MAX_APEX })
+            assertTrue(abs(entryFlight(BodySlot.TORSO, random).bulge) <= DollConfig.MAX_ARC)
+            assertTrue((exitFlights(1, random).single() as Exit).drop in 0f..DollConfig.MAX_ARC)
+            assertTrue(exitFlights(3, random).all { (it as Toss).apex in DollConfig.TOSS_MIN_APEX..DollConfig.TOSS_MAX_APEX })
         }
     }
 

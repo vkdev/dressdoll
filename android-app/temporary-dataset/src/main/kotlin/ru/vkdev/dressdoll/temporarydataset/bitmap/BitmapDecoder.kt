@@ -3,6 +3,7 @@ package ru.vkdev.dressdoll.temporarydataset.bitmap
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import ru.vkdev.dressdoll.temporarydataset.TemporaryDatasetConfig
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
@@ -14,10 +15,13 @@ internal fun interface BitmapDecoder {
 
 /** [open] бросает [FileNotFoundException], если файла нет. */
 internal class AssetBitmapDecoder(
+    private val catalogMinSide: Int,
+    private val dollMipmap: Boolean,
     private val open: (assetPath: String) -> InputStream,
 ) : BitmapDecoder {
 
-    constructor(assets: AssetManager) : this(assets::open)
+    constructor(assets: AssetManager, config: TemporaryDatasetConfig) :
+        this(config.catalogMinSide, config.dollMipmap, assets::open)
 
     override fun decode(key: TDImageKey): Bitmap? {
         // Options изменяемые (декодер пишет в поля out*), поэтому у каждого параллельного декодирования свои.
@@ -27,14 +31,12 @@ internal class AssetBitmapDecoder(
         if (!key.onDoll) {
             val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
             (openOrNull(key) ?: return null).use { BitmapFactory.decodeStream(it, null, bounds) }
-            options.inSampleSize = catalogSampleSize(bounds.outWidth, bounds.outHeight)
+            options.inSampleSize = catalogSampleSize(bounds.outWidth, bounds.outHeight, catalogMinSide)
         }
         val stream = openOrNull(key) ?: return null
         val bitmap = stream.use { BitmapFactory.decodeStream(it, null, options) }
             ?: throw IOException("Cannot decode ${key.assetPath}")
-        // В альбомной ориентации с открытой шторкой кукла уменьшается сильнее чем вдвое,
-        // и без mipmap мелкие детали рябят. Mipmap строится при загрузке в GPU.
-        if (key.onDoll) bitmap.setHasMipMap(true)
+        if (key.onDoll && dollMipmap) bitmap.setHasMipMap(true)
         return bitmap
     }
 
@@ -45,13 +47,9 @@ internal class AssetBitmapDecoder(
     }
 }
 
-internal fun catalogSampleSize(width: Int, height: Int): Int {
+internal fun catalogSampleSize(width: Int, height: Int, minSide: Int): Int {
     val side = maxOf(width, height)
     var sample = 1
-    while (side / (sample * 2) >= CATALOG_MIN_SIDE) sample *= 2
+    while (side / (sample * 2) >= minSide) sample *= 2
     return sample
 }
-
-// Шторка не шире 640 dp, а в ней две колонки: картинка плитки не больше ~250 dp по длинной стороне.
-// 512 px хватает телефону до xxxhdpi и планшету до xhdpi.
-internal const val CATALOG_MIN_SIDE = 512

@@ -21,7 +21,7 @@
 
 ## Шаги
 
-1. Переименовать модуль, пакеты и интерфейс; обновить зависимости `catalog`, `outfit`, `doll`, `app` и документацию в `.docs/doll/`.
-2. Регистрация `ComponentCallbacks2` в `:repository:impl`, методы памяти убрать из интерфейса и `DressDollApplication`; тест, что вызов доходит до `TemporaryDataset.trimMemory`.
-3. Удалить устаревший комментарий в `MainActivity`.
-4. Сборка и тесты.
+1. ~~Переименовать модуль, пакеты и интерфейс; обновить зависимости `catalog`, `outfit`, `doll`, `app` и документацию в `.docs/doll/`.~~
+2. ~~Регистрация `ComponentCallbacks2` в `:repository:impl`, методы памяти убрать из интерфейса и `DressDollApplication`; тест, что вызов доходит до `TemporaryDataset.trimMemory`.~~
+3. ~~Удалить устаревший комментарий в `MainActivity`.~~
+4. ~~Сборка и тесты.~~

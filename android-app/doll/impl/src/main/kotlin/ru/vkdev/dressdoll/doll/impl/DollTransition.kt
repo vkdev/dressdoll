@@ -7,7 +7,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import ru.vkdev.dressdoll.repository.api.ClothingItemId
+import ru.vkdev.dressdoll.clothing.api.ClothingItemId
 import kotlin.random.Random
 
 /** Живёт, пока экран куклы в композиции: вернулись на экран — первая сцена показывается без анимации. */
@@ -50,7 +50,7 @@ internal class DollTransition(private val random: Random = Random.Default) {
             leftItems.zip(exitFlights(leftItems.size, random)).toMap()
         leaving = left
         shown = scene
-        progress.animateTo(1f, tween(FLIGHT_MILLIS, easing = LinearEasing))
+        progress.animateTo(1f, tween(DollConfig.FLIGHT_MILLIS, easing = LinearEasing))
         flights = emptyMap()
         leaving = emptyList()
     }

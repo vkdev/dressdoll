@@ -33,17 +33,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.vkdev.dressdoll.settings.api.SettingsSection
-import ru.vkdev.dressdoll.theme.api.HeadlineText
-import ru.vkdev.dressdoll.theme.api.LocalThemePalette
-import ru.vkdev.dressdoll.theme.api.OptionCard
-import ru.vkdev.dressdoll.theme.api.SectionLabel
-import ru.vkdev.dressdoll.theme.api.SelectableCard
-import ru.vkdev.dressdoll.theme.api.Spacing
-import ru.vkdev.dressdoll.theme.api.Strokes
+import ru.vkdev.dressdoll.theme.api.SystemDefault
 import ru.vkdev.dressdoll.theme.api.ThemeChoice
-import ru.vkdev.dressdoll.theme.api.ThemeIds
 import ru.vkdev.dressdoll.theme.api.ThemePalette
 import ru.vkdev.dressdoll.theme.api.ThemeSelector
+import ru.vkdev.dressdoll.theme.ui.HeadlineText
+import ru.vkdev.dressdoll.theme.ui.LocalUppercaseHeadlines
+import ru.vkdev.dressdoll.theme.ui.OptionCard
+import ru.vkdev.dressdoll.theme.ui.SectionLabel
+import ru.vkdev.dressdoll.theme.ui.SelectableCard
+import ru.vkdev.dressdoll.theme.ui.Spacing
+import ru.vkdev.dressdoll.theme.ui.Strokes
 
 internal class ThemeSettingsSection(private val selector: ThemeSelector) : SettingsSection {
 
@@ -94,8 +94,8 @@ private fun SystemItem(
     selected: Boolean,
     onClick: () -> Unit,
 ) {
-    val day = palettes.firstOrNull { it.id == ThemeIds.CINNAMON }
-    val night = palettes.firstOrNull { it.id == ThemeIds.DISCO }
+    val day = palettes.firstOrNull { it.systemDefault == SystemDefault.LIGHT }
+    val night = palettes.firstOrNull { it.systemDefault == SystemDefault.DARK }
     val colors = MaterialTheme.colorScheme
     OptionCard(
         title = stringResource(R.string.settings_theme_system),
@@ -146,10 +146,10 @@ private fun PaletteCard(
     ) {
         MaterialTheme(colorScheme = palette.colorScheme, typography = palette.typography) {
             val colors = MaterialTheme.colorScheme
-            // HeadlineText берёт регистр заголовков из LocalThemePalette. Цвет текста по умолчанию
-            // Surface карточки вычислил по активной теме, поэтому задаём его заново.
+            // Регистр заголовков и цвет текста по умолчанию заданы для активной темы, поэтому
+            // карточка задаёт их заново по своей палитре.
             CompositionLocalProvider(
-                LocalThemePalette provides palette,
+                LocalUppercaseHeadlines provides palette.uppercaseHeadlines,
                 LocalContentColor provides colors.onBackground,
             ) {
                 Column(
@@ -211,6 +211,8 @@ private fun ColorStripe() {
 // Размеры превью палитры: только у этого экрана, поэтому не элементы темы.
 private val DayNightSize = 44.dp
 private val ColorStripeHeight = 10.dp
+private val SampleButtonMinHeight = 36.dp
+private val SampleChipMinHeight = 32.dp
 
 // Образцы, а не настоящие кнопки и чипсы: внутри выбираемой карточки они не должны
 // перехватывать нажатия и попадать в озвучку.
@@ -227,7 +229,7 @@ private fun SampleControls() {
     ) {
         Box(
             modifier = Modifier
-                .heightIn(min = 36.dp)
+                .heightIn(min = SampleButtonMinHeight)
                 .background(colors.primary, CircleShape)
                 .padding(horizontal = Spacing.large),
             contentAlignment = Alignment.Center,
@@ -241,7 +243,7 @@ private fun SampleControls() {
         }
         Box(
             modifier = Modifier
-                .heightIn(min = 32.dp)
+                .heightIn(min = SampleChipMinHeight)
                 .border(Strokes.thin, colors.outline, CircleShape)
                 .padding(horizontal = Spacing.medium),
             contentAlignment = Alignment.Center,
@@ -254,7 +256,7 @@ private fun SampleControls() {
         }
         Box(
             modifier = Modifier
-                .heightIn(min = 32.dp)
+                .heightIn(min = SampleChipMinHeight)
                 .background(colors.secondaryContainer, CircleShape)
                 .padding(horizontal = Spacing.medium),
             contentAlignment = Alignment.Center,

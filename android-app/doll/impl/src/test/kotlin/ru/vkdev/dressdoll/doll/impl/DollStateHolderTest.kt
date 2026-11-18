@@ -16,19 +16,18 @@ import org.junit.Assert.assertSame
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import ru.vkdev.dressdoll.clothing.api.BodySlot
+import ru.vkdev.dressdoll.clothing.api.CanvasPoint
+import ru.vkdev.dressdoll.clothing.api.CanvasRect
+import ru.vkdev.dressdoll.clothing.api.CategoryId
+import ru.vkdev.dressdoll.clothing.api.ClothingCategory
+import ru.vkdev.dressdoll.clothing.api.ClothingItem
+import ru.vkdev.dressdoll.clothing.api.ClothingItemId
+import ru.vkdev.dressdoll.clothing.api.ClothingRepository
+import ru.vkdev.dressdoll.clothing.api.DollFigure
+import ru.vkdev.dressdoll.clothing.api.DollImages
 import ru.vkdev.dressdoll.outfit.api.OutfitRepository
 import ru.vkdev.dressdoll.outfit.api.WornItem
-import ru.vkdev.dressdoll.repository.api.BodySlot
-import ru.vkdev.dressdoll.repository.api.CanvasPoint
-import ru.vkdev.dressdoll.repository.api.CanvasRect
-import ru.vkdev.dressdoll.repository.api.CatalogSection
-import ru.vkdev.dressdoll.repository.api.CategoryId
-import ru.vkdev.dressdoll.repository.api.ClothingCategory
-import ru.vkdev.dressdoll.repository.api.ClothingItem
-import ru.vkdev.dressdoll.repository.api.ClothingItemId
-import ru.vkdev.dressdoll.repository.api.DollFigure
-import ru.vkdev.dressdoll.repository.api.DollImages
-import ru.vkdev.dressdoll.repository.api.DollRepository
 import java.io.IOException
 
 @RunWith(RobolectricTestRunner::class)
@@ -240,15 +239,13 @@ class DollStateHolderTest {
         }
     }
 
-    private class FakeRepository : DollRepository {
+    private class FakeRepository : ClothingRepository {
         val figureImage: Bitmap = Bitmap.createBitmap(4, 4, Bitmap.Config.ARGB_8888)
         val gates = mutableMapOf<ClothingItemId, CompletableDeferred<Unit>>()
         val broken = mutableSetOf<ClothingItemId>()
         val withoutBack = mutableSetOf<ClothingItemId>()
 
         override fun clothingCategories(): Flow<List<ClothingCategory>> = flowOf(CATEGORIES.values.toList())
-
-        override fun catalogSections(): Flow<List<CatalogSection>> = flowOf(emptyList())
 
         override fun clothingItems(category: CategoryId): Flow<List<ClothingItem>> =
             flowOf(ITEMS.filter { it.category == category }.map { ClothingItem(it, it.category.value) })
@@ -267,10 +264,6 @@ class DollStateHolderTest {
 
         override suspend fun figure(): DollFigure =
             DollFigure(figureImage, canvasWidth = 4, canvasHeight = 4, bounds = CanvasRect(1, 1, 2, 2))
-
-        override fun onTrimMemory(level: Int) {}
-
-        override fun onLowMemory() {}
     }
 
     private companion object {

@@ -39,12 +39,12 @@ internal class DiscoState(initiallyOn: Boolean, private val random: Random = Ran
 
     suspend fun play(on: Boolean) {
         if (!on) {
-            dim.animateTo(0f, tween(DISCO_FADE_MILLIS))
+            dim.animateTo(0f, tween(DiscoConfig.FADE_MILLIS))
             clear()
             return
         }
         coroutineScope {
-            dim.animateTo(1f, tween(DISCO_FADE_MILLIS))
+            dim.animateTo(1f, tween(DiscoConfig.FADE_MILLIS))
             // Масштаб анимаций 0: Animatable и так завершаются сразу, а качание кадрами нужно выключить самим.
             if ((coroutineContext[MotionDurationScale]?.scaleFactor ?: 1f) > 0f) {
                 launch { sway() }
@@ -53,7 +53,7 @@ internal class DiscoState(initiallyOn: Boolean, private val random: Random = Ran
                 // После ON_STOP цикл не отменяется до возврата, а delay, в отличие от кадров, не встаёт на паузу.
                 withFrameMillis {}
                 launch { switchTo(nextSpots(random)) }
-                delay(SPOT_CHANGE_MILLIS)
+                delay(DiscoConfig.SPOT_CHANGE_MILLIS)
             }
         }
     }
@@ -68,7 +68,7 @@ internal class DiscoState(initiallyOn: Boolean, private val random: Random = Ran
         leaving = current
         current = spots
         change.snapTo(0f)
-        change.animateTo(1f, tween(DISCO_FADE_MILLIS, easing = LinearEasing))
+        change.animateTo(1f, tween(DiscoConfig.FADE_MILLIS, easing = LinearEasing))
         leaving = emptyList()
     }
 
@@ -78,7 +78,7 @@ internal class DiscoState(initiallyOn: Boolean, private val random: Random = Ran
         while (true) {
             withFrameMillis { now ->
                 val time = now - start
-                if (time - timeMillis >= SWAY_STEP_MILLIS) timeMillis = time
+                if (time - timeMillis >= DiscoConfig.SWAY_STEP_MILLIS) timeMillis = time
             }
         }
     }

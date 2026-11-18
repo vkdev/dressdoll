@@ -8,11 +8,12 @@ android {
 
 dependencies {
     api(project(":doll:api"))
-    implementation(project(":repository:api"))
+    implementation(project(":core:coroutines"))
+    implementation(project(":clothing:api"))
     implementation(project(":outfit:api"))
     implementation(project(":catalog:api"))
     implementation(project(":disco:api"))
-    implementation(project(":theme:api"))
+    implementation(project(":theme:ui"))
     implementation(project(":settings:api"))
 
     implementation(libs.kotlinx.coroutines.core)

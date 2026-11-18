@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.vkdev.dressdoll.theme.api.SystemDefault
 import ru.vkdev.dressdoll.theme.api.ThemeChoice
-import ru.vkdev.dressdoll.theme.api.ThemeIds
 import ru.vkdev.dressdoll.theme.api.ThemePalette
 import ru.vkdev.dressdoll.theme.api.ThemeSelector
 import java.io.IOException
@@ -29,6 +29,12 @@ internal class ThemeSelectorImpl(
 ) : ThemeSelector {
 
     override val palettes: List<ThemePalette> = palettes.sortedBy { it.order }
+
+    // Без светлой палитры «Как в системе» всё равно выберет что-то из имеющихся.
+    internal val defaultChoice: ThemeChoice = this.palettes
+        .firstOrNull { it.systemDefault == SystemDefault.LIGHT }
+        ?.let { ThemeChoice.Palette(it.id) }
+        ?: ThemeChoice.System
 
     @Volatile
     private var selected: ThemeChoice? = null
@@ -45,7 +51,7 @@ internal class ThemeSelectorImpl(
             dataStore.data
                 // После ошибки поток завершается, но новые выборы всё равно идут через select().
                 .catch { error -> if (error is IOException) emit(emptyPreferences()) else throw error }
-                .map { prefs -> decode(prefs[KEY]) ?: DEFAULT_CHOICE }
+                .map { prefs -> decode(prefs[KEY]) ?: defaultChoice }
                 // update атомарен: если select() успел поменять значение, повтор прочитает
                 // новый selected и не затрёт выбор сохранённым.
                 .collect { saved -> current.update { selected ?: saved } }
@@ -68,7 +74,6 @@ internal class ThemeSelectorImpl(
 
     internal companion object {
         val KEY = stringPreferencesKey("theme_choice")
-        val DEFAULT_CHOICE: ThemeChoice = ThemeChoice.Palette(ThemeIds.CINNAMON)
 
         private const val SYSTEM = "system"
         private const val PALETTE_PREFIX = "palette:"

@@ -17,10 +17,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
-import ru.vkdev.dressdoll.repository.api.CanvasPoint
-import ru.vkdev.dressdoll.repository.api.CanvasRect
-import ru.vkdev.dressdoll.repository.api.ClothingItemId
-import ru.vkdev.dressdoll.theme.api.Spacing
+import ru.vkdev.dressdoll.clothing.api.CanvasPoint
+import ru.vkdev.dressdoll.clothing.api.CanvasRect
+import ru.vkdev.dressdoll.clothing.api.ClothingItemId
+import ru.vkdev.dressdoll.theme.ui.Spacing
 
 /**
  * Одежда может выходить за область: обрезает вызывающий.

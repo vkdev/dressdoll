@@ -8,6 +8,6 @@ android {
 
 dependencies {
     // ClothingItemId и StateFlow входят в публичный API.
-    api(project(":repository:api"))
+    api(project(":clothing:api"))
     api(libs.kotlinx.coroutines.core)
 }

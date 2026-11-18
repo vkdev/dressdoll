@@ -2,9 +2,9 @@ package ru.vkdev.dressdoll.doll.impl
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import ru.vkdev.dressdoll.clothing.api.CategoryId
+import ru.vkdev.dressdoll.clothing.api.ClothingItemId
 import ru.vkdev.dressdoll.outfit.api.WornItem
-import ru.vkdev.dressdoll.repository.api.CategoryId
-import ru.vkdev.dressdoll.repository.api.ClothingItemId
 
 // Примеры из .docs/doll/z-index.md.
 class DressingRulesTest {

@@ -34,8 +34,8 @@
 
 ## Шаги
 
-1. KDoc правил ошибок в `ClothingRepository`; `figure()` и `dollImages()` в `TemporaryDataset` бросают `IllegalStateException` при нарушении инварианта.
-2. `CatalogStateHolder` и тесты на фейковом репозитории: загрузка категорий, кеш вещей, `IOException` картинки → `null`.
-3. `CatalogImpl` и панели берут данные из держателя, репозиторий из UI уходит.
-4. `DollStateHolder.loadImages` ловит только `IOException`, как сейчас; проверить, что остальное соответствует правилам.
-5. Сборка и тесты.
+1. ~~KDoc правил ошибок в `ClothingRepository`; `figure()` и `dollImages()` в `TemporaryDataset` бросают `IllegalStateException` при нарушении инварианта.~~
+2. ~~`CatalogStateHolder` и тесты на фейковом репозитории: загрузка категорий, кеш вещей, `IOException` картинки → `null`.~~
+3. ~~`CatalogImpl` и панели берут данные из держателя, репозиторий из UI уходит.~~
+4. ~~`DollStateHolder.loadImages` ловит только `IOException`, как сейчас; проверить, что остальное соответствует правилам.~~
+5. ~~Сборка и тесты.~~

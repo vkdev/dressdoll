@@ -3,10 +3,8 @@ package ru.vkdev.dressdoll.temporarydataset.bitmap
 import android.content.ComponentCallbacks2
 import android.graphics.Bitmap
 import android.util.LruCache
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import java.util.concurrent.ConcurrentHashMap
 
@@ -16,10 +14,13 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * Параллельные запросы одной картинки делят одно декодирование.
  * Вытесненные битмапы не recycle(): UI может ещё их рисовать.
+ *
+ * Декодирование идёт в [scope], а не в корутине запроса: его делят несколько запросов,
+ * и отмена одного не должна отменять остальные. Диспетчер блокирующего чтения задаёт [scope].
  */
 internal class BitmapRepository(
     private val decoder: BitmapDecoder,
-    ioDispatcher: CoroutineDispatcher,
+    private val scope: CoroutineScope,
     catalogCacheBytes: Int,
     dollCacheBytes: Int,
 ) {
@@ -29,7 +30,6 @@ internal class BitmapRepository(
     // Картинки, которых точно нет (например, back.png у части вещей): LruCache не хранит null.
     private val missing: MutableSet<TDImageKey> = ConcurrentHashMap.newKeySet()
     private val inFlight = HashMap<TDImageKey, Deferred<Bitmap?>>()
-    private val scope = CoroutineScope(SupervisorJob() + ioDispatcher)
 
     /** `null`, если картинки нет. */
     suspend fun load(key: TDImageKey): Bitmap? {

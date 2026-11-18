@@ -46,23 +46,6 @@ abstract class NavigatorImplTest {
         assertFalse(navigator.back())
         assertEquals(listOf(A), backStack.toList())
     }
-
-    @Test
-    fun `replaceAll leaves only new route`() {
-        navigator.navigate(B)
-
-        navigator.replaceAll(C)
-
-        assertEquals(listOf(C), backStack.toList())
-        assertFalse(navigator.canGoBack)
-    }
-
-    @Test
-    fun `replaceAll with current single route keeps it`() {
-        navigator.replaceAll(A)
-
-        assertEquals(listOf(A), backStack.toList())
-    }
 }
 
 class ListNavigatorImplTest : NavigatorImplTest() {

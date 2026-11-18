@@ -3,11 +3,11 @@ package ru.vkdev.dressdoll.outfit.impl
 import androidx.datastore.core.DataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
+import ru.vkdev.dressdoll.clothing.api.CategoryId
+import ru.vkdev.dressdoll.clothing.api.ClothingItemId
 import ru.vkdev.dressdoll.core.datastore.PersistedValue
 import ru.vkdev.dressdoll.outfit.api.OutfitRepository
 import ru.vkdev.dressdoll.outfit.api.WornItem
-import ru.vkdev.dressdoll.repository.api.CategoryId
-import ru.vkdev.dressdoll.repository.api.ClothingItemId
 
 internal class OutfitRepositoryImpl(
     dataStore: DataStore<OutfitFile>,

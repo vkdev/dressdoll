@@ -37,14 +37,14 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import ru.vkdev.dressdoll.catalog.api.Catalog
+import ru.vkdev.dressdoll.clothing.api.ClothingItemId
 import ru.vkdev.dressdoll.disco.api.Disco
-import ru.vkdev.dressdoll.repository.api.ClothingItemId
-import ru.vkdev.dressdoll.theme.api.AppIcons
-import ru.vkdev.dressdoll.theme.api.HeaderBar
-import ru.vkdev.dressdoll.theme.api.IconActionButton
-import ru.vkdev.dressdoll.theme.api.IconToggleActionButton
-import ru.vkdev.dressdoll.theme.api.Sizes
-import ru.vkdev.dressdoll.theme.api.Spacing
+import ru.vkdev.dressdoll.theme.ui.AppIcons
+import ru.vkdev.dressdoll.theme.ui.HeaderBar
+import ru.vkdev.dressdoll.theme.ui.IconActionButton
+import ru.vkdev.dressdoll.theme.ui.IconToggleActionButton
+import ru.vkdev.dressdoll.theme.ui.Sizes
+import ru.vkdev.dressdoll.theme.ui.Spacing
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)

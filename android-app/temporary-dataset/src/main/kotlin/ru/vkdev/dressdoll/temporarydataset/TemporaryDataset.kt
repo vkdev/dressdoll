@@ -3,16 +3,16 @@ package ru.vkdev.dressdoll.temporarydataset
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.plus
 import ru.vkdev.dressdoll.temporarydataset.bitmap.AssetBitmapDecoder
 import ru.vkdev.dressdoll.temporarydataset.bitmap.BitmapRepository
 import ru.vkdev.dressdoll.temporarydataset.bitmap.TDImageKey
-import java.io.FileNotFoundException
 
 internal const val DATASET_ROOT = "cloth-src"
 internal const val DOLL_IMAGE = "doll_1.png"
@@ -28,15 +28,21 @@ class TemporaryDataset internal constructor(
     private val bitmaps: BitmapRepository,
 ) {
 
+    /** [scope] — время жизни общих декодирований картинок, они идут на [ioDispatcher]. */
     constructor(
         assets: AssetManager,
+        scope: CoroutineScope,
         ioDispatcher: CoroutineDispatcher,
-        catalogCacheBytes: Int = defaultCacheBytes(),
-        dollCacheBytes: Int = defaultCacheBytes(),
+        config: TemporaryDatasetConfig,
     ) : this(
         assets = assets,
         ioDispatcher = ioDispatcher,
-        bitmaps = BitmapRepository(AssetBitmapDecoder(assets), ioDispatcher, catalogCacheBytes, dollCacheBytes),
+        bitmaps = BitmapRepository(
+            decoder = AssetBitmapDecoder(assets, config),
+            scope = scope + ioDispatcher,
+            catalogCacheBytes = config.catalogCacheBytes,
+            dollCacheBytes = config.dollCacheBytes,
+        ),
     )
 
     // Читается только внутри flow на ioDispatcher, поэтому список ассетов не читается на главном потоке.
@@ -46,8 +52,6 @@ class TemporaryDataset internal constructor(
     fun clothingCategories(): Flow<List<TDClothingCategory>> = flow {
         emit(categories)
     }.flowOn(ioDispatcher)
-
-    fun catalogSections(): Flow<List<TDSection>> = flowOf(categoriesConfig.sections)
 
     fun clothingItems(category: CategoryName): Flow<List<TDClothingItem>> = flow {
         emit(itemsOf(category))
@@ -60,7 +64,10 @@ class TemporaryDataset internal constructor(
 
     suspend fun catalogImage(item: TDItemId): Bitmap? = bitmaps.load(TDImageKey.Item(item, TDImageKind.CATALOG))
 
-    /** @throws IllegalStateException если у вещи нет позиции: сборка генерирует её для каждой папки вещи. */
+    /**
+     * @throws IllegalStateException если у вещи нет позиции или `front.png`: сборка проверяет и то и другое.
+     * @throws java.io.IOException если картинка есть, но не декодируется.
+     */
     suspend fun dollImages(item: TDItemId): TDDollImages = coroutineScope {
         val topLeft = checkNotNull(itemPlacements[item]) { "No placement for ${item.category.value}/${item.folder}" }
         val front = async { require(TDImageKey.Item(item, TDImageKind.FRONT)) }
@@ -68,6 +75,7 @@ class TemporaryDataset internal constructor(
         TDDollImages(front = front.await(), back = back.await(), topLeft = topLeft)
     }
 
+    /** @throws IllegalStateException если нет `doll_1.png`: сборка проверяет его. */
     suspend fun figure(): TDDollFigure = TDDollFigure(
         image = require(TDImageKey.Figure),
         canvasWidth = dollConfig.canvasWidth,
@@ -75,7 +83,7 @@ class TemporaryDataset internal constructor(
         bounds = dollConfig.figure,
     )
 
-    /** Вызывать из `Application.onTrimMemory`. */
+    /** Вызывать из `ComponentCallbacks2.onTrimMemory`. */
     fun trimMemory(level: Int) = bitmaps.trimMemory(level)
 
     // Сборка уже сверила конфиг с папками; здесь страховка на случай нестандартного ignoreAssetsPattern.
@@ -95,7 +103,7 @@ class TemporaryDataset internal constructor(
         }
 
     private suspend fun require(key: TDImageKey): Bitmap =
-        bitmaps.load(key) ?: throw FileNotFoundException("No image ${key.assetPath}")
+        checkNotNull(bitmaps.load(key)) { "No image ${key.assetPath}" }
 
     // Некоторые реализации AssetManager (например, Robolectric) отдают вложенные пути вида
     // "01/front.png", поэтому берётся только первый сегмент.
@@ -104,9 +112,4 @@ class TemporaryDataset internal constructor(
             .map { it.substringBefore('/') }
             .distinct()
             .sorted()
-
-    private companion object {
-        // Каждому кешу 1/16 кучи: хватает на одетую куклу или экран каталога.
-        fun defaultCacheBytes(): Int = (Runtime.getRuntime().maxMemory() / 16).toInt()
-    }
 }
