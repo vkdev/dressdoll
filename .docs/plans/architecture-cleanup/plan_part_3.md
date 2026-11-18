@@ -2,7 +2,7 @@
 
 Создан: 2026-11-17 21:27
 
-Часть 3 из 5. От частей 1 и 2 не зависит, но после них в модулях меньше конфликтов: лучше делать третьей.
+Часть 3 из 10. От частей 1 и 2 не зависит, но после них в модулях меньше конфликтов: лучше делать третьей.
 
 ## Зачем
 
@@ -26,6 +26,6 @@
 
 ## Шаги
 
-1. `AndroidLibraryPlugin` в `build-logic`, регистрация и псевдоним в `libs.versions.toml`; `AndroidLibraryComposePlugin` на нём.
-2. Перевести модули по правилу выше, убрать повторы блока `android`, ручной Koin в `doll:impl`, `@OptIn` в `DollModule`, флаг Robolectric из `doll:impl` и `temporary-dataset`.
-3. Сборка `assembleDebug` и все юнит-тесты, включая `build-logic`.
+1. ~~`AndroidLibraryPlugin` в `build-logic`, регистрация и псевдоним в `libs.versions.toml`; `AndroidLibraryComposePlugin` на нём.~~
+2. ~~Перевести модули по правилу выше, убрать повторы блока `android`, ручной Koin в `doll:impl`, `@OptIn` в `DollModule`, флаг Robolectric из `doll:impl` и `temporary-dataset`.~~ Флаг убран и из `ThemePalettePlugin`: теперь его ставит `android.library`. `doll:api` собрался без Compose.
+3. ~~Сборка `assembleDebug` и все юнит-тесты, включая `build-logic`.~~

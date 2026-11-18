@@ -16,7 +16,7 @@
 
 - Данные читаются и пишутся только через интерфейс репозитория, DataStore и формат скрыты в impl.
 - Репозиторий только хранит. Значение по умолчанию и сортировка палитр остаются в селекторе.
-- Значение сначала меняется в памяти, на диск пишется в фоне через канал `CONFLATED`. `IOException` при чтении и записи не роняет приложение, значение действует до перезапуска.
+- Значение сначала меняется в памяти, на диск пишется в фоне. `IOException` при чтении и записи не роняет приложение, значение действует до перезапуска. Всё это уже делает `PersistedValue` из `:core:datastore` ([architecture-cleanup, часть 4](../architecture-cleanup/plan_part_4.md)): репозиторий берёт его, а не копирует код.
 - Пока значение не прочитано с диска, репозиторий отдаёт `null`.
 
 ## Открытые вопросы
@@ -41,13 +41,7 @@ internal interface ThemeRepository {
 
 `Saved` отделяет «ещё не прочитано» от «ничего не сохранено». Подставлять значение по умолчанию — дело селектора, а не репозитория.
 
-`ThemeRepositoryImpl(dataStore, scope)` забирает из `ThemeSelectorImpl`:
-- чтение `dataStore.data` с `IOException` → «ничего не сохранено»;
-- канал `CONFLATED` и запись в фоне с игнорированием `IOException`;
-- защиту от затирания: `save` до первого чтения не перекрывается значением с диска;
-- `KEY`, `encode`/`decode`.
-
-`save` меняет `saved` синхронно, до записи на диск.
+`ThemeRepositoryImpl(dataStore, scope)` строится на `PersistedValue<Preferences, Saved?>`: `initial = null`, `onReadError = emptyPreferences()`, `read` — `Saved(decode(prefs[KEY]))`, `write` — `encode` в `KEY`. Из `ThemeSelectorImpl` в него переходят только `KEY` и `encode`/`decode`; фоновая запись, перехват `IOException` и защита от затирания уже в помощнике, `save` меняет `saved` синхронно.
 
 `createThemeDataStore` и файл `theme` остаются как есть: формат на диске не меняется, у пользователей выбор сохранится.
 
@@ -68,5 +62,5 @@ internal interface ThemeRepository {
 
 Делим `ThemeSelectorImplTest`:
 
-- `ThemeRepositoryImplTest` получает тесты про диск: прочитано с диска новым экземпляром, последний из быстрых выборов, повреждённый файл, сбой записи, сбой чтения, неизвестное значение → `Saved(null)`, симметрия `encode`/`decode`, `save` до первого чтения не затирается, `saved` меняется синхронно в `save`.
+- `ThemeRepositoryImplTest` получает тесты про формат: прочитано с диска новым экземпляром, повреждённый файл, неизвестное значение → `Saved(null)`, симметрия `encode`/`decode`. Гонки и сбои чтения и записи уже покрыты в `PersistedValueTest`, их не дублировать.
 - `ThemeSelectorImplTest` работает с поддельным `ThemeRepository` без DataStore: `null` до чтения, затем Корица по умолчанию; `Saved(null)` → Корица; `choice.value` равен выбору сразу после `select`, без прокрутки диспетчера; палитры отсортированы по `order`.

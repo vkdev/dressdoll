@@ -57,19 +57,6 @@ class DiscoSettingsRepositoryImplTest {
     }
 
     @Test
-    fun `выбор до чтения с диска не затирается сохранённым`() = runTest {
-        withRepository { repository, dataStore ->
-            repository.setBeamStyle(BeamStyle.SOFT)
-            dataStore.data.first { it[DiscoSettingsRepositoryImpl.KEY] == BeamStyle.SOFT.name }
-        }
-        withRepository { repository, _ ->
-            repository.setBeamStyle(BeamStyle.PAPER)
-            advanceUntilIdle()
-            assertEquals(BeamStyle.PAPER, repository.beamStyle.value)
-        }
-    }
-
-    @Test
     fun `неизвестное значение на диске — стиль по умолчанию`() = runTest {
         withRepository { _, dataStore ->
             dataStore.edit { it[DiscoSettingsRepositoryImpl.KEY] = "NEON" }

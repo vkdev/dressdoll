@@ -13,6 +13,10 @@ dependencies {
 
 gradlePlugin {
     plugins {
+        register("androidLibrary") {
+            id = libs.plugins.dressdoll.android.library.asProvider().get().pluginId
+            implementationClass = "ru.vkdev.dressdoll.buildlogic.AndroidLibraryPlugin"
+        }
         register("androidLibraryCompose") {
             id = libs.plugins.dressdoll.android.library.compose.get().pluginId
             implementationClass = "ru.vkdev.dressdoll.buildlogic.AndroidLibraryComposePlugin"

@@ -1,17 +1,9 @@
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.dressdoll.android.library.compose)
 }
 
 android {
     namespace = "ru.vkdev.dressdoll.theme.api"
-    compileSdk = libs.versions.compileSdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-    }
-    buildFeatures {
-        compose = true
-    }
 }
 
 dependencies {

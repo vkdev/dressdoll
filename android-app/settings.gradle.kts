@@ -18,6 +18,7 @@ dependencyResolutionManagement {
 rootProject.name = "DressDoll"
 
 include(":app")
+include(":core:datastore")
 include(":theme:api")
 include(":theme:impl")
 include(":theme:common")

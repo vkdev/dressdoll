@@ -9,14 +9,10 @@ import org.gradle.kotlin.dsl.dependencies
 class AndroidLibraryComposePlugin : Plugin<Project> {
 
     override fun apply(target: Project) = with(target) {
-        pluginManager.apply(libs.pluginId("android-library"))
+        pluginManager.apply(AndroidLibraryPlugin::class.java)
         pluginManager.apply(libs.pluginId("kotlin-compose"))
 
         extensions.configure<LibraryExtension> {
-            compileSdk = libs.intVersion("compileSdk")
-            defaultConfig {
-                minSdk = libs.intVersion("minSdk")
-            }
             buildFeatures {
                 compose = true
             }

@@ -2,7 +2,7 @@
 
 Создан: 2026-11-17 21:27
 
-Часть 4 из 5. Связана с планом [theme-repository](../theme-repository/plan_part_1.md): тот ещё не начат и должен взять помощник отсюда, а не копировать код в четвёртый раз.
+Часть 4 из 10. Связана с планом [theme-repository](../theme-repository/plan_part_1.md): тот ещё не начат и должен взять помощник отсюда, а не копировать код в четвёртый раз.
 
 ## Зачем
 
@@ -36,7 +36,7 @@
 
 ## Шаги
 
-1. `:core:datastore` с `PersistedValue` и тестами на файле во временной папке.
-2. `OutfitRepositoryImpl` и `DiscoSettingsRepositoryImpl` на помощнике, лишние тесты убрать.
-3. В плане [theme-repository](../theme-repository/plan_part_1.md) заменить описание фоновой записи ссылкой на `PersistedValue`.
-4. Сборка и тесты.
+1. ~~`:core:datastore` с `PersistedValue` и тестами на файле во временной папке.~~ Выбранное значение хранится в коробке, чтобы выбор `null` тоже не затирался чтением.
+2. ~~`OutfitRepositoryImpl` и `DiscoSettingsRepositoryImpl` на помощнике, лишние тесты убрать.~~
+3. ~~В плане [theme-repository](../theme-repository/plan_part_1.md) заменить описание фоновой записи ссылкой на `PersistedValue`.~~
+4. ~~Сборка и тесты.~~

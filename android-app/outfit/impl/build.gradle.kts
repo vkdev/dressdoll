@@ -1,18 +1,15 @@
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.dressdoll.android.library)
     alias(libs.plugins.kotlin.serialization)
 }
 
 android {
     namespace = "ru.vkdev.dressdoll.outfit.impl"
-    compileSdk = libs.versions.compileSdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-    }
 }
 
 dependencies {
     api(project(":outfit:api"))
+    implementation(project(":core:datastore"))
 
     implementation(libs.androidx.datastore)
     implementation(libs.kotlinx.serialization.json)

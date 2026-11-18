@@ -1,13 +1,9 @@
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.dressdoll.android.library)
 }
 
 android {
     namespace = "ru.vkdev.dressdoll.repository.impl"
-    compileSdk = libs.versions.compileSdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-    }
 }
 
 dependencies {
